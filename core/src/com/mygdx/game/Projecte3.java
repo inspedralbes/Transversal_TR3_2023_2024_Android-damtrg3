@@ -1,23 +1,31 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Game;
-import com.mygdx.game.helpers.AssetManager;
-import com.mygdx.game.screens.GameScreen;
-import com.mygdx.game.screens.MenuScreen;
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.ScreenUtils;
 
-public class Projecte3 extends Game {
-
+public class Projecte3 extends ApplicationAdapter {
+	SpriteBatch batch;
+	Texture img;
 	
 	@Override
 	public void create () {
-		AssetManager.load();
+		batch = new SpriteBatch();
+		img = new Texture("badlogic.jpg");
+	}
 
-		setScreen(new MenuScreen(this));
+	@Override
+	public void render () {
+		ScreenUtils.clear(1, 0, 0, 1);
+		batch.begin();
+		batch.draw(img, 0, 0);
+		batch.end();
 	}
 	
 	@Override
 	public void dispose () {
-		super.dispose();
-		AssetManager.dispose();
+		batch.dispose();
+		img.dispose();
 	}
 }
