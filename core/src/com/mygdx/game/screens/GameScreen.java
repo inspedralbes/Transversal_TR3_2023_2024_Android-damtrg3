@@ -4,15 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
-import com.mygdx.game.actors.Player;
 import com.mygdx.game.helpers.AssetManager;
-import com.mygdx.game.helpers.GameInputHandler;
 import com.mygdx.game.utils.Settings;
 
 public class GameScreen implements Screen {
@@ -21,7 +17,7 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private Projecte3 game;
     private Stage stage = new Stage();
-    private Player player;
+
 
     public GameScreen(Projecte3 game) {
         this.game = game;
@@ -35,11 +31,7 @@ public class GameScreen implements Screen {
         mapRenderer.setView(camera);
         mapRenderer.render();
 
-        //Carregar el jugador
-        player = new Player();
-        stage.addActor(player);
 
-        Gdx.input.setInputProcessor(new GameInputHandler(player));
     }
 
     @Override

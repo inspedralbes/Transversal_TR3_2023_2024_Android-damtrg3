@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -16,6 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.ApiService;
@@ -72,6 +75,18 @@ public class LoginScreen implements Screen {
         loginButton = new TextButton("Login", AssetManager.neon_skin);
         registrarButton = new TextButton("Register", AssetManager.neon_skin);
         Label registraLabel = new Label("No tens compte?", AssetManager.neon_skin);
+
+        table.add(correuLabel);
+        table.add(correuField).fillX().uniformX();
+        table.row();
+        table.add(contrasenyaLabel);
+        table.add(contrasenyaField).fillX().uniformX();
+        table.row();
+        table.add(loginButton).fillX().uniformX();
+        table.row();
+        table.add(registraLabel);
+        table.row();
+        table.add(registrarButton).fillX().uniformX();
 
 
         loginButton.addListener(new ClickListener() {
@@ -131,17 +146,6 @@ public class LoginScreen implements Screen {
                 });
             }
         });
-        table.add(correuLabel);
-        table.add(correuField).fillX().uniformX();
-        table.row();
-        table.add(contrasenyaLabel);
-        table.add(contrasenyaField).fillX().uniformX();
-        table.row();
-        table.add(loginButton).fillX().uniformX();
-        table.row();
-        table.add(registraLabel);
-        table.row();
-        table.add(registrarButton).fillX().uniformX();
     }
 
     @Override

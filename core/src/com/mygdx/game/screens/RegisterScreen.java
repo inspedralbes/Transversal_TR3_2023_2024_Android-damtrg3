@@ -80,6 +80,21 @@ public class RegisterScreen implements Screen {
         movetoLogin = new TextButton("Login", AssetManager.neon_skin);
         Label loginlabel = new Label("Ja tens un compte?", AssetManager.neon_skin);
 
+        table.add(nomCognomsLabel);
+        table.add(nomCognomsField).fillX().uniformX();
+        table.row().pad(10, 0, 10, 0);
+        table.add(correuLabel);
+        table.add(correuField).fillX().uniformX();
+        table.row();
+        table.add(contrasenyaLabel);
+        table.add(contrasenyaField).fillX().uniformX();
+        table.row().pad(10, 0, 10, 0);
+        table.add(registrarButton).fillX().uniformX();
+        table.row();
+        table.add(loginlabel);
+        table.row();
+        table.add(movetoLogin).fillX().uniformX();
+
         registrarButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -139,20 +154,6 @@ public class RegisterScreen implements Screen {
             }
         });
 
-        table.add(nomCognomsLabel);
-        table.add(nomCognomsField).fillX().uniformX();
-        table.row().pad(10, 0, 10, 0);
-        table.add(correuLabel);
-        table.add(correuField).fillX().uniformX();
-        table.row();
-        table.add(contrasenyaLabel);
-        table.add(contrasenyaField).fillX().uniformX();
-        table.row().pad(10, 0, 10, 0);
-        table.add(registrarButton).fillX().uniformX();
-        table.row();
-        table.add(loginlabel);
-        table.row();
-        table.add(movetoLogin).fillX().uniformX();
     }
     @Override
     public void render(float delta) {
