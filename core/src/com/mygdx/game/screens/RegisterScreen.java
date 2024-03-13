@@ -37,6 +37,8 @@ public class RegisterScreen implements Screen {
     private TextField correuField;
     private TextField contrasenyaField;
     private TextButton registrarButton;
+
+    private TextButton movetoLogin;
     private Batch batch;
 
     private OrthogonalTiledMapRenderer mapRenderer;
@@ -75,6 +77,9 @@ public class RegisterScreen implements Screen {
         contrasenyaField.setPasswordMode(true);
         contrasenyaField.setPasswordCharacter('*');
         registrarButton = new TextButton("Register", AssetManager.neon_skin);
+        movetoLogin = new TextButton("Login", AssetManager.neon_skin);
+        Label loginlabel = new Label("Ja tens un compte?", AssetManager.neon_skin);
+
         registrarButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -122,6 +127,18 @@ public class RegisterScreen implements Screen {
         }
         );
 
+        movetoLogin.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        game.setScreen(new LoginScreen(game));
+                    }
+                });
+            }
+        });
+
         table.add(nomCognomsLabel);
         table.add(nomCognomsField).fillX().uniformX();
         table.row().pad(10, 0, 10, 0);
@@ -132,6 +149,10 @@ public class RegisterScreen implements Screen {
         table.add(contrasenyaField).fillX().uniformX();
         table.row().pad(10, 0, 10, 0);
         table.add(registrarButton).fillX().uniformX();
+        table.row();
+        table.add(loginlabel);
+        table.row();
+        table.add(movetoLogin).fillX().uniformX();
     }
     @Override
     public void render(float delta) {
