@@ -3,6 +3,7 @@ package com.mygdx.game.actors;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.helpers.AssetManager;
@@ -13,6 +14,15 @@ public class Player extends Actor {
     private int width, height;
     private Vector2 direction;
     private float stateTime;
+    private boolean jumping;
+    private float jumpHeight;
+    private float velocity;
+    private float originalY;
+    private ShapeRenderer shapeRenderer;
+    private float peakShadowSize;
+    private float jumpStartTime; // the time when the jump started
+    private float jumpDuration = 2;
+    private float jumpCooldown = 0;
 
     public Player() {
         position = Settings.PLAYER_START;
@@ -20,17 +30,65 @@ public class Player extends Actor {
         height = Settings.PLAYER_HEIGHT;
         direction = new Vector2(0, 0);
         stateTime = 0;
+        jumping = false;
+        jumpHeight = 50;
+        velocity = 0;
+        originalY = position.y;
+        peakShadowSize = 0;
+
+        shapeRenderer = new ShapeRenderer();
     }
 
     public void act(float delta){
         this.position.x += direction.x * Settings.PLAYER_SPEED * delta;
-        this.position.y += direction.y * Settings.PLAYER_SPEED * delta;
+
+        if (jumping) {
+            float elapsedTime = stateTime - jumpStartTime;
+            if (elapsedTime < jumpDuration) {
+                float progress = elapsedTime / jumpDuration;
+                position.y = originalY + (float)Math.sin(progress * Math.PI) * jumpHeight;
+            } else {
+                jumping = false;
+                jumpCooldown = 0;
+                position.y = originalY;
+            }
+        } else {
+            this.position.y += direction.y * Settings.PLAYER_SPEED * delta;
+        }
+
         stateTime += delta;
+        jumpCooldown += delta;
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
+
+        // Draw the shadow
+        batch.end();
+        shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0, 0, 0, 0.5f);
+        float size1 = width / 2 * 0.5f;
+        float size2 = size1 * 0.5f;
+        float shadowSize;
+        float shadowY = originalY + 10; // Shadow's y position is the same as the player's starting position
+        if (jumping) {
+            if (velocity > 0) {
+                shadowSize = size1 - (size1 - size2) * (jumpHeight - velocity) / jumpHeight;
+                peakShadowSize = shadowSize; // Store the shadow size at the peak of the jump
+            } else {
+                // Calculate the shadow size based on the player's current position relative to the original position
+                float progress = (originalY - position.y) / jumpHeight;
+                shadowSize = (peakShadowSize + (size1 - peakShadowSize) * progress) + 15; // Interpolate between peakShadowSize and size1
+            }
+        } else {
+            shadowSize = size1;
+            shadowY = position.y + 10;
+        }
+        shapeRenderer.circle(position.x + width / 2, shadowY, shadowSize);
+        shapeRenderer.end();
+        batch.begin();
 
         // Choose the texture or animation based on the direction
         TextureRegion texture;
@@ -49,5 +107,13 @@ public class Player extends Actor {
 
     public Vector2 getDirection() {
         return direction;
+    }
+
+    public void jump() {
+        if (!jumping && jumpCooldown >= 2) {
+            jumping = true;
+            originalY = position.y;
+            jumpStartTime = stateTime;
+        }
     }
 }

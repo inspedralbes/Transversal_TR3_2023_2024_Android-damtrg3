@@ -30,6 +30,9 @@ public class GameInputHandler implements InputProcessor {
             case Input.Keys.RIGHT:
                 player.getDirection().x = 1;
                 break;
+            case Input.Keys.SPACE:
+                player.jump();
+                break;
         }
         return false;
     }
