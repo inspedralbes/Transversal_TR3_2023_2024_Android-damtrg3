@@ -12,6 +12,7 @@ public class AssetManager {
 
     public static Skin neon_skin;
     public static Texture menu_bg;
+    public static TextureRegion white;
 
     public static void load() {
         menu_bg = new Texture(Gdx.files.internal("menu_bg.jpg"));
@@ -19,6 +20,8 @@ public class AssetManager {
         tiledMap = new TmxMapLoader().load("maps/map.tmx");
 
         neon_skin = new Skin(Gdx.files.internal("skins/neon/neon-ui.json"));
+        white = neon_skin.getRegion("white");
+
     }
 
     public static void dispose() {
