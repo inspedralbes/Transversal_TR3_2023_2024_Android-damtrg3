@@ -32,7 +32,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class LoginScreen implements Screen {
     private Projecte3 game;
     private Stage stage;
-    private TextField nomCognomsField;
     private TextField correuField;
     private TextField contrasenyaField;
     private TextButton registrarButton;
