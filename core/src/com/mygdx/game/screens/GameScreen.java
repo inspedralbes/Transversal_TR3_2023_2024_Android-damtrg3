@@ -7,23 +7,39 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
+import com.mygdx.game.actors.Player;
 import com.mygdx.game.helpers.AssetManager;
+import com.mygdx.game.helpers.GameInputHandler;
 import com.mygdx.game.utils.Settings;
 
 public class GameScreen implements Screen {
 
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera;
+    private Projecte3 game;
+    private Stage stage = new Stage();
+    private Player player;
 
     public GameScreen(Projecte3 game) {
-        camera = new OrthographicCamera();
-        mapRenderer = new OrthogonalTiledMapRenderer(AssetManager.tiledMap);
+        this.game = game;
 
-        camera.setToOrtho(false, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
+        camera = new OrthographicCamera(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
+        camera.setToOrtho(false);
+        StretchViewport viewport = new StretchViewport(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT, camera);
+        stage = new Stage(viewport);
+        mapRenderer = new OrthogonalTiledMapRenderer(AssetManager.tiledMap);
 
         mapRenderer.setView(camera);
         mapRenderer.render();
+
+        //Carregar el jugador
+        player = new Player();
+        stage.addActor(player);
+
+        Gdx.input.setInputProcessor(new GameInputHandler(player));
     }
 
     @Override
@@ -38,6 +54,9 @@ public class GameScreen implements Screen {
 
         mapRenderer.setView(camera);
         mapRenderer.render();
+
+        stage.act(delta);
+        stage.draw();
     }
 
     @Override
