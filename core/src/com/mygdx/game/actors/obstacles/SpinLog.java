@@ -21,6 +21,7 @@ public class SpinLog extends Actor {
     private Vector2 shadowOffset;
     private Color shadowColor;
     private Polygon collisionPolygon;
+    private float acceleration;
     public SpinLog(){
         position = new Vector2(0, 0);
         speed = 1.0f;
@@ -30,6 +31,7 @@ public class SpinLog extends Actor {
         shadowColor = new Color(0, 0, 0, 0.5f);
         collisionPolygon = new Polygon(new float[]{0, 0, logTexture.getRegionWidth(), 0, logTexture.getRegionWidth(), logTexture.getRegionHeight(), 0, logTexture.getRegionHeight()});
         collisionPolygon.setOrigin(logTexture.getRegionWidth() / 2, logTexture.getRegionHeight() / 2);
+        acceleration = 0.1f;
     }
 
     @Override
@@ -48,6 +50,8 @@ public class SpinLog extends Actor {
 
         collisionPolygon.setPosition(position.x - logTexture.getRegionWidth() / 2, position.y - logTexture.getRegionHeight() / 2);
         collisionPolygon.setRotation(rotation);
+
+        speed += acceleration * delta;
     }
 
     public void draw(Batch batch, float parentAlpha){

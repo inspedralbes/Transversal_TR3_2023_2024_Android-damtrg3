@@ -26,6 +26,7 @@ public class Player extends Actor {
     private float jumpCooldown = 0;
     private Rectangle collisionRect;
     private Vector2 pushVelocity;
+    private int damageTaken;
 
     public Player() {
         position = Settings.PLAYER_START;
@@ -34,12 +35,13 @@ public class Player extends Actor {
         direction = new Vector2(0, 0);
         stateTime = 0;
         jumping = false;
-        jumpHeight = 50;
+        jumpHeight = 35;
         velocity = 0;
         originalY = position.y;
         peakShadowSize = 0;
         collisionRect = new Rectangle(position.x, position.y, width, height);
         pushVelocity = new Vector2(0, 0);
+        damageTaken = 0;
 
         shapeRenderer = new ShapeRenderer();
     }
@@ -122,15 +124,17 @@ public class Player extends Actor {
     }
 
     public void jump() {
-        if (!jumping && jumpCooldown >= 2) {
+        if (!jumping && jumpCooldown >= 1) {
             jumping = true;
             originalY = position.y;
             jumpStartTime = stateTime;
         }
     }
 
-    public void updatePosition(float rotation, float logX) {
-        float pushForce = 1000;
+    public void updatePosition(float rotation) {
+        damageTaken += 1;
+
+        float pushForce = damageTaken * 500;
         float pushDirectionX = (float) Math.cos(Math.toRadians(rotation + 90));
         float pushDirectionY = (float) Math.sin(Math.toRadians(rotation + 90));
 
