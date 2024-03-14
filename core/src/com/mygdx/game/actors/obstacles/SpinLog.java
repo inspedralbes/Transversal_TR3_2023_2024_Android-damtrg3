@@ -78,4 +78,8 @@ public class SpinLog extends Actor {
 
         return Intersector.overlapConvexPolygons(collisionPolygon, playerPolygon);
     }
+
+    public float getRotation(){
+        return rotation;
+    }
 }

@@ -84,7 +84,8 @@ public class GameScreen implements Screen {
                 SpinLog spinLog = (SpinLog) actor;
                 if(spinLog.collides(player)){
                     if(!player.isJumping()){
-                        player.remove();
+                        float logRotation = spinLog.getRotation();
+                        player.updatePosition(logRotation, spinLog.getPosition().x);
                     }
                 }
             }

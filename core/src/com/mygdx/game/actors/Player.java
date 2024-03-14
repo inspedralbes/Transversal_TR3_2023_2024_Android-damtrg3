@@ -24,8 +24,8 @@ public class Player extends Actor {
     private float jumpStartTime; // the time when the jump started
     private float jumpDuration = 2;
     private float jumpCooldown = 0;
-
     private Rectangle collisionRect;
+    private Vector2 pushVelocity;
 
     public Player() {
         position = Settings.PLAYER_START;
@@ -39,6 +39,7 @@ public class Player extends Actor {
         originalY = position.y;
         peakShadowSize = 0;
         collisionRect = new Rectangle(position.x, position.y, width, height);
+        pushVelocity = new Vector2(0, 0);
 
         shapeRenderer = new ShapeRenderer();
     }
@@ -59,6 +60,11 @@ public class Player extends Actor {
         } else {
             this.position.y += direction.y * Settings.PLAYER_SPEED * delta;
         }
+
+        this.position.x += pushVelocity.x * delta;
+        this.position.y += pushVelocity.y * delta;
+
+        pushVelocity.scl(0.9f); // Slow down the push velocity
 
         collisionRect.set(position.x + 20, position.y + 10, width - 40, height - 50);
 
@@ -121,6 +127,20 @@ public class Player extends Actor {
             originalY = position.y;
             jumpStartTime = stateTime;
         }
+    }
+
+    public void updatePosition(float rotation, float logX) {
+        float pushForce = 1000;
+        float pushDirectionX = (float) Math.cos(Math.toRadians(rotation + 90));
+        float pushDirectionY = (float) Math.sin(Math.toRadians(rotation + 90));
+
+        if (this.position.x > logX) {
+            pushDirectionX *= -1;
+            pushDirectionY *= -1;
+        }
+
+        // Set the velocity vector based on the push direction and force
+        this.pushVelocity.set(pushForce * pushDirectionX, pushForce * pushDirectionY);
     }
 
     public Rectangle getCollisionRect() {
