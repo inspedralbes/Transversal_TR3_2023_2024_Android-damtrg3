@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.helpers.AssetManager;
@@ -24,6 +25,8 @@ public class Player extends Actor {
     private float jumpDuration = 2;
     private float jumpCooldown = 0;
 
+    private Rectangle collisionRect;
+
     public Player() {
         position = Settings.PLAYER_START;
         width = Settings.PLAYER_WIDTH;
@@ -35,6 +38,7 @@ public class Player extends Actor {
         velocity = 0;
         originalY = position.y;
         peakShadowSize = 0;
+        collisionRect = new Rectangle(position.x, position.y, width, height);
 
         shapeRenderer = new ShapeRenderer();
     }
@@ -55,6 +59,8 @@ public class Player extends Actor {
         } else {
             this.position.y += direction.y * Settings.PLAYER_SPEED * delta;
         }
+
+        collisionRect.set(position.x + 20, position.y + 10, width - 40, height - 50);
 
         stateTime += delta;
         jumpCooldown += delta;
@@ -115,5 +121,17 @@ public class Player extends Actor {
             originalY = position.y;
             jumpStartTime = stateTime;
         }
+    }
+
+    public Rectangle getCollisionRect() {
+        return collisionRect;
+    }
+
+    public boolean isJumping() {
+        return jumping;
+    }
+
+    public Vector2 getPosition() {
+        return position;
     }
 }

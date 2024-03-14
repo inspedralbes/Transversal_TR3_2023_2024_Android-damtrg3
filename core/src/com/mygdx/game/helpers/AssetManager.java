@@ -29,6 +29,8 @@ public class AssetManager {
     public static Animation<TextureRegion> cat_walk_top_animation;
     public static Animation<TextureRegion> cat_walk_left_animation;
 
+    public static TextureRegion spinLog;
+
     public static void load() {
         menu_bg = new Texture(Gdx.files.internal("menu_bg.jpg"));
 
@@ -62,6 +64,7 @@ public class AssetManager {
         cat_walk_left_animation = new Animation<TextureRegion>(0.1f, cat_walk_left);
         cat_walk_left_animation.setPlayMode(Animation.PlayMode.LOOP);
 
+        spinLog = new TextureRegion(new Texture(Gdx.files.internal("obstacles/tronco.png")));
     }
 
     public static void dispose() {
