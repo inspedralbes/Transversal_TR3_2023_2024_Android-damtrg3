@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.helpers.AssetManager;
@@ -23,6 +24,9 @@ public class Player extends Actor {
     private float jumpStartTime; // the time when the jump started
     private float jumpDuration = 2;
     private float jumpCooldown = 0;
+    private Rectangle collisionRect;
+    private Vector2 pushVelocity;
+    private int damageTaken;
 
     public Player() {
         position = Settings.PLAYER_START;
@@ -31,10 +35,13 @@ public class Player extends Actor {
         direction = new Vector2(0, 0);
         stateTime = 0;
         jumping = false;
-        jumpHeight = 50;
+        jumpHeight = 35;
         velocity = 0;
         originalY = position.y;
         peakShadowSize = 0;
+        collisionRect = new Rectangle(position.x, position.y, width, height);
+        pushVelocity = new Vector2(0, 0);
+        damageTaken = 0;
 
         shapeRenderer = new ShapeRenderer();
     }
@@ -55,6 +62,13 @@ public class Player extends Actor {
         } else {
             this.position.y += direction.y * Settings.PLAYER_SPEED * delta;
         }
+
+        this.position.x += pushVelocity.x * delta;
+        this.position.y += pushVelocity.y * delta;
+
+        pushVelocity.scl(0.9f); // Slow down the push velocity
+
+        collisionRect.set(position.x + 20, position.y + 10, width - 40, height - 50);
 
         stateTime += delta;
         jumpCooldown += delta;
@@ -110,10 +124,33 @@ public class Player extends Actor {
     }
 
     public void jump() {
-        if (!jumping && jumpCooldown >= 2) {
+        if (!jumping && jumpCooldown >= 1) {
             jumping = true;
             originalY = position.y;
             jumpStartTime = stateTime;
         }
+    }
+
+    public void updatePosition(float rotation) {
+        damageTaken += 1;
+
+        float pushForce = damageTaken * 500;
+        float pushDirectionX = (float) Math.cos(Math.toRadians(rotation + 90));
+        float pushDirectionY = (float) Math.sin(Math.toRadians(rotation + 90));
+
+        // Set the velocity vector based on the push direction and force
+        this.pushVelocity.set(pushForce * pushDirectionX, pushForce * pushDirectionY);
+    }
+
+    public Rectangle getCollisionRect() {
+        return collisionRect;
+    }
+
+    public boolean isJumping() {
+        return jumping;
+    }
+
+    public Vector2 getPosition() {
+        return position;
     }
 }
