@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -85,6 +86,18 @@ public class GameScreen implements Screen {
                 if(spinLog.collides(player)){
                     if(!player.isJumping()){
                         float logRotation = spinLog.getRotation();
+                        Vector2 playerPos = player.getPosition();
+                        Vector2 logPos = spinLog.getPosition();
+                        float angle = (float) Math.toDegrees(Math.atan2(playerPos.y - logPos.y, playerPos.x - logPos.x));
+
+                        if(angle < 0){
+                            angle += 360;
+                        }
+
+                        if(angle > 180 && angle < 360){
+                            logRotation += 180;
+                        }
+
                         player.updatePosition(logRotation, spinLog.getPosition().x);
                     }
                 }

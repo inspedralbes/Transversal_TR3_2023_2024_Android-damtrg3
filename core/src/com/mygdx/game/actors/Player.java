@@ -134,11 +134,6 @@ public class Player extends Actor {
         float pushDirectionX = (float) Math.cos(Math.toRadians(rotation + 90));
         float pushDirectionY = (float) Math.sin(Math.toRadians(rotation + 90));
 
-        if (this.position.x > logX) {
-            pushDirectionX *= -1;
-            pushDirectionY *= -1;
-        }
-
         // Set the velocity vector based on the push direction and force
         this.pushVelocity.set(pushForce * pushDirectionX, pushForce * pushDirectionY);
     }
