@@ -1,20 +1,24 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.mygdx.game.helpers.AssetManager;
-import com.mygdx.game.screens.GameScreen;
-import com.mygdx.game.screens.MenuScreen;
+import com.mygdx.game.screens.LoginScreen;
+import com.mygdx.game.screens.RegisterScreen;
 
 public class Projecte3 extends Game {
 
-	
+
 	@Override
 	public void create () {
 		AssetManager.load();
 
-		setScreen(new MenuScreen(this));
+		setScreen(new LoginScreen(this));
 	}
-	
+
 	@Override
 	public void dispose () {
 		super.dispose();
