@@ -74,7 +74,7 @@ public class LoginScreen implements Screen {
         Table contentTable = new Table(); // Table para los campos de entrada y botones
         contentTable.pad(20); // Agrega un relleno de 20 píxeles alrededor del contenido
 
-        Label correuLabel = new Label("Correu:", AssetManager.lava_skin);
+        Label correuLabel = new Label("Correu1:", AssetManager.lava_skin);
         correuField = new TextField("", AssetManager.lava_skin);
         Label contrasenyaLabel = new Label("Contrasenya:", AssetManager.lava_skin);
         contrasenyaField = new TextField("", AssetManager.lava_skin);
