@@ -27,6 +27,8 @@ import com.mygdx.game.utils.Resposta;
 import com.mygdx.game.utils.Settings;
 import com.mygdx.game.utils.UsuariLocalitzat;
 
+import java.awt.Menu;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -129,7 +131,7 @@ public class LoginScreen implements Screen {
                                     Gdx.app.postRunnable(new Runnable() {
                                         @Override
                                         public void run() {
-                                            game.setScreen(new GameScreen(game));
+                                            game.setScreen(new MenuSalasScreen(game));
                                         }
                                     });
                                 }
