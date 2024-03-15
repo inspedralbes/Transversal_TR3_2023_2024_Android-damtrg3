@@ -11,15 +11,24 @@ public class AssetManager {
     public static TiledMap tiledMap;
 
     public static Skin neon_skin;
+
+    public static Skin lava_skin;
+
+    public static Skin lava2_skin;
     public static Texture menu_bg;
+
+    public static Texture menu_bg2;
     public static TextureRegion white;
 
     public static void load() {
         menu_bg = new Texture(Gdx.files.internal("menu_bg.jpg"));
 
+        menu_bg2 = new Texture(Gdx.files.internal("bgNou.jpg"));
+
         tiledMap = new TmxMapLoader().load("maps/map.tmx");
 
         neon_skin = new Skin(Gdx.files.internal("skins/neon/neon-ui.json"));
+        lava_skin = new Skin(Gdx.files.internal("skins/lava/tracer-ui.json"));
         white = neon_skin.getRegion("white");
 
     }

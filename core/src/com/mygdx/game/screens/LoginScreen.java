@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -61,32 +62,43 @@ public class LoginScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         batch = stage.getBatch();
-        Table table = new Table();
-        table.setFillParent(true);
 
+        Table wrapperTable = new Table(); // Table para envolver los campos
+        wrapperTable.setSize(500, 600); // Establece el tamaño deseado para la tabla
+        wrapperTable.setPosition((Gdx.graphics.getWidth() - wrapperTable.getWidth()) / 2, (Gdx.graphics.getHeight() - wrapperTable.getHeight()) / 2); // Centra la tabla en la pantalla
 
-        stage.addActor(table);
-        Label correuLabel = new Label("Correu:", AssetManager.neon_skin);
-        correuField = new TextField("", AssetManager.neon_skin);
-        Label contrasenyaLabel = new Label("Contrasenya:", AssetManager.neon_skin);
-        contrasenyaField = new TextField("", AssetManager.neon_skin);
+        Texture backgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
+        TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
+        wrapperTable.setBackground(backgroundDrawable);
+
+        Table contentTable = new Table(); // Table para los campos de entrada y botones
+        contentTable.pad(20); // Agrega un relleno de 20 píxeles alrededor del contenido
+
+        Label correuLabel = new Label("Correu:", AssetManager.lava_skin);
+        correuField = new TextField("", AssetManager.lava_skin);
+        Label contrasenyaLabel = new Label("Contrasenya:", AssetManager.lava_skin);
+        contrasenyaField = new TextField("", AssetManager.lava_skin);
         contrasenyaField.setPasswordMode(true);
         contrasenyaField.setPasswordCharacter('*');
-        loginButton = new TextButton("Login", AssetManager.neon_skin);
-        registrarButton = new TextButton("Register", AssetManager.neon_skin);
-        Label registraLabel = new Label("No tens compte?", AssetManager.neon_skin);
+        loginButton = new TextButton("Login", AssetManager.lava_skin);
+        registrarButton = new TextButton("Register", AssetManager.lava_skin);
+        Label registraLabel = new Label("No tens compte?", AssetManager.lava_skin);
 
-        table.add(correuLabel);
-        table.add(correuField).fillX().uniformX();
-        table.row();
-        table.add(contrasenyaLabel);
-        table.add(contrasenyaField).fillX().uniformX();
-        table.row();
-        table.add(loginButton).fillX().uniformX();
-        table.row();
-        table.add(registraLabel);
-        table.row();
-        table.add(registrarButton).fillX().uniformX();
+        contentTable.add(correuLabel).left().padBottom(10); // Alinea la etiqueta a la izquierda y agrega un espacio en la parte inferior
+        contentTable.add(correuField).fillX().uniformX().padBottom(10); // Llena horizontalmente y uniformemente, agrega un espacio en la parte inferior
+        contentTable.row();
+        contentTable.add(contrasenyaLabel).left().padBottom(10);
+        contentTable.add(contrasenyaField).fillX().uniformX().padBottom(10);
+        contentTable.row();
+        contentTable.add(loginButton).fillX().uniformX().padBottom(10);
+        contentTable.row();
+        contentTable.add(registraLabel).padBottom(10);
+        contentTable.add(registrarButton).fillX().uniformX().right().padBottom(10); // Alinea el botón de registro a la derecha
+
+        wrapperTable.add(contentTable); // Agrega el Table de contenido dentro del Table de envoltura
+
+        stage.addActor(wrapperTable); // Agrega el Table de envoltura al Stage
+
 
 
         loginButton.addListener(new ClickListener() {
@@ -154,7 +166,7 @@ public class LoginScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
-        batch.draw(AssetManager.menu_bg, 0, 0, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
+        batch.draw(AssetManager.menu_bg2, 0, 0, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
         batch.end();
 
         stage.draw();
