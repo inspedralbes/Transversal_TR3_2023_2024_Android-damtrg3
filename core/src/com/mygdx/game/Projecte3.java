@@ -8,9 +8,6 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.LoginScreen;
-import com.mygdx.game.screens.RegisterScreen;
-
-import jdk.internal.net.http.common.Log;
 
 public class Projecte3 extends Game {
 
@@ -20,10 +17,9 @@ public class Projecte3 extends Game {
 	@Override
 	public void create () {
 		AssetManager.load();
-
 		setScreen(new LoginScreen(this));
-	}
 
+	}
 	@Override
 	public void dispose () {
 		super.dispose();

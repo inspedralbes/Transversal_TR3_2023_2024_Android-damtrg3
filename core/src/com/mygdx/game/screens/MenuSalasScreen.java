@@ -20,10 +20,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.Settings;
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.net.URISyntaxException;
 
 public class MenuSalasScreen implements Screen {
 
@@ -45,6 +50,8 @@ public class MenuSalasScreen implements Screen {
     //Buttons
     private TextButton crearSalaBtn;
     private TextButton unirSalaBtn;
+
+    public static Socket socket;
 
 
     public MenuSalasScreen(Projecte3 game) {
@@ -208,6 +215,11 @@ public class MenuSalasScreen implements Screen {
                     @Override
                     public void run() {
                         System.out.println("Sala creada!");
+                        try {
+                            connectToSocketServer();
+                        } catch (URISyntaxException e) {
+                            throw new RuntimeException(e);
+                        }
                         game.setScreen(new SalasScreen(game));
                     }
                 });
@@ -246,6 +258,15 @@ public class MenuSalasScreen implements Screen {
                     @Override
                     public void run() {
                         System.out.println("Te has unido a la sala!");
+
+                        //Connexió al servidor de Socket.IO
+                        try {
+                            connectToSocketServer();
+                        } catch (URISyntaxException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        socket.emit("unirSala", idSala);
                         game.setScreen(new SalasScreen(game));
                     }
                 });
@@ -261,5 +282,18 @@ public class MenuSalasScreen implements Screen {
                 System.out.println("Unión a la sala cancelada");
             }
         });
+    }
+
+    private void connectToSocketServer() throws URISyntaxException {
+        socket = IO.socket("http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES);
+        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                System.out.println("Conectado al servidor de Socket.IO");
+            }
+        });
+
+        // Conectar al servidor
+        socket.connect();
     }
 }

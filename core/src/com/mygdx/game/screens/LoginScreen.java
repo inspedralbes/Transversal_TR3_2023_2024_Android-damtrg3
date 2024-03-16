@@ -134,7 +134,7 @@ public class LoginScreen implements Screen {
                                     Gdx.app.postRunnable(new Runnable() {
                                         @Override
                                         public void run() {
-                                            game.setScreen(new MenuSalasScreen(game));
+                                            game.setScreen(new GameScreen(game));
 
                                         }
                                     });

@@ -15,7 +15,7 @@ public class Settings {
 
     //INFO IPS
 
-    public static final String IP_SERVER = "localhost";
+    public static final String IP_SERVER = "192.168.1.80";
 
     public static final String PUERTO_PETICIONES = "3327";
 }

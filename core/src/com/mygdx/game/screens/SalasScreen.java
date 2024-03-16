@@ -20,6 +20,12 @@ import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.Settings;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import io.socket.emitter.Emitter;
+
 public class SalasScreen implements Screen {
 
     private Projecte3 game;
@@ -68,9 +74,29 @@ public class SalasScreen implements Screen {
         textSalaJugadors = new Label("Jugadors:"+ game.nomUsuari , AssetManager.lava_skin);
 
         //Sockets
+        MenuSalasScreen.socket.on("actualitzarSala", new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        if (args.length > 0) {
+                            JSONObject salaInfo = (JSONObject) args[0];
+                            System.out.println(salaInfo.toString());
 
+                            // Acceder directamente a las claves en el objeto salaInfo
+                            try {
+                                String idSala = salaInfo.getString("idSala");
+                                String creador = salaInfo.getString("creador");
+                                JSONArray jugadores = salaInfo.getJSONArray("jugadores");
 
-
+                                textSala.setText("Sala id: " + idSala);
+                                textSalaCreador.setText("Creador: " + creador);
+                                textSalaJugadors.setText("Jugadores: " + jugadores.toString());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                // Manejar la excepción si alguna de las claves no está presente en el objeto salaInfo
+                            }
+                        }
+                    }
+                });
 
 
 
