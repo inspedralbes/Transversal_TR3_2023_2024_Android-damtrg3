@@ -116,7 +116,7 @@ public class LoginScreen implements Screen {
                             .addConverterFactory(GsonConverterFactory.create())
                             .build();
                     apiService = retrofit.create(ApiService.class);
-                    UsuariLocalitzat usuariTrobat = new UsuariLocalitzat( correu, contrasenya);
+                    UsuariLocalitzat usuariTrobat = new UsuariLocalitzat(correu, contrasenya);
 
                     Call<Resposta> call = apiService.EnviarUsuari(usuariTrobat);
 
@@ -128,10 +128,14 @@ public class LoginScreen implements Screen {
                                 Resposta r = response.body();
                                 System.out.println(r.isAutoritzacio());
                                 if (r.isAutoritzacio()) {
+
+                                    Gdx.app.error("Correu", correu);
+                                    game.nomUsuari = correu;
                                     Gdx.app.postRunnable(new Runnable() {
                                         @Override
                                         public void run() {
                                             game.setScreen(new MenuSalasScreen(game));
+
                                         }
                                     });
                                 }

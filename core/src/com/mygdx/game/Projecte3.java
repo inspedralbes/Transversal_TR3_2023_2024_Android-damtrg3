@@ -14,6 +14,8 @@ import jdk.internal.net.http.common.Log;
 
 public class Projecte3 extends Game {
 
+	public static String nomUsuari;
+	public static String SalaActual;
 
 	@Override
 	public void create () {

@@ -1,6 +1,7 @@
 package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -19,6 +20,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.Settings;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MenuSalasScreen implements Screen {
 
@@ -67,11 +72,11 @@ public class MenuSalasScreen implements Screen {
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
         wrapperTable.setBackground(backgroundDrawable);
 
-//Crear table que tindra el contingut
+        //Crear table que tindra el contingut
         Table contentTable = new Table();
         contentTable.center();
 
-//Assignar elements (Labels, btn, textField)
+        //Assignar elements (Labels, btn, textField)
         //Labels
         crearSalaLabel = new Label("Sales", AssetManager.lava_skin);
         //Btns
@@ -85,6 +90,13 @@ public class MenuSalasScreen implements Screen {
         contentTable.row();
         contentTable.add(crearSalaBtn).padBottom(100).colspan(2);
         contentTable.add(unirSalaBtn).padBottom(100).padRight(40).colspan(2);
+
+        crearSalaBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                crearNovaSala();
+            }
+        });
 
         wrapperTable.add(contentTable); // Agrega el Table de contenido dentro del Table de envoltura
         stage.addActor(wrapperTable); // Agrega el Table de envoltura al Stage
@@ -114,8 +126,14 @@ public class MenuSalasScreen implements Screen {
         unirSalaBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // Si el popup está visible, lo oculta. Si no está visible, lo muestra.
                 popupTable.setVisible(!popupTable.isVisible());
+            }
+        });
+
+        accedirButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                unirseASala(codiSalaField.getText());
             }
         });
 
@@ -123,6 +141,7 @@ public class MenuSalasScreen implements Screen {
 
 
     }
+
 
     @Override
     public void render(float delta) {
@@ -160,5 +179,87 @@ public class MenuSalasScreen implements Screen {
     @Override
     public void dispose() {
 
+    }
+
+
+    public void crearNovaSala() {
+        JSONObject roomJSON = new JSONObject();
+        String salaId = "123ABC";
+        roomJSON.put("idSala", salaId);
+        game.SalaActual = salaId;
+        roomJSON.put("creadorSala", game.nomUsuari);
+        roomJSON.put("estatSala", "En espera");
+
+        JSONArray jugadores = new JSONArray();
+        jugadores.put(game.nomUsuari);
+
+        roomJSON.put("jugadores", jugadores);
+
+        Net.HttpRequest httpRequest = new Net.HttpRequest(Net.HttpMethods.POST);
+        httpRequest.setUrl("http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/crearSala");
+        String data = roomJSON.toString();
+        httpRequest.setContent(data);
+        httpRequest.setHeader("Content-Type", "application/json");
+
+        Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
+            @Override
+            public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("Sala creada!");
+                        game.setScreen(new SalasScreen(game));
+                    }
+                });
+            }
+            @Override
+            public void failed(Throwable t) {
+                System.out.println("Error al crear sala: " + t.getMessage());
+            }
+
+            @Override
+            public void cancelled() {
+                System.out.println("Creació de sala cancelada");
+            }
+        });
+    }
+
+    public void unirseASala(final String idSala) {
+        JSONObject requestData = new JSONObject();
+        try {
+            requestData.put("idSala", idSala);
+            Gdx.app.error("Usuari", game.nomUsuari);
+            requestData.put("nomUsuari", game.nomUsuari);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Net.HttpRequest httpRequest = new Net.HttpRequest(Net.HttpMethods.POST);
+        httpRequest.setUrl("http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/unirSala");
+        httpRequest.setContent(requestData.toString());
+        httpRequest.setHeader("Content-Type", "application/json");
+
+        Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
+            @Override
+            public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("Te has unido a la sala!");
+                        game.setScreen(new SalasScreen(game));
+                    }
+                });
+            }
+
+            @Override
+            public void failed(Throwable t) {
+                System.out.println("Error al unirse a la sala: " + t.getMessage());
+            }
+
+            @Override
+            public void cancelled() {
+                System.out.println("Unión a la sala cancelada");
+            }
+        });
     }
 }
