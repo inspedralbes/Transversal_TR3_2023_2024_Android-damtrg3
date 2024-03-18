@@ -8,11 +8,13 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.LoginScreen;
+import com.mygdx.game.utils.User;
 
 public class Projecte3 extends Game {
 
 	public static String nomUsuari;
 	public static String SalaActual;
+
 
 	@Override
 	public void create () {

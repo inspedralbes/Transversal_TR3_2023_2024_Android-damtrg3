@@ -6,8 +6,8 @@ public class UsuariLocalitzat {
     @SerializedName("user_id")
     private int userId;
 
-    @SerializedName("nomCognoms")
-    private String nomCognoms;
+    @SerializedName("nomUsuari")
+    private String nomUsuari;
 
     @SerializedName("correu")
     private String correu;
@@ -15,13 +15,13 @@ public class UsuariLocalitzat {
     @SerializedName("contrasenya")
     private String contrasenya;
 
-    public UsuariLocalitzat(String nomCognoms, String correu, String contrasenya) {
-        this.nomCognoms = nomCognoms;
+    public UsuariLocalitzat(String nomUsuari, String correu, String contrasenya) {
+        this.nomUsuari = nomUsuari;
         this.correu = correu;
         this.contrasenya = contrasenya;
     }
-    public UsuariLocalitzat(String correu, String contrasenya) {
-        this.correu = correu;
+    public UsuariLocalitzat(String nomUsuari, String contrasenya) {
+        this.nomUsuari = nomUsuari;
         this.contrasenya = contrasenya;
     }
 }

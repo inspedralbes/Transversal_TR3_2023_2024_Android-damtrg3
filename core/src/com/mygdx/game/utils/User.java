@@ -1,22 +1,22 @@
 package com.mygdx.game.utils;
 
 public class User {
-    private String nomCognoms;
+    private String nomUsuari;
     private String correu;
     private String contrasenya;
 
-public User(String nomCognoms, String correu, String contrasenya) {
-        this.nomCognoms = nomCognoms;
+public User(String nomUsuari, String correu, String contrasenya) {
+        this.nomUsuari = nomUsuari;
         this.correu = correu;
         this.contrasenya = contrasenya;
     }
 
-    public String getNomCognoms() {
-        return nomCognoms;
+    public String getnomUsuari() {
+        return nomUsuari;
     }
 
-    public void setNomCognoms(String nomCognoms) {
-        this.nomCognoms = nomCognoms;
+    public void setnomUsuari(String nomUsuari) {
+        this.nomUsuari = nomUsuari;
     }
 
     public String getCorreu() {
