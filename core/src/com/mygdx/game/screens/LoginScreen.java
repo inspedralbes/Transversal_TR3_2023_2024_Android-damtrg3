@@ -27,6 +27,8 @@ import com.mygdx.game.utils.Resposta;
 import com.mygdx.game.utils.Settings;
 import com.mygdx.game.utils.UsuariLocalitzat;
 
+import java.awt.Menu;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -74,7 +76,7 @@ public class LoginScreen implements Screen {
         Table contentTable = new Table(); // Table para los campos de entrada y botones
         contentTable.pad(20); // Agrega un relleno de 20 píxeles alrededor del contenido
 
-        Label correuLabel = new Label("Correu:", AssetManager.lava_skin);
+        Label correuLabel = new Label("Correu1:", AssetManager.lava_skin);
         correuField = new TextField("", AssetManager.lava_skin);
         Label contrasenyaLabel = new Label("Contrasenya:", AssetManager.lava_skin);
         contrasenyaField = new TextField("", AssetManager.lava_skin);
@@ -114,7 +116,7 @@ public class LoginScreen implements Screen {
                             .addConverterFactory(GsonConverterFactory.create())
                             .build();
                     apiService = retrofit.create(ApiService.class);
-                    UsuariLocalitzat usuariTrobat = new UsuariLocalitzat( correu, contrasenya);
+                    UsuariLocalitzat usuariTrobat = new UsuariLocalitzat(correu, contrasenya);
 
                     Call<Resposta> call = apiService.EnviarUsuari(usuariTrobat);
 
@@ -126,10 +128,14 @@ public class LoginScreen implements Screen {
                                 Resposta r = response.body();
                                 System.out.println(r.isAutoritzacio());
                                 if (r.isAutoritzacio()) {
+
+                                    Gdx.app.error("Correu", correu);
+                                    game.nomUsuari = correu;
                                     Gdx.app.postRunnable(new Runnable() {
                                         @Override
                                         public void run() {
-                                            game.setScreen(new GameScreen(game));
+                                            game.setScreen(new MenuSalasScreen(game));
+
                                         }
                                     });
                                 }
