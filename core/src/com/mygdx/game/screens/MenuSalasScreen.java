@@ -29,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.Random;
 
 public class MenuSalasScreen implements Screen {
 
@@ -190,52 +191,64 @@ public class MenuSalasScreen implements Screen {
 
 
     public void crearNovaSala() {
-        JSONObject roomJSON = new JSONObject();
-        String salaId = "123ABC";
-        roomJSON.put("idSala", salaId);
-        game.SalaActual = salaId;
-        roomJSON.put("creadorSala", game.nomUsuari);
-        roomJSON.put("estatSala", "En espera");
-
-
-        JSONArray jugadores = new JSONArray();
-        jugadores.put(game.nomUsuari);
-
-        roomJSON.put("jugadores", jugadores);
-
-        Net.HttpRequest httpRequest = new Net.HttpRequest(Net.HttpMethods.POST);
-        httpRequest.setUrl("http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/crearSala");
-        String data = roomJSON.toString();
-        httpRequest.setContent(data);
-        httpRequest.setHeader("Content-Type", "application/json");
-
-        Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
+        String salaId = generarSalaId();
+        salaExiste(salaId, new SalaExisteCallback() {
             @Override
-            public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        System.out.println("Sala creada!");
-                        try {
-                            connectToSocketServer();
-                        } catch (URISyntaxException e) {
-                            throw new RuntimeException(e);
+            public void onSalaExisteChecked(boolean salaExiste) {
+                if (!salaExiste) {
+                    // Si la sala no existe, puedes continuar con la creación de la sala
+                    JSONObject roomJSON = new JSONObject();
+                    roomJSON.put("idSala", salaId);
+                    game.SalaActual = salaId;
+                    roomJSON.put("creadorSala", game.nomUsuari);
+                    roomJSON.put("estatSala", "En espera");
+
+                    JSONArray jugadores = new JSONArray();
+                    jugadores.put(game.nomUsuari);
+
+                    roomJSON.put("jugadores", jugadores);
+
+                    Net.HttpRequest httpRequest = new Net.HttpRequest(Net.HttpMethods.POST);
+                    httpRequest.setUrl("http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/crearSala");
+                    String data = roomJSON.toString();
+                    httpRequest.setContent(data);
+                    httpRequest.setHeader("Content-Type", "application/json");
+
+                    Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
+                        @Override
+                        public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                            Gdx.app.postRunnable(new Runnable() {
+                                @Override
+                                public void run() {
+                                    System.out.println("Sala creada!");
+                                    try {
+                                        connectToSocketServer();
+                                    } catch (URISyntaxException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    game.setScreen(new SalasScreen(game));
+                                }
+                            });
                         }
-                        game.setScreen(new SalasScreen(game));
-                    }
-                });
-            }
-            @Override
-            public void failed(Throwable t) {
-                System.out.println("Error al crear sala: " + t.getMessage());
-            }
 
-            @Override
-            public void cancelled() {
-                System.out.println("Creació de sala cancelada");
+                        @Override
+                        public void failed(Throwable t) {
+                            System.out.println("Error al crear sala: " + t.getMessage());
+                        }
+
+                        @Override
+                        public void cancelled() {
+                            System.out.println("Creació de sala cancelada");
+                        }
+                    });
+                } else {
+                    // Si la sala existe, genera un nuevo ID y verifica de nuevo
+                    crearNovaSala();
+                }
             }
         });
     }
+
 
     public void unirseASala(final String idSala) {
         JSONObject requestData = new JSONObject();
@@ -296,5 +309,51 @@ public class MenuSalasScreen implements Screen {
 
         // Conectar al servidor
         socket.connect();
+    }
+
+    public String generarSalaId() {
+        Random random = new Random();
+        String salaId = "";
+
+        for (int i = 0; i < 3; i++) {
+            salaId += random.nextInt(10); // Generar un dígito aleatorio
+        }
+
+        for (int i = 0; i < 3; i++) {
+            char letra = (char) ('A' + random.nextInt(26)); // Generar una letra mayúscula aleatoria
+            salaId += letra;
+        }
+
+        return salaId;
+    }
+    public interface SalaExisteCallback {
+        void onSalaExisteChecked(boolean salaExiste);
+    }
+
+    public void salaExiste(String salaId, final SalaExisteCallback callback) {
+        // Crear una solicitud HTTP GET para verificar si la sala existe
+        Net.HttpRequest httpRequest = new Net.HttpRequest(Net.HttpMethods.GET);
+        httpRequest.setUrl("http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/salaExiste/" + salaId);
+        httpRequest.setHeader("Content-Type", "application/json");
+
+        // Enviar la solicitud y obtener la respuesta
+        Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
+            @Override
+            public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                // La sala existe si la respuesta es "true"
+                boolean salaExiste = httpResponse.getResultAsString().equals("true");
+                callback.onSalaExisteChecked(salaExiste);
+            }
+
+            @Override
+            public void failed(Throwable t) {
+                throw new RuntimeException("Error al verificar la sala: " + t.getMessage());
+            }
+
+            @Override
+            public void cancelled() {
+                throw new RuntimeException("Verificación de sala cancelada");
+            }
+        });
     }
 }
