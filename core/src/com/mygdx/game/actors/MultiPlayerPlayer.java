@@ -2,6 +2,10 @@ package com.mygdx.game.actors;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 public class MultiPlayerPlayer extends Player{
     private String user;
     private boolean isCurrentUser;
@@ -10,13 +14,6 @@ public class MultiPlayerPlayer extends Player{
         super();
         this.user = user;
         isCurrentUser = false;
-
-    }
-
-    @Override
-    public void act(float delta){
-        super.act(delta);
-
     }
 
     public String getUser(){

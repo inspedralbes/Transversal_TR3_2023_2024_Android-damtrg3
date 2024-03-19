@@ -24,9 +24,13 @@ import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.helpers.MultiplayerGameInputHandler;
 import com.mygdx.game.utils.Settings;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import io.socket.emitter.Emitter;
 
@@ -150,6 +154,58 @@ public class MultiplayerGameScreen implements Screen {
                                 }
                             }
                         } catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+        executorService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                for (MultiPlayerPlayer player : players) {
+                    if (player.isCurrentUser()) {
+                        String lobby = game.SalaActual;
+                        String username = player.getUser();
+                        Vector2 position = player.getPosition();
+
+                        JSONObject data = new JSONObject();
+                        try {
+                            data.put("salaId", lobby);
+                            data.put("user", username);
+                            data.put("positionX", position.x);
+                            data.put("positionY", position.y);
+
+                            MenuSalasScreen.socket.emit("user_position", data);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }, 0, 3, TimeUnit.SECONDS);
+
+        MenuSalasScreen.socket.on("update_positions", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        JSONObject data = (JSONObject) args[0];
+                        try {
+                            String user = data.getString("user");
+                            float positionX = (float) data.getDouble("positionX");
+                            float positionY = (float) data.getDouble("positionY");
+
+                            for (MultiPlayerPlayer player : players) {
+                                if (player.getUser().equals(user)) {
+                                    player.setPosition(new Vector2(positionX, positionY));
+                                }
+                            }
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
