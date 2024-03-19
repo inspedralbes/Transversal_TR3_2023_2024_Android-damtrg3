@@ -2,8 +2,10 @@ package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -12,6 +14,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.actors.Player;
@@ -19,6 +22,7 @@ import com.mygdx.game.actors.obstacles.SpinLog;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.helpers.GameInputHandler;
 import com.mygdx.game.utils.Settings;
+
 
 public class GameScreen implements Screen {
 
@@ -30,6 +34,8 @@ public class GameScreen implements Screen {
     private ShapeRenderer shapeRenderer;
 
     private TiledMapTileLayer plataformaLayer;
+
+    private Label forceLabel;
 
     public GameScreen(Projecte3 game) {
         shapeRenderer = new ShapeRenderer();
@@ -47,6 +53,11 @@ public class GameScreen implements Screen {
 
         SpinLog spinLog = new SpinLog();
         stage.addActor(spinLog);
+
+        // Crear la etiqueta de fuerza y añadirla al escenario
+        forceLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        forceLabel.setPosition(10, Gdx.graphics.getHeight() - 10);
+        stage.addActor(forceLabel);
 
         //Carregar el jugador
         player = new Player();
@@ -72,6 +83,9 @@ public class GameScreen implements Screen {
 
         mapRenderer.setView(camera);
         mapRenderer.render();
+
+        float currentForce = player.getPushForce(); // La fuerza actual es igual a pushForce
+        forceLabel.setText("Fuerza: " + currentForce); // Muestra la fuerza directamente
 
         stage.act(delta);
         stage.draw();

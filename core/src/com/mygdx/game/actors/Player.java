@@ -28,6 +28,8 @@ public class Player extends Actor {
     private Vector2 pushVelocity;
     private int damageTaken;
 
+    float pushForce;
+
     public Player() {
         position = Settings.PLAYER_START;
         width = Settings.PLAYER_WIDTH;
@@ -134,7 +136,7 @@ public class Player extends Actor {
     public void updatePosition(float rotation) {
         damageTaken += 1;
 
-        float pushForce = damageTaken * 500;
+        pushForce = damageTaken * 500;
         float pushDirectionX = (float) Math.cos(Math.toRadians(rotation + 90));
         float pushDirectionY = (float) Math.sin(Math.toRadians(rotation + 90));
 
@@ -152,5 +154,9 @@ public class Player extends Actor {
 
     public Vector2 getPosition() {
         return position;
+    }
+
+    public float getPushForce() {
+        return pushForce;
     }
 }
