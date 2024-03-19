@@ -138,14 +138,10 @@ public class MultiplayerGameScreen implements Screen {
                                     } else if(type.equals("keyUp")){
                                         switch (keycode) {
                                             case "up":
-                                                currentPlayer.getDirection().y = 0;
-                                                break;
                                             case "down":
                                                 currentPlayer.getDirection().y = 0;
                                                 break;
                                             case "left":
-                                                currentPlayer.getDirection().x = 0;
-                                                break;
                                             case "right":
                                                 currentPlayer.getDirection().x = 0;
                                                 break;
@@ -186,7 +182,7 @@ public class MultiplayerGameScreen implements Screen {
                     }
                 }
             }
-        }, 0, 3, TimeUnit.SECONDS);
+        }, 0, 1, TimeUnit.SECONDS);
 
         MenuSalasScreen.socket.on("update_positions", new Emitter.Listener() {
             @Override
