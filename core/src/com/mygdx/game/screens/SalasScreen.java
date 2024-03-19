@@ -24,6 +24,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.awt.Menu;
+
 import io.socket.emitter.Emitter;
 
 public class SalasScreen implements Screen {
@@ -31,21 +33,21 @@ public class SalasScreen implements Screen {
     private Projecte3 game;
     private Stage stage;
     private Batch batch;
-    private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera;
 
     private Label textSala;
     private Label textSalaCreador;
 
     private Label textSalaJugadors;
+    private TextButton startButton;
+    private String[] jugadorsSala;
+
     public SalasScreen(Projecte3 game) {
         this.game = game;
         camera = new OrthographicCamera();
-        mapRenderer = new OrthogonalTiledMapRenderer(AssetManager.tiledMap);
         camera.setToOrtho(false, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
 
-        mapRenderer.setView(camera);
-        mapRenderer.render();
+
     }
 
     @Override
@@ -86,6 +88,10 @@ public class SalasScreen implements Screen {
                                 String idSala = salaInfo.getString("idSala");
                                 String creador = salaInfo.getString("creador");
                                 JSONArray jugadores = salaInfo.getJSONArray("jugadores");
+                                jugadorsSala = new String[jugadores.length()];
+                                for (int i = 0; i < jugadores.length(); i++) {
+                                    jugadorsSala[i] = jugadores.getString(i);
+                                }
 
                                 textSala.setText("Sala id: " + idSala);
                                 textSalaCreador.setText("Creador: " + creador);
@@ -126,6 +132,39 @@ public class SalasScreen implements Screen {
 
         stage.addActor(popupTable); // Añadir la tabla del pop-up al escenario después de la tabla de envoltura
 
+        startButton = new TextButton("Start", AssetManager.lava_skin);
+        startButton.setSize(100, 100);
+        startButton.setPosition(100, 100);
+
+        startButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                JSONObject salaInfo = new JSONObject();
+                try {
+                    salaInfo.put("idSala", game.SalaActual);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(game.SalaActual);
+                System.out.println(salaInfo.toString());
+                MenuSalasScreen.socket.emit("START_GAME", salaInfo);
+            }
+        });
+
+        stage.addActor(startButton);
+
+        MenuSalasScreen.socket.on("GAME_STARTED", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("GAME_STARTED");
+                        game.setScreen(new MultiplayerGameScreen(game, jugadorsSala));
+                    }
+                });
+            }
+        });
 
     }
 

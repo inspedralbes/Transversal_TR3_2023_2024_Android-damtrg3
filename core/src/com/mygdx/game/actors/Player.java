@@ -66,7 +66,7 @@ public class Player extends Actor {
         this.position.x += pushVelocity.x * delta;
         this.position.y += pushVelocity.y * delta;
 
-        pushVelocity.scl(0.9f); // Slow down the push velocity
+        pushVelocity.scl(0.9f);
 
         collisionRect.set(position.x + 20, position.y + 10, width - 40, height - 50);
 
@@ -152,5 +152,9 @@ public class Player extends Actor {
 
     public Vector2 getPosition() {
         return position;
+    }
+
+    public void setPosition(Vector2 position) {
+        this.position = position;
     }
 }
