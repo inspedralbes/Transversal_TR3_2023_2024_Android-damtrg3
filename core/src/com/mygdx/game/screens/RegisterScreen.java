@@ -5,8 +5,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -17,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.ApiService;
@@ -62,38 +65,49 @@ public class RegisterScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         batch = stage.getBatch();
-        Table table = new Table();
-        table.setFillParent(true);
+
+        Table wrapperTable = new Table(); // Table para envolver los campos
+        wrapperTable.setSize(550, 750); // Establece el tamaño deseado para la tabla
+        wrapperTable.setPosition((Gdx.graphics.getWidth() - wrapperTable.getWidth()) / 2, (Gdx.graphics.getHeight() - wrapperTable.getHeight()) / 2); // Centra la tabla en la pantalla
+
+        Texture backgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
+        TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
+        wrapperTable.setBackground(backgroundDrawable);
+
+        Table contentTable = new Table(); // Table para los campos de entrada y botones
+        contentTable.pad(20); // Agrega un relleno de 20 píxeles alrededor del contenido
 
 
-        stage.addActor(table);
-
-        Label nomCognomsLabel = new Label("Nom i cognoms:", AssetManager.neon_skin);
-        nomCognomsField = new TextField("", AssetManager.neon_skin);
-        Label correuLabel = new Label("Correu:", AssetManager.neon_skin);
-        correuField = new TextField("", AssetManager.neon_skin);
-        Label contrasenyaLabel = new Label("Contrasenya:", AssetManager.neon_skin);
-        contrasenyaField = new TextField("", AssetManager.neon_skin);
+        Label nomCognomsLabel = new Label("Nom d'usuari:", AssetManager.lava_skin);
+        nomCognomsField = new TextField("", AssetManager.lava_skin);
+        Label correuLabel = new Label("Correu:", AssetManager.lava_skin);
+        correuField = new TextField("", AssetManager.lava_skin);
+        Label contrasenyaLabel = new Label("Contrasenya:", AssetManager.lava_skin);
+        contrasenyaField = new TextField("", AssetManager.lava_skin);
         contrasenyaField.setPasswordMode(true);
         contrasenyaField.setPasswordCharacter('*');
-        registrarButton = new TextButton("Register", AssetManager.neon_skin);
-        movetoLogin = new TextButton("Login", AssetManager.neon_skin);
-        Label loginlabel = new Label("Ja tens un compte?", AssetManager.neon_skin);
+        registrarButton = new TextButton("Register", AssetManager.lava_skin);
+        movetoLogin = new TextButton("Login", AssetManager.lava_skin);
+        Label loginlabel = new Label("Ja tens un compte? ", AssetManager.lava_skin);
 
-        table.add(nomCognomsLabel);
-        table.add(nomCognomsField).fillX().uniformX();
-        table.row().pad(10, 0, 10, 0);
-        table.add(correuLabel);
-        table.add(correuField).fillX().uniformX();
-        table.row();
-        table.add(contrasenyaLabel);
-        table.add(contrasenyaField).fillX().uniformX();
-        table.row().pad(10, 0, 10, 0);
-        table.add(registrarButton).fillX().uniformX();
-        table.row();
-        table.add(loginlabel);
-        table.row();
-        table.add(movetoLogin).fillX().uniformX();
+        contentTable.add(nomCognomsLabel).left().padBottom(10);;
+        contentTable.add(nomCognomsField).fillX().uniformX().padBottom(10);
+        contentTable.row();
+        contentTable.add(correuLabel).left().padBottom(10);
+        contentTable.add(correuField).fillX().uniformX().padBottom(10);
+        contentTable.row();
+        contentTable.add(contrasenyaLabel).left().padBottom(10);
+        contentTable.add(contrasenyaField).fillX().uniformX().padBottom(10);
+        contentTable.row();
+        contentTable.add(registrarButton).fillX().uniformX().padBottom(10);;
+        contentTable.row();
+        contentTable.add(loginlabel).padBottom(10);
+        contentTable.add(movetoLogin).fillX().uniformX().right().padBottom(10);
+
+
+        wrapperTable.add(contentTable); // Agrega el Table de contenido dentro del Table de envoltura
+
+        stage.addActor(wrapperTable); // Agrega el Table de envoltura al Stage
 
         registrarButton.addListener(new ClickListener() {
             @Override
@@ -161,7 +175,7 @@ public class RegisterScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
-        batch.draw(AssetManager.menu_bg, 0, 0, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
+        batch.draw(AssetManager.menu_bg2, 0, 0, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
         batch.end();
 
         stage.draw();
