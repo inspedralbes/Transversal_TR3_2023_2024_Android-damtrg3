@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -59,23 +60,42 @@ public class GameModeScreen implements Screen {
         contentTable.center();
 
 
-        Texture myTexture = new Texture(Gdx.files.internal("obstacles/tronco.png"));
-        Drawable myTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myTexture));
+        // Cargar la imagen
+        Texture myTextureSolo = new Texture(Gdx.files.internal("soloLogo3.png"));
+        Drawable myTexRegionDrawable1 = new TextureRegionDrawable(new TextureRegion(myTextureSolo));
+
+        Texture myTextureMulti = new Texture(Gdx.files.internal("multiLogo2.png"));
+        Drawable myTexRegionDrawable2 = new TextureRegionDrawable(new TextureRegion(myTextureMulti));
 
         // Crear un Image con la imagen
-        Image myImage = new Image(myTexRegionDrawable);
+        Image myImageSolo = new Image(myTexRegionDrawable1);
+        Image myImageMulti = new Image(myTexRegionDrawable2);
+
+        // Crear un contenedor para la imagen y añadir relleno
+        Container<Image> imageContainer = new Container<Image>(myImageSolo);
+        imageContainer.padLeft(35);
+
+        Container<Image> imageContainer2 = new Container<Image>(myImageMulti);
+        imageContainer2.padLeft(10);
+
 
         // Usar la skin de AssetManager para el TextButton
         Skin skin = AssetManager.lava_skin;
 
         // Crear un TextButton con texto
-        TextButton myTextButton = new TextButton("Inidividual", skin);
+        TextButton SoloButton = new TextButton("Inidividual", skin);
+        TextButton MultiButton = new TextButton("Multijugador", skin);
 
-        // Añadir la imagen como actor al botón
-        myTextButton.add(myImage);
+// Añadir la imagen (dentro del contenedor) como actor al botón
+        SoloButton.add(imageContainer);
+        MultiButton.add(imageContainer2);
+
+        contentTable.add(SoloButton).left().padBottom(10);
+        contentTable.row();
+        contentTable.add(MultiButton).left().padBottom(10);
 
 
-        contentTable.add(myTextButton).left().padBottom(10);
+
 
 
 
