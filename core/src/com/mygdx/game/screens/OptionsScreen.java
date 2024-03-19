@@ -23,7 +23,7 @@ public class OptionsScreen implements Screen {
         this.game = game;
         stage = new Stage();
 
-        toggleMusicButton = new TextButton("Toggle Music", AssetManager.neon_skin);
+        toggleMusicButton = new TextButton("Toggle Music 1", AssetManager.neon_skin);
         volumeSlider = new Slider(0, 1, 0.01f, false, AssetManager.neon_skin);
         backButton = new TextButton("Back", AssetManager.neon_skin);
 
