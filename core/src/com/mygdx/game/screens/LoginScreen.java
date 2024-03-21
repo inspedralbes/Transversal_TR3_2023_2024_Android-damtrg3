@@ -106,7 +106,7 @@ public class LoginScreen implements Screen {
         loginButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                String correu = correuField.getText().toString().trim();
+                String nomUsuari = correuField.getText().toString().trim();
                 String contrasenya = contrasenyaField.getText().toString().trim();
                 if (correuField.getText().isEmpty() || contrasenyaField.getText().isEmpty()) {
                     showToastMessage("Falten camps per omplir");
@@ -116,7 +116,7 @@ public class LoginScreen implements Screen {
                             .addConverterFactory(GsonConverterFactory.create())
                             .build();
                     apiService = retrofit.create(ApiService.class);
-                    UsuariLocalitzat usuariTrobat = new UsuariLocalitzat(correu, contrasenya);
+                    UsuariLocalitzat usuariTrobat = new UsuariLocalitzat(nomUsuari, contrasenya);
 
                     Call<Resposta> call = apiService.EnviarUsuari(usuariTrobat);
 
@@ -129,8 +129,8 @@ public class LoginScreen implements Screen {
                                 System.out.println(r.isAutoritzacio());
                                 if (r.isAutoritzacio()) {
 
-                                    Gdx.app.error("Correu", correu);
-                                    game.nomUsuari = correu;
+                                    Gdx.app.error("nomUsuari", nomUsuari);
+                                    game.nomUsuari = nomUsuari;
                                     Gdx.app.postRunnable(new Runnable() {
                                         @Override
                                         public void run() {

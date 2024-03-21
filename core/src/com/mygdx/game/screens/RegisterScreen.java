@@ -98,7 +98,7 @@ public class RegisterScreen implements Screen {
         registrarButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                String nomCognoms = nomCognomsField.getText().toString().trim();
+                String nomUsuari = nomCognomsField.getText().toString().trim();
                 String correu = correuField.getText().toString().trim();
                 String contrasenya = contrasenyaField.getText().toString().trim();
                 if (nomCognomsField.getText().isEmpty() || correuField.getText().isEmpty() || contrasenyaField.getText().isEmpty()) {
@@ -109,7 +109,7 @@ public class RegisterScreen implements Screen {
                             .addConverterFactory(GsonConverterFactory.create())
                             .build();
                     apiService = retrofit.create(ApiService.class);
-                    UsuariLocalitzat usuariTrobat = new UsuariLocalitzat(nomCognoms, correu,contrasenya);
+                    UsuariLocalitzat usuariTrobat = new UsuariLocalitzat(nomUsuari, correu,contrasenya);
 
                     Call<Resposta> call = apiService.EnviarUsuario(usuariTrobat);
 
