@@ -47,7 +47,7 @@ public class LoginScreen implements Screen {
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera;
     private ApiService apiService;
-    private static final String URL = "http://localhost:3327/";
+    private static final String URL = "http://192.168.205.83:3327/";
 
     public LoginScreen(Projecte3 game) {
         this.game = game;

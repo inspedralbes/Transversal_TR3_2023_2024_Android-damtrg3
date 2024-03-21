@@ -186,7 +186,7 @@ public class MultiplayerGameScreen implements Screen {
                     }
                 }
             }
-        }, 0, 3, TimeUnit.SECONDS);
+        }, 0, 1, TimeUnit.SECONDS);
 
         MenuSalasScreen.socket.on("update_positions", new Emitter.Listener() {
             @Override
