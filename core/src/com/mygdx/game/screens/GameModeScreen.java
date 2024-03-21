@@ -159,26 +159,30 @@ public class GameModeScreen implements Screen {
         //----------------------------- Button Perfil --------------------------------
 
 
-// Cargar las imágenes para los estados normal y presionado del ImageButton
+        // Cargar las imágenes para los estados normal y presionado del ImageButton
         Texture myButtonPerfilTexture = new Texture(Gdx.files.internal("GameMode/perfilNou2.png")); // Cambia "perfil.png" a la imagen que quieras usar
         Drawable myButtonPerfilTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myButtonPerfilTexture));
         Texture myButtonPerfilPressedTexture = new Texture(Gdx.files.internal("GameMode/perfil4Nou.png")); // Cambia "perfil2.png" a la imagen que quieras usar cuando se presione el botón
         Drawable myButtonPerfilPressedTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myButtonPerfilPressedTexture));
 
-// Crear un ButtonStyle y establecer los Drawable para los estados normal y presionado
+        // Crear un ButtonStyle y establecer los Drawable para los estados normal y presionado
         ImageButton.ImageButtonStyle buttonPerfilStyle = new ImageButton.ImageButtonStyle();
         buttonPerfilStyle.imageUp = myButtonPerfilTexRegionDrawable;
         buttonPerfilStyle.imageDown = myButtonPerfilPressedTexRegionDrawable;
 
-// Crear un ImageButton con el ButtonStyle
+        // Crear un ImageButton con el ButtonStyle
         ImageButton myImageButtonPerfil = new ImageButton(buttonPerfilStyle);
 
-//ClickListener
+        //ClickListener
         myImageButtonPerfil.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // Aquí va el código que se ejecutará cuando se haga clic en el ImageButton
-                System.out.println("¡ImageButtonPerfil clickeado!");
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        game.setScreen(new PerfilScreen(game));
+                    }
+                });
             }
         });
 
@@ -209,8 +213,12 @@ public class GameModeScreen implements Screen {
         myImageButtonTienda.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // Aquí va el código que se ejecutará cuando se haga clic en el ImageButton
-                System.out.println("¡ImageButtonTienda clickeado!");
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        game.setScreen(new TiendaScreen(game));
+                    }
+                });
             }
         });
 
