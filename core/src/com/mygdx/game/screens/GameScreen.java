@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.actors.Player;
+import com.mygdx.game.actors.PlayerSlash;
 import com.mygdx.game.actors.obstacles.SpinLog;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.helpers.GameInputHandler;
@@ -114,6 +115,7 @@ public class GameScreen implements Screen {
         TiledMapTileLayer.Cell cell = plataformaLayer.getCell(playerTileX, playerTileY);
         if (cell == null) {
             if(!player.isJumping()){
+                player.setAlive(false);
                 player.remove();
             }
 
@@ -154,6 +156,9 @@ public class GameScreen implements Screen {
             } else if (actor instanceof SpinLog){
                 SpinLog spinLog = (SpinLog) actor;
                 shapeRenderer.polygon(spinLog.getCollisionPolygon().getTransformedVertices());
+            } else if(actor instanceof PlayerSlash){
+                PlayerSlash playerSlash = (PlayerSlash) actor;
+                shapeRenderer.rect(playerSlash.getCollisionRect().x, playerSlash.getCollisionRect().y, playerSlash.getCollisionRect().width, playerSlash.getCollisionRect().height);
             }
         }
         shapeRenderer.end();

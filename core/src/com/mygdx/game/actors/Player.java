@@ -24,10 +24,11 @@ public class Player extends Actor {
     private float jumpStartTime; // the time when the jump started
     private float jumpDuration = 1;
     private float jumpCooldown = 0;
+    private float slashCooldown = 0;
     private Rectangle collisionRect;
     private Vector2 pushVelocity;
     private int damageTaken;
-
+    private boolean isAlive;
     float pushForce;
 
     public Player() {
@@ -44,6 +45,7 @@ public class Player extends Actor {
         collisionRect = new Rectangle(position.x, position.y, width, height);
         pushVelocity = new Vector2(0, 0);
         damageTaken = 0;
+        isAlive = true;
 
         shapeRenderer = new ShapeRenderer();
     }
@@ -74,6 +76,7 @@ public class Player extends Actor {
 
         stateTime += delta;
         jumpCooldown += delta;
+        slashCooldown += delta;
     }
 
     @Override
@@ -140,8 +143,27 @@ public class Player extends Actor {
         float pushDirectionX = (float) Math.cos(Math.toRadians(rotation + 90));
         float pushDirectionY = (float) Math.sin(Math.toRadians(rotation + 90));
 
-        // Set the velocity vector based on the push direction and force
         this.pushVelocity.set(pushForce * pushDirectionX, pushForce * pushDirectionY);
+    }
+
+    public void updatePosition(Vector2 direction){
+        float angle = direction.angleRad();
+
+        damageTaken += 1;
+        pushForce = damageTaken * 500;
+
+        float pushDirectionX = (float) Math.cos(angle);
+        float pushDirectionY = (float) Math.sin(angle);
+
+        this.pushVelocity.set(pushForce * pushDirectionX, pushForce * pushDirectionY);
+    }
+
+    public void slash(){
+        if(isAlive && slashCooldown >= 1.5){
+            PlayerSlash slash = new PlayerSlash(this);
+            getStage().addActor(slash);
+            slashCooldown = 0;
+        }
     }
 
     public Rectangle getCollisionRect() {
@@ -162,5 +184,13 @@ public class Player extends Actor {
 
     public float getPushForce() {
         return pushForce;
+    }
+
+    public void setAlive(boolean isAlive){
+        this.isAlive = isAlive;
+    }
+
+    public boolean isAlive(){
+        return isAlive;
     }
 }

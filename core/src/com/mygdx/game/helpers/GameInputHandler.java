@@ -33,6 +33,9 @@ public class GameInputHandler implements InputProcessor {
             case Input.Keys.SPACE:
                 player.jump();
                 break;
+            case Input.Keys.C:
+                player.slash();
+                break;
         }
         return false;
     }

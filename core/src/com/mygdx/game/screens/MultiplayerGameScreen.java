@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.actors.MultiPlayerPlayer;
 import com.mygdx.game.actors.Player;
+import com.mygdx.game.actors.PlayerSlash;
 import com.mygdx.game.actors.obstacles.SpinLog;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.helpers.MultiplayerGameInputHandler;
@@ -134,6 +135,9 @@ public class MultiplayerGameScreen implements Screen {
                                             case Input.Keys.SPACE:
                                                 currentPlayer.jump();
                                                 break;
+                                            case Input.Keys.C:
+                                                currentPlayer.slash();
+                                                break;
                                         }
                                     } else if(type.equals("keyUp")){
                                         switch (keycode) {
@@ -238,6 +242,15 @@ public class MultiplayerGameScreen implements Screen {
                         }
                     }
                 }
+            } else if(actor instanceof PlayerSlash){
+                PlayerSlash playerSlash = (PlayerSlash) actor;
+                for (MultiPlayerPlayer currentPlayer : players) {
+                    if(playerSlash.collides(currentPlayer)){
+                        if(!currentPlayer.isJumping() && !playerSlash.getPlayer().equals(currentPlayer)){
+                            currentPlayer.updatePosition(playerSlash.getDirection());
+                        }
+                    }
+                }
             }
         }
     }
@@ -284,12 +297,15 @@ public class MultiplayerGameScreen implements Screen {
     public void drawHitboxes(){
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         for(Actor actor : stage.getActors()){
-            if (actor instanceof MultiPlayerPlayer){
-                MultiPlayerPlayer player = (MultiPlayerPlayer) actor;
+            if (actor instanceof Player){
+                Player player = (Player) actor;
                 shapeRenderer.rect(player.getCollisionRect().x, player.getCollisionRect().y, player.getCollisionRect().width, player.getCollisionRect().height);
             } else if (actor instanceof SpinLog){
                 SpinLog spinLog = (SpinLog) actor;
                 shapeRenderer.polygon(spinLog.getCollisionPolygon().getTransformedVertices());
+            } else if(actor instanceof PlayerSlash){
+                PlayerSlash playerSlash = (PlayerSlash) actor;
+                shapeRenderer.rect(playerSlash.getCollisionRect().x, playerSlash.getCollisionRect().y, playerSlash.getCollisionRect().width, playerSlash.getCollisionRect().height);
             }
         }
         shapeRenderer.end();
