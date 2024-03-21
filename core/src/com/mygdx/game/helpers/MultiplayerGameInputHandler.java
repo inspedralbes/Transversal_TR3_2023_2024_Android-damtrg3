@@ -29,28 +29,8 @@ public class MultiplayerGameInputHandler extends GameInputHandler{
             data.put("player", this.player.getUser());
             data.put("salaId", this.game.SalaActual);
             data.put("type", "keyDown");
-            switch (keycode) {
-                case Input.Keys.UP:
-                    data.put("keycode", "up");
-                    socket.emit("key", data.toString());
-                    break;
-                case Input.Keys.DOWN:
-                    data.put("keycode", "down");
-                    socket.emit("key", data.toString());
-                    break;
-                case Input.Keys.LEFT:
-                    data.put("keycode", "left");
-                    socket.emit("key", data.toString());
-                    break;
-                case Input.Keys.RIGHT:
-                    data.put("keycode", "right");
-                    socket.emit("key", data.toString());
-                    break;
-                case Input.Keys.SPACE:
-                    data.put("keycode", "space");
-                    socket.emit("key", data.toString());
-                    break;
-            }
+            data.put("keycode", keycode);
+            socket.emit("key", data.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -65,24 +45,8 @@ public class MultiplayerGameInputHandler extends GameInputHandler{
             data.put("player", this.player.getUser());
             data.put("salaId", this.game.SalaActual);
             data.put("type", "keyUp");
-            switch (keycode) {
-                case Input.Keys.UP:
-                    data.put("keycode", "up");
-                    socket.emit("key", data.toString());
-                    break;
-                case Input.Keys.DOWN:
-                    data.put("keycode", "down");
-                    socket.emit("key", data.toString());
-                    break;
-                case Input.Keys.LEFT:
-                    data.put("keycode", "left");
-                    socket.emit("key", data.toString());
-                    break;
-                case Input.Keys.RIGHT:
-                    data.put("keycode", "right");
-                    socket.emit("key", data.toString());
-                    break;
-            }
+            data.put("keycode", keycode);
+            socket.emit("key", data.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -113,36 +113,36 @@ public class MultiplayerGameScreen implements Screen {
                         try{
                             String player = data.getString("player");
                             String type = data.getString("type");
-                            String keycode = data.getString("keycode");
+                            int keycode = data.getInt("keycode");
 
                             for (MultiPlayerPlayer currentPlayer : players) {
                                 if(currentPlayer.getUser().equals(player)){
                                     if(type.equals("keyDown")){
                                         switch (keycode) {
-                                            case "up":
+                                            case Input.Keys.UP:
                                                 currentPlayer.getDirection().y = 1;
                                                 break;
-                                            case "down":
+                                            case Input.Keys.DOWN:
                                                 currentPlayer.getDirection().y = -1;
                                                 break;
-                                            case "left":
+                                            case Input.Keys.LEFT:
                                                 currentPlayer.getDirection().x = -1;
                                                 break;
-                                            case "right":
+                                            case Input.Keys.RIGHT:
                                                 currentPlayer.getDirection().x = 1;
                                                 break;
-                                            case "space":
+                                            case Input.Keys.SPACE:
                                                 currentPlayer.jump();
                                                 break;
                                         }
                                     } else if(type.equals("keyUp")){
                                         switch (keycode) {
-                                            case "up":
-                                            case "down":
+                                            case Input.Keys.UP:
+                                            case Input.Keys.DOWN:
                                                 currentPlayer.getDirection().y = 0;
                                                 break;
-                                            case "left":
-                                            case "right":
+                                            case Input.Keys.LEFT:
+                                            case Input.Keys.RIGHT:
                                                 currentPlayer.getDirection().x = 0;
                                                 break;
                                         }
