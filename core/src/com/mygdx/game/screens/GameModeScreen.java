@@ -65,10 +65,10 @@ public class GameModeScreen implements Screen {
         //----------------------------- Button Solo i Multi --------------------------------
 
 
-        Texture myTextureSolo = new Texture(Gdx.files.internal("soloLogo6.png"));
+        Texture myTextureSolo = new Texture(Gdx.files.internal("GameMode/soloLogo6.png"));
         Drawable myTexRegionDrawable1 = new TextureRegionDrawable(new TextureRegion(myTextureSolo));
 
-        Texture myTextureMulti = new Texture(Gdx.files.internal("multiLogo4.png"));
+        Texture myTextureMulti = new Texture(Gdx.files.internal("GameMode/multiLogo4.png"));
         Drawable myTexRegionDrawable2 = new TextureRegionDrawable(new TextureRegion(myTextureMulti));
 
         // Crear un Image con la imagen
@@ -96,9 +96,9 @@ public class GameModeScreen implements Screen {
         //----------------------------- Button Config --------------------------------
 
         // Cargar las imágenes para los estados normal y presionado del ImageButton
-        Texture myButtonTexture = new Texture(Gdx.files.internal("ruedita.png"));
+        Texture myButtonTexture = new Texture(Gdx.files.internal("GameMode/ruedita.png"));
         Drawable myButtonTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myButtonTexture));
-        Texture myButtonPressedTexture = new Texture(Gdx.files.internal("ruedita2.png"));
+        Texture myButtonPressedTexture = new Texture(Gdx.files.internal("GameMode/ruedita2.png"));
         Drawable myButtonPressedTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myButtonPressedTexture));
 
         // Crear un ButtonStyle y establecer los Drawable para los estados normal y presionado
@@ -126,17 +126,17 @@ public class GameModeScreen implements Screen {
         // Crear un contenedor para el ImageButton
         Container<ImageButton> imageButtonContainer = new Container<ImageButton>(myImageButton);
         imageButtonContainer.padBottom(300).padRight(230);
-        imageButtonContainer.width(38);
-        imageButtonContainer.height(38);
+        imageButtonContainer.width(43);
+        imageButtonContainer.height(43);
 
 
         //----------------------------- Button Perfil --------------------------------
 
 
 // Cargar las imágenes para los estados normal y presionado del ImageButton
-        Texture myButtonPerfilTexture = new Texture(Gdx.files.internal("perfilNou.png")); // Cambia "perfil.png" a la imagen que quieras usar
+        Texture myButtonPerfilTexture = new Texture(Gdx.files.internal("GameMode/perfilNou2.png")); // Cambia "perfil.png" a la imagen que quieras usar
         Drawable myButtonPerfilTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myButtonPerfilTexture));
-        Texture myButtonPerfilPressedTexture = new Texture(Gdx.files.internal("perfil2Nou.png")); // Cambia "perfil2.png" a la imagen que quieras usar cuando se presione el botón
+        Texture myButtonPerfilPressedTexture = new Texture(Gdx.files.internal("GameMode/perfil4Nou.png")); // Cambia "perfil2.png" a la imagen que quieras usar cuando se presione el botón
         Drawable myButtonPerfilPressedTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myButtonPerfilPressedTexture));
 
 // Crear un ButtonStyle y establecer los Drawable para los estados normal y presionado
@@ -159,16 +159,16 @@ public class GameModeScreen implements Screen {
         // Crear un contenedor para el ImageButton
         Container<ImageButton> imageButtonPerfilContainer = new Container<ImageButton>(myImageButtonPerfil);
         imageButtonPerfilContainer.padBottom(300).padLeft(460);
-        imageButtonPerfilContainer.width(35);
-        imageButtonPerfilContainer.height(35);
+        imageButtonPerfilContainer.width(40);
+        imageButtonPerfilContainer.height(40);
 
 
         //----------------------------- Button Tienda --------------------------------
 
         // Cargar las imágenes para los estados normal y presionado del ImageButton
-        Texture myButtonTiendaTexture = new Texture(Gdx.files.internal("tiendaNou.png")); // Cambia "tienda.png" a la imagen que quieras usar
+        Texture myButtonTiendaTexture = new Texture(Gdx.files.internal("GameMode/tienda3.png")); // Cambia "tienda.png" a la imagen que quieras usar
         Drawable myButtonTiendaTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myButtonTiendaTexture));
-        Texture myButtonTiendaPressedTexture = new Texture(Gdx.files.internal("tienda2Nou.png")); // Cambia "tienda2.png" a la imagen que quieras usar cuando se presione el botón
+        Texture myButtonTiendaPressedTexture = new Texture(Gdx.files.internal("GameMode/tienda3Nou.png")); // Cambia "tienda2.png" a la imagen que quieras usar cuando se presione el botón
         Drawable myButtonTiendaPressedTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myButtonTiendaPressedTexture));
 
         // Crear un ButtonStyle y establecer los Drawable para los estados normal y presionado
@@ -191,8 +191,8 @@ public class GameModeScreen implements Screen {
         // Crear un contenedor para el ImageButton
         Container<ImageButton> imageButtonTiendaContainer = new Container<ImageButton>(myImageButtonTienda);
         imageButtonTiendaContainer.padBottom(300).padLeft(550);
-        imageButtonTiendaContainer.width(35);
-        imageButtonTiendaContainer.height(35);
+        imageButtonTiendaContainer.width(40);
+        imageButtonTiendaContainer.height(40);
 
 
 
