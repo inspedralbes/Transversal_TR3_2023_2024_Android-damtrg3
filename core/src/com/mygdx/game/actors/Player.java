@@ -22,7 +22,7 @@ public class Player extends Actor {
     private ShapeRenderer shapeRenderer;
     private float peakShadowSize;
     private float jumpStartTime; // the time when the jump started
-    private float jumpDuration = 2;
+    private float jumpDuration = 1;
     private float jumpCooldown = 0;
     private Rectangle collisionRect;
     private Vector2 pushVelocity;
@@ -35,7 +35,7 @@ public class Player extends Actor {
         direction = new Vector2(0, 0);
         stateTime = 0;
         jumping = false;
-        jumpHeight = 35;
+        jumpHeight = 30;
         velocity = 0;
         originalY = position.y;
         peakShadowSize = 0;
@@ -66,7 +66,7 @@ public class Player extends Actor {
         this.position.x += pushVelocity.x * delta;
         this.position.y += pushVelocity.y * delta;
 
-        pushVelocity.scl(0.9f); // Slow down the push velocity
+        pushVelocity.scl(0.9f);
 
         collisionRect.set(position.x + 20, position.y + 10, width - 40, height - 50);
 
@@ -152,5 +152,9 @@ public class Player extends Actor {
 
     public Vector2 getPosition() {
         return position;
+    }
+
+    public void setPosition(Vector2 position) {
+        this.position = position;
     }
 }

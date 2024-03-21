@@ -60,6 +60,12 @@ public class MenuSalasScreen implements Screen {
         mapRenderer = new OrthogonalTiledMapRenderer(AssetManager.tiledMap);
         camera.setToOrtho(false, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
 
+        try {
+            connectToSocketServer();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
         mapRenderer.setView(camera);
         mapRenderer.render();
     }
@@ -192,15 +198,17 @@ public class MenuSalasScreen implements Screen {
     public void crearNovaSala() {
         JSONObject roomJSON = new JSONObject();
         String salaId = "123ABC";
-        roomJSON.put("idSala", salaId);
-        game.SalaActual = salaId;
-        roomJSON.put("creadorSala", game.nomUsuari);
-        roomJSON.put("estatSala", "En espera");
-
         JSONArray jugadores = new JSONArray();
-        jugadores.put(game.nomUsuari);
-
-        roomJSON.put("jugadores", jugadores);
+        try {
+            roomJSON.put("idSala", salaId);
+            roomJSON.put("creadorSala", game.nomUsuari);
+            roomJSON.put("estatSala", "En espera");
+            jugadores.put(game.nomUsuari);
+            roomJSON.put("jugadores", jugadores);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        game.SalaActual = salaId;
 
         Net.HttpRequest httpRequest = new Net.HttpRequest(Net.HttpMethods.POST);
         httpRequest.setUrl("http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/crearSala");
@@ -215,11 +223,6 @@ public class MenuSalasScreen implements Screen {
                     @Override
                     public void run() {
                         System.out.println("Sala creada!");
-                        try {
-                            connectToSocketServer();
-                        } catch (URISyntaxException e) {
-                            throw new RuntimeException(e);
-                        }
                         game.setScreen(new SalasScreen(game));
                     }
                 });
@@ -234,9 +237,12 @@ public class MenuSalasScreen implements Screen {
                 System.out.println("Creació de sala cancelada");
             }
         });
+
+        socket.emit("join room", salaId);
     }
 
     public void unirseASala(final String idSala) {
+        game.SalaActual = idSala;
         JSONObject requestData = new JSONObject();
         try {
             requestData.put("idSala", idSala);
@@ -260,11 +266,6 @@ public class MenuSalasScreen implements Screen {
                         System.out.println("Te has unido a la sala!");
 
                         //Connexió al servidor de Socket.IO
-                        try {
-                            connectToSocketServer();
-                        } catch (URISyntaxException e) {
-                            throw new RuntimeException(e);
-                        }
 
                         socket.emit("unirSala", idSala);
                         game.setScreen(new SalasScreen(game));
@@ -282,6 +283,8 @@ public class MenuSalasScreen implements Screen {
                 System.out.println("Unión a la sala cancelada");
             }
         });
+
+        socket.emit("join room", idSala);
     }
 
     private void connectToSocketServer() throws URISyntaxException {
