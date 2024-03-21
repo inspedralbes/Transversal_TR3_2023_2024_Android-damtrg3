@@ -204,15 +204,18 @@ public class MenuSalasScreen implements Screen {
                 if (!salaExiste) {
                     // Si la sala no existe, puedes continuar con la creación de la sala
                     JSONObject roomJSON = new JSONObject();
-                    roomJSON.put("idSala", salaId);
+                    try {
+                        roomJSON.put("idSala", salaId);
+                        roomJSON.put("creadorSala", game.nomUsuari);
+                        roomJSON.put("estatSala", "En espera");
+                        JSONArray jugadores = new JSONArray();
+                        jugadores.put(game.nomUsuari);
+
+                        roomJSON.put("jugadores", jugadores);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
                     game.SalaActual = salaId;
-                    roomJSON.put("creadorSala", game.nomUsuari);
-                    roomJSON.put("estatSala", "En espera");
-
-                    JSONArray jugadores = new JSONArray();
-                    jugadores.put(game.nomUsuari);
-
-                    roomJSON.put("jugadores", jugadores);
 
                     Net.HttpRequest httpRequest = new Net.HttpRequest(Net.HttpMethods.POST);
                     httpRequest.setUrl("http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/crearSala");
@@ -227,11 +230,6 @@ public class MenuSalasScreen implements Screen {
                                 @Override
                                 public void run() {
                                     System.out.println("Sala creada!");
-                                    try {
-                                        connectToSocketServer();
-                                    } catch (URISyntaxException e) {
-                                        throw new RuntimeException(e);
-                                    }
                                     game.setScreen(new SalasScreen(game));
                                 }
                             });
