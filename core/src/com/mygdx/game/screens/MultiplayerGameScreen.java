@@ -167,7 +167,7 @@ public class MultiplayerGameScreen implements Screen {
             @Override
             public void run() {
                 for (MultiPlayerPlayer player : players) {
-                    if (player.isCurrentUser()) {
+                    if (player.isCurrentUser() && player.isAlive()) {
                         String lobby = game.SalaActual;
                         String username = player.getUser();
                         Vector2 position = player.getPosition();
@@ -179,14 +179,17 @@ public class MultiplayerGameScreen implements Screen {
                             data.put("positionX", position.x);
                             data.put("positionY", position.y);
 
-                            MenuSalasScreen.socket.emit("user_position", data);
+                            if(!position.equals(player.getPreviousPosition())){
+                                MenuSalasScreen.socket.emit("user_position", data);
+                                player.setPreviousPosition(position);
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
                 }
             }
-        }, 0, 1, TimeUnit.SECONDS);
+        }, 0, 2, TimeUnit.SECONDS);
 
         MenuSalasScreen.socket.on("update_positions", new Emitter.Listener() {
             @Override

@@ -30,6 +30,7 @@ public class Player extends Actor {
     private int damageTaken;
     private boolean isAlive;
     float pushForce;
+    private Vector2 previousPosition;
 
     public Player() {
         position = Settings.PLAYER_START;
@@ -46,6 +47,7 @@ public class Player extends Actor {
         pushVelocity = new Vector2(0, 0);
         damageTaken = 0;
         isAlive = true;
+        previousPosition = position;
 
         shapeRenderer = new ShapeRenderer();
     }
@@ -192,5 +194,13 @@ public class Player extends Actor {
 
     public boolean isAlive(){
         return isAlive;
+    }
+
+    public Vector2 getPreviousPosition() {
+        return previousPosition;
+    }
+
+    public void setPreviousPosition(Vector2 previousPosition) {
+        this.previousPosition = previousPosition;
     }
 }
