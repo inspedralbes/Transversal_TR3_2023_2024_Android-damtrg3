@@ -141,7 +141,7 @@ public class Player extends Actor {
     public void updatePosition(float rotation) {
         damageTaken += 1;
 
-        pushForce = damageTaken * 500;
+        pushForce = damageTaken * 250;
         float pushDirectionX = (float) Math.cos(Math.toRadians(rotation + 90));
         float pushDirectionY = (float) Math.sin(Math.toRadians(rotation + 90));
 
@@ -152,7 +152,7 @@ public class Player extends Actor {
         float angle = direction.angleRad();
 
         damageTaken += 1;
-        pushForce = damageTaken * 500;
+        pushForce = damageTaken * 250;
 
         float pushDirectionX = (float) Math.cos(angle);
         float pushDirectionY = (float) Math.sin(angle);
@@ -202,5 +202,9 @@ public class Player extends Actor {
 
     public void setPreviousPosition(Vector2 previousPosition) {
         this.previousPosition = previousPosition;
+    }
+
+    public int getDamageTaken() {
+        return damageTaken;
     }
 }

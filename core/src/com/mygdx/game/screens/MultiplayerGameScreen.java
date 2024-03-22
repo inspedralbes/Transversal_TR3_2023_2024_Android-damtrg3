@@ -69,7 +69,7 @@ public class MultiplayerGameScreen implements Screen {
         mapRenderer.render();
 
         SpinLog spinLog = new SpinLog();
-        stage.addActor(spinLog);
+        //stage.addActor(spinLog);
 
         //Carregar els jugadors
         spawnLayer = AssetManager.tiledMap.getLayers().get("spawn").getObjects();
@@ -284,7 +284,7 @@ public class MultiplayerGameScreen implements Screen {
         batch.begin();
         for(MultiPlayerPlayer player : players){
             if(player.isAlive()){
-                font.draw(batch, player.getUser(), player.getPosition().x + 15, player.getPosition().y + 50);
+                font.draw(batch, player.getUser() + " " + player.getDamageTaken(), player.getPosition().x + 15, player.getPosition().y + 50);
             }
         }
         batch.end();
