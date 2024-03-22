@@ -5,6 +5,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -47,8 +49,12 @@ public class MultiplayerGameScreen implements Screen {
     private TiledMapTileLayer plataformaLayer;
     private MapObjects spawnLayer;
     private MultiPlayerPlayer[] players;
+    private BitmapFont font;
+    private SpriteBatch batch;
 
     public MultiplayerGameScreen(Projecte3 game, String[] jugadors) {
+        font = new BitmapFont();
+        batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
         this.game = game;
@@ -231,7 +237,7 @@ public class MultiplayerGameScreen implements Screen {
                     }
                 }
             }
-        }, 0, 2, TimeUnit.SECONDS);
+        }, 0, 250, TimeUnit.MILLISECONDS);
 
         MenuSalasScreen.socket.on("update_positions", new Emitter.Listener() {
             @Override
@@ -274,6 +280,14 @@ public class MultiplayerGameScreen implements Screen {
         stage.draw();
 
         drawHitboxes();
+
+        batch.begin();
+        for(MultiPlayerPlayer player : players){
+            if(player.isAlive()){
+                font.draw(batch, player.getUser(), player.getPosition().x + 15, player.getPosition().y + 50);
+            }
+        }
+        batch.end();
     }
     public void checkCollisions(){
         for(Actor actor : stage.getActors()){
@@ -338,6 +352,8 @@ public class MultiplayerGameScreen implements Screen {
     @Override
     public void dispose() {
         mapRenderer.dispose();
+        font.dispose();
+        batch.dispose();
     }
     public void drawHitboxes(){
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
