@@ -69,7 +69,7 @@ public class MultiplayerGameScreen implements Screen {
         mapRenderer.render();
 
         SpinLog spinLog = new SpinLog();
-        //stage.addActor(spinLog);
+        stage.addActor(spinLog);
 
         //Carregar els jugadors
         spawnLayer = AssetManager.tiledMap.getLayers().get("spawn").getObjects();
