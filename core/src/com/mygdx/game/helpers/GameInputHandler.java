@@ -44,32 +44,12 @@ public class GameInputHandler implements InputProcessor {
     public boolean keyUp(int keycode) {
         switch (keycode) {
             case Input.Keys.UP:
-                if (!Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-                    player.getDirection().y = 0;
-                } else {
-                    player.getDirection().y = -1;
-                }
-                break;
             case Input.Keys.DOWN:
-                if (!Gdx.input.isKeyPressed(Input.Keys.UP)) {
-                    player.getDirection().y = 0;
-                } else {
-                    player.getDirection().y = 1;
-                }
+                player.getDirection().y = 0;
                 break;
             case Input.Keys.LEFT:
-                if (!Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                    player.getDirection().x = 0;
-                } else {
-                    player.getDirection().x = 1;
-                }
-                break;
             case Input.Keys.RIGHT:
-                if (!Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                    player.getDirection().x = 0;
-                } else {
-                    player.getDirection().x = -1;
-                }
+                player.getDirection().x = 0;
                 break;
         }
         return false;
