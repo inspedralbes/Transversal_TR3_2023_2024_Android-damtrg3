@@ -99,6 +99,29 @@ public class MultiplayerGameScreen implements Screen {
                 System.out.println(player.getPosition());
             }
         }
+
+        for (MultiPlayerPlayer player : players) {
+            if (player.isCurrentUser() && player.isAlive()) {
+                String lobby = game.SalaActual;
+                String username = player.getUser();
+                Vector2 position = player.getPosition();
+
+                JSONObject data = new JSONObject();
+                try {
+                    data.put("salaId", lobby);
+                    data.put("user", username);
+                    data.put("positionX", position.x);
+                    data.put("positionY", position.y);
+
+                    if(!position.equals(player.getPreviousPosition())){
+                        MenuSalasScreen.socket.emit("user_position", data);
+                        player.setPreviousPosition(position);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         
     }
 
