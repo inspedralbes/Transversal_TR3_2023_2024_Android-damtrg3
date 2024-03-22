@@ -104,7 +104,7 @@ public class MultiplayerGameScreen implements Screen {
 
     @Override
     public void show() {
-        MenuSalasScreen.socket.on("key_event", new Emitter.Listener() {
+        MenuSalasScreen.socket.on("key_down", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
                 Gdx.app.postRunnable(new Runnable() {
@@ -113,43 +113,62 @@ public class MultiplayerGameScreen implements Screen {
                         JSONObject data = (JSONObject) args[0];
                         try{
                             String player = data.getString("player");
-                            String type = data.getString("type");
                             int keycode = data.getInt("keycode");
 
                             for (MultiPlayerPlayer currentPlayer : players) {
                                 if(currentPlayer.getUser().equals(player)){
-                                    if(type.equals("keyDown")){
-                                        switch (keycode) {
-                                            case Input.Keys.UP:
-                                                currentPlayer.getDirection().y = 1;
-                                                break;
-                                            case Input.Keys.DOWN:
-                                                currentPlayer.getDirection().y = -1;
-                                                break;
-                                            case Input.Keys.LEFT:
-                                                currentPlayer.getDirection().x = -1;
-                                                break;
-                                            case Input.Keys.RIGHT:
-                                                currentPlayer.getDirection().x = 1;
-                                                break;
-                                            case Input.Keys.SPACE:
-                                                currentPlayer.jump();
-                                                break;
-                                            case Input.Keys.C:
-                                                currentPlayer.slash();
-                                                break;
-                                        }
-                                    } else if(type.equals("keyUp")){
-                                        switch (keycode) {
-                                            case Input.Keys.UP:
-                                            case Input.Keys.DOWN:
-                                                currentPlayer.getDirection().y = 0;
-                                                break;
-                                            case Input.Keys.LEFT:
-                                            case Input.Keys.RIGHT:
-                                                currentPlayer.getDirection().x = 0;
-                                                break;
-                                        }
+                                    switch (keycode) {
+                                        case Input.Keys.UP:
+                                            currentPlayer.getDirection().y = 1;
+                                            break;
+                                        case Input.Keys.DOWN:
+                                            currentPlayer.getDirection().y = -1;
+                                            break;
+                                        case Input.Keys.LEFT:
+                                            currentPlayer.getDirection().x = -1;
+                                            break;
+                                        case Input.Keys.RIGHT:
+                                            currentPlayer.getDirection().x = 1;
+                                            break;
+                                        case Input.Keys.SPACE:
+                                            currentPlayer.jump();
+                                            break;
+                                        case Input.Keys.C:
+                                            currentPlayer.slash();
+                                            break;
+                                    }
+                                }
+                            }
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+
+        MenuSalasScreen.socket.on("key_up", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        JSONObject data = (JSONObject) args[0];
+                        try{
+                            String player = data.getString("player");
+                            int keycode = data.getInt("keycode");
+
+                            for (MultiPlayerPlayer currentPlayer : players) {
+                                if(currentPlayer.getUser().equals(player)){
+                                    switch (keycode) {
+                                        case Input.Keys.UP:
+                                        case Input.Keys.DOWN:
+                                            currentPlayer.getDirection().y = 0;
+                                            break;
+                                        case Input.Keys.LEFT:
+                                        case Input.Keys.RIGHT:
+                                            currentPlayer.getDirection().x = 0;
+                                            break;
                                     }
                                 }
                             }
