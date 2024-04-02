@@ -29,8 +29,9 @@ public class Player extends Actor {
     private Vector2 pushVelocity;
     private float damageTaken;
     private boolean isAlive;
-    float pushForce;
+    private float pushForce;
     private Vector2 previousPosition;
+    private float score;
 
     public Player() {
         position = Settings.PLAYER_START;
@@ -48,6 +49,7 @@ public class Player extends Actor {
         damageTaken = 0;
         isAlive = true;
         previousPosition = position;
+        score = 0;
 
         shapeRenderer = new ShapeRenderer();
     }
@@ -168,6 +170,10 @@ public class Player extends Actor {
         }
     }
 
+    public void increaseScore(float delta){
+        this.score += delta;
+    }
+
     public Rectangle getCollisionRect() {
         return collisionRect;
     }
@@ -206,5 +212,9 @@ public class Player extends Actor {
 
     public float getDamageTaken() {
         return damageTaken;
+    }
+
+    public float getScore() {
+        return score;
     }
 }

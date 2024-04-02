@@ -1,6 +1,7 @@
 package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -37,6 +38,7 @@ public class GameScreen implements Screen {
     private TiledMapTileLayer plataformaLayer;
 
     private Label forceLabel;
+    private Label scoreLabel;
 
     public GameScreen(Projecte3 game) {
         shapeRenderer = new ShapeRenderer();
@@ -59,6 +61,10 @@ public class GameScreen implements Screen {
         forceLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         forceLabel.setPosition(10, Gdx.graphics.getHeight() - 10);
         stage.addActor(forceLabel);
+
+        scoreLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        scoreLabel.setPosition(10, Gdx.graphics.getHeight() - 30);
+        stage.addActor(scoreLabel);
 
         //Carregar el jugador
         player = new Player();
@@ -88,10 +94,13 @@ public class GameScreen implements Screen {
         float currentForce = player.getPushForce(); // La fuerza actual es igual a pushForce
         forceLabel.setText("Fuerza: " + currentForce); // Muestra la fuerza directamente
 
+        scoreLabel.setText("Puntuación: " + player.getScore());
+
         stage.act(delta);
         stage.draw();
 
         drawHitboxes();
+        player.increaseScore(delta);
     }
 
     public void checkCollisions(){
@@ -114,11 +123,11 @@ public class GameScreen implements Screen {
         int playerTileY = (int) (player.getPosition().y / tileSize);
         TiledMapTileLayer.Cell cell = plataformaLayer.getCell(playerTileX, playerTileY);
         if (cell == null) {
-            if(!player.isJumping()){
+            if(!player.isJumping() && player.isAlive()){
+                sendScore(player.getScore());
                 player.setAlive(false);
                 player.remove();
             }
-
         }
     }
 
@@ -162,5 +171,30 @@ public class GameScreen implements Screen {
             }
         }
         shapeRenderer.end();
+    }
+
+    public void sendScore(float score){
+        final String URL = "http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/score";
+        Net.HttpRequest request = new Net.HttpRequest(Net.HttpMethods.POST);
+        request.setUrl(URL);
+        request.setHeader("Content-Type", "application/json");
+        request.setContent("{\"score\":" + score + ", \"username\":\"" + Projecte3.nomUsuari + "\"}");
+
+        Gdx.net.sendHttpRequest(request, new Net.HttpResponseListener() {
+            @Override
+            public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                Gdx.app.log("SCORE", "Score sent successfully");
+            }
+
+            @Override
+            public void failed(Throwable t) {
+                Gdx.app.error("SCORE", "Failed to send score: " + t.getMessage());
+            }
+
+            @Override
+            public void cancelled() {
+                Gdx.app.error("SCORE", "Request cancelled");
+            }
+        });
     }
 }

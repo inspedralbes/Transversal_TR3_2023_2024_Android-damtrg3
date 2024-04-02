@@ -138,7 +138,7 @@ public class RegisterScreen implements Screen {
                                     Gdx.app.postRunnable(new Runnable() {
                                         @Override
                                         public void run() {
-                                            game.setScreen(new MenuScreen(game));
+                                            game.setScreen(new LoginScreen(game));
                                         }
                                     });
                                 }
