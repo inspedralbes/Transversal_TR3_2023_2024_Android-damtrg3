@@ -32,6 +32,8 @@ public class Player extends Actor {
     private float pushForce;
     private Vector2 previousPosition;
     private float score;
+    private boolean isInvulnerable;
+    private float invulnerabilityTime;
 
     public Player() {
         position = Settings.PLAYER_START;
@@ -50,6 +52,8 @@ public class Player extends Actor {
         isAlive = true;
         previousPosition = position;
         score = 0;
+        isInvulnerable = false;
+        invulnerabilityTime = 0;
 
         shapeRenderer = new ShapeRenderer();
     }
@@ -77,6 +81,13 @@ public class Player extends Actor {
         pushVelocity.scl(0.9f);
 
         collisionRect.set(position.x + 20, position.y + 10, width - 40, height - 50);
+
+        if (isInvulnerable) {
+            invulnerabilityTime -= delta;
+            if (invulnerabilityTime <= 0) {
+                isInvulnerable = false;
+            }
+        }
 
         stateTime += delta;
         jumpCooldown += delta;
@@ -151,6 +162,10 @@ public class Player extends Actor {
     }
 
     public void updatePosition(Vector2 direction){
+        if(isInvulnerable){
+            return;
+        }
+
         float angle = direction.angleRad();
 
         damageTaken += Settings.PLAYER_DAMAGE_RECIEVED;
@@ -160,6 +175,9 @@ public class Player extends Actor {
         float pushDirectionY = (float) Math.sin(angle);
 
         this.pushVelocity.set(pushForce * pushDirectionX, pushForce * pushDirectionY);
+
+        isInvulnerable = true;
+        invulnerabilityTime = 1;
     }
 
     public void slash(){
