@@ -31,7 +31,7 @@ public class SpinLog extends Actor {
         shadowColor = new Color(0, 0, 0, 0.5f);
         collisionPolygon = new Polygon(new float[]{0, 0, logTexture.getRegionWidth(), 0, logTexture.getRegionWidth(), logTexture.getRegionHeight(), 0, logTexture.getRegionHeight()});
         collisionPolygon.setOrigin(logTexture.getRegionWidth() / 2, logTexture.getRegionHeight() / 2);
-        acceleration = 0.1f;
+        acceleration = Settings.SPINLOG_ACCEL;
     }
 
     @Override

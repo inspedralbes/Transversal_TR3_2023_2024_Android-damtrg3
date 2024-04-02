@@ -27,7 +27,7 @@ public class Player extends Actor {
     private float slashCooldown = 0;
     private Rectangle collisionRect;
     private Vector2 pushVelocity;
-    private int damageTaken;
+    private float damageTaken;
     private boolean isAlive;
     float pushForce;
     private Vector2 previousPosition;
@@ -151,7 +151,7 @@ public class Player extends Actor {
     public void updatePosition(Vector2 direction){
         float angle = direction.angleRad();
 
-        damageTaken += 1;
+        damageTaken += Settings.PLAYER_DAMAGE_RECIEVED;
         pushForce = damageTaken * 250;
 
         float pushDirectionX = (float) Math.cos(angle);
@@ -204,7 +204,7 @@ public class Player extends Actor {
         this.previousPosition = previousPosition;
     }
 
-    public int getDamageTaken() {
+    public float getDamageTaken() {
         return damageTaken;
     }
 }

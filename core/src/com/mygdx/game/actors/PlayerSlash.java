@@ -72,16 +72,24 @@ public class PlayerSlash extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha){
         super.draw(batch, parentAlpha);
-        if(direction.x > 0)
+        if(direction.x > 0){
+            //RIGHT
             rotation = 90;
-        else if(direction.x < 0)
+            batch.draw(AssetManager.slash_animation.getKeyFrame(lifeTime), collisionRect.x + 70, collisionRect.y - 30, 0, 0, collisionRect.width * 3, collisionRect.height * 3, 1, 1, rotation);
+        } else if(direction.x < 0) {
+            //LEFT
             rotation = 270;
-        else if(direction.y > 0)
+            batch.draw(AssetManager.slash_animation.getKeyFrame(lifeTime), collisionRect.x - 30, collisionRect.y + 60, 0, 0, collisionRect.width * 3, collisionRect.height * 3, 1, 1, rotation);
+        } else if(direction.y > 0) {
+            //UP
             rotation = 180;
-        else{
+            batch.draw(AssetManager.slash_animation.getKeyFrame(lifeTime), collisionRect.x + 60, collisionRect.y + 65, 0, 0, collisionRect.width * 3, collisionRect.height * 3, 1, 1, rotation);
+        } else {
+            //DOWN AND IDLE
             rotation = 0;
+            batch.draw(AssetManager.slash_animation.getKeyFrame(lifeTime), collisionRect.x - 25, collisionRect.y - 35, 0, 0, collisionRect.width * 3, collisionRect.height * 3, 1, 1, rotation);
         }
-        batch.draw(AssetManager.slash_animation.getKeyFrame(lifeTime), collisionRect.x, collisionRect.y, 0, 0, collisionRect.width * 2, collisionRect.height * 2, 1, 1, rotation);
+
     }
 
     public Rectangle getCollisionRect(){
