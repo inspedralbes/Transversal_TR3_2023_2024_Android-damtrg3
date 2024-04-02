@@ -65,11 +65,12 @@ public class Player extends Actor {
             float elapsedTime = stateTime - jumpStartTime;
             if (elapsedTime < jumpDuration) {
                 float progress = elapsedTime / jumpDuration;
-                position.y = originalY + (float)Math.sin(progress * Math.PI) * jumpHeight;
+                this.position.y = originalY + (float)Math.sin(progress * Math.PI) * jumpHeight;
+                originalY += direction.y * Settings.PLAYER_SPEED * delta;
             } else {
                 jumping = false;
                 jumpCooldown = 0;
-                position.y = originalY;
+                this.position.y = originalY;
             }
         } else {
             this.position.y += direction.y * Settings.PLAYER_SPEED * delta;
