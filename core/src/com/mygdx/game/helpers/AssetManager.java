@@ -38,6 +38,11 @@ public class AssetManager {
     public static Animation<TextureRegion> cat_walk_top_animation;
     public static Animation<TextureRegion> cat_walk_left_animation;
 
+    //Player effects
+    public static Texture slash_spritesheet;
+    public static TextureRegion[] slash = new TextureRegion[8];
+    public static Animation<TextureRegion> slash_animation;
+
     public static void load() {
         menu_bg = new Texture(Gdx.files.internal("menu_bg.jpg"));
 
@@ -75,8 +80,15 @@ public class AssetManager {
         cat_walk_left_animation = new Animation<TextureRegion>(0.1f, cat_walk_left);
         cat_walk_left_animation.setPlayMode(Animation.PlayMode.LOOP);
 
-
         spinLog = new TextureRegion(new Texture(Gdx.files.internal("obstacles/tronco.png")));
+
+        slash_spritesheet = new Texture(Gdx.files.internal("characters/effects/slash_spritesheet.png"));
+        for (int i = 0; i < 8; i++) {
+            slash[i] = new TextureRegion(slash_spritesheet, 496 * i, 0, 496, 496);
+            slash[i].flip(false, true);
+        }
+        slash_animation = new Animation<TextureRegion>(0.1f, slash);
+        slash_animation.setPlayMode(Animation.PlayMode.NORMAL);
     }
 
     public static void dispose() {

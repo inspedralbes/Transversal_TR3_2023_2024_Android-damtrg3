@@ -5,6 +5,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -19,6 +21,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.actors.MultiPlayerPlayer;
 import com.mygdx.game.actors.Player;
+import com.mygdx.game.actors.PlayerSlash;
 import com.mygdx.game.actors.obstacles.SpinLog;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.helpers.MultiplayerGameInputHandler;
@@ -46,8 +49,12 @@ public class MultiplayerGameScreen implements Screen {
     private TiledMapTileLayer plataformaLayer;
     private MapObjects spawnLayer;
     private MultiPlayerPlayer[] players;
+    private BitmapFont font;
+    private SpriteBatch batch;
 
     public MultiplayerGameScreen(Projecte3 game, String[] jugadors) {
+        font = new BitmapFont();
+        batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
         this.game = game;
@@ -98,12 +105,35 @@ public class MultiplayerGameScreen implements Screen {
                 System.out.println(player.getPosition());
             }
         }
+
+        for (MultiPlayerPlayer player : players) {
+            if (player.isCurrentUser() && player.isAlive()) {
+                String lobby = game.SalaActual;
+                String username = player.getUser();
+                Vector2 position = player.getPosition();
+
+                JSONObject data = new JSONObject();
+                try {
+                    data.put("salaId", lobby);
+                    data.put("user", username);
+                    data.put("positionX", position.x);
+                    data.put("positionY", position.y);
+
+                    if(!position.equals(player.getPreviousPosition())){
+                        MenuSalasScreen.socket.emit("user_position", data);
+                        player.setPreviousPosition(position);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         
     }
 
     @Override
     public void show() {
-        MenuSalasScreen.socket.on("key_event", new Emitter.Listener() {
+        MenuSalasScreen.socket.on("key_down", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
                 Gdx.app.postRunnable(new Runnable() {
@@ -112,40 +142,62 @@ public class MultiplayerGameScreen implements Screen {
                         JSONObject data = (JSONObject) args[0];
                         try{
                             String player = data.getString("player");
-                            String type = data.getString("type");
                             int keycode = data.getInt("keycode");
 
                             for (MultiPlayerPlayer currentPlayer : players) {
                                 if(currentPlayer.getUser().equals(player)){
-                                    if(type.equals("keyDown")){
-                                        switch (keycode) {
-                                            case Input.Keys.UP:
-                                                currentPlayer.getDirection().y = 1;
-                                                break;
-                                            case Input.Keys.DOWN:
-                                                currentPlayer.getDirection().y = -1;
-                                                break;
-                                            case Input.Keys.LEFT:
-                                                currentPlayer.getDirection().x = -1;
-                                                break;
-                                            case Input.Keys.RIGHT:
-                                                currentPlayer.getDirection().x = 1;
-                                                break;
-                                            case Input.Keys.SPACE:
-                                                currentPlayer.jump();
-                                                break;
-                                        }
-                                    } else if(type.equals("keyUp")){
-                                        switch (keycode) {
-                                            case Input.Keys.UP:
-                                            case Input.Keys.DOWN:
-                                                currentPlayer.getDirection().y = 0;
-                                                break;
-                                            case Input.Keys.LEFT:
-                                            case Input.Keys.RIGHT:
-                                                currentPlayer.getDirection().x = 0;
-                                                break;
-                                        }
+                                    switch (keycode) {
+                                        case Input.Keys.UP:
+                                            currentPlayer.getDirection().y = 1;
+                                            break;
+                                        case Input.Keys.DOWN:
+                                            currentPlayer.getDirection().y = -1;
+                                            break;
+                                        case Input.Keys.LEFT:
+                                            currentPlayer.getDirection().x = -1;
+                                            break;
+                                        case Input.Keys.RIGHT:
+                                            currentPlayer.getDirection().x = 1;
+                                            break;
+                                        case Input.Keys.SPACE:
+                                            currentPlayer.jump();
+                                            break;
+                                        case Input.Keys.C:
+                                            currentPlayer.slash();
+                                            break;
+                                    }
+                                }
+                            }
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+
+        MenuSalasScreen.socket.on("key_up", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        JSONObject data = (JSONObject) args[0];
+                        try{
+                            String player = data.getString("player");
+                            int keycode = data.getInt("keycode");
+
+                            for (MultiPlayerPlayer currentPlayer : players) {
+                                if(currentPlayer.getUser().equals(player)){
+                                    switch (keycode) {
+                                        case Input.Keys.UP:
+                                        case Input.Keys.DOWN:
+                                            currentPlayer.getDirection().y = 0;
+                                            break;
+                                        case Input.Keys.LEFT:
+                                        case Input.Keys.RIGHT:
+                                            currentPlayer.getDirection().x = 0;
+                                            break;
                                     }
                                 }
                             }
@@ -163,7 +215,7 @@ public class MultiplayerGameScreen implements Screen {
             @Override
             public void run() {
                 for (MultiPlayerPlayer player : players) {
-                    if (player.isCurrentUser()) {
+                    if (player.isCurrentUser() && player.isAlive()) {
                         String lobby = game.SalaActual;
                         String username = player.getUser();
                         Vector2 position = player.getPosition();
@@ -175,14 +227,17 @@ public class MultiplayerGameScreen implements Screen {
                             data.put("positionX", position.x);
                             data.put("positionY", position.y);
 
-                            MenuSalasScreen.socket.emit("user_position", data);
+                            if(!position.equals(player.getPreviousPosition())){
+                                MenuSalasScreen.socket.emit("user_position", data);
+                                player.setPreviousPosition(position);
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
                 }
             }
-        }, 0, 1, TimeUnit.SECONDS);
+        }, 0, 250, TimeUnit.MILLISECONDS);
 
         MenuSalasScreen.socket.on("update_positions", new Emitter.Listener() {
             @Override
@@ -225,6 +280,14 @@ public class MultiplayerGameScreen implements Screen {
         stage.draw();
 
         drawHitboxes();
+
+        batch.begin();
+        for(MultiPlayerPlayer player : players){
+            if(player.isAlive()){
+                font.draw(batch, player.getUser() + " " + player.getDamageTaken(), player.getPosition().x + 15, player.getPosition().y + 50);
+            }
+        }
+        batch.end();
     }
     public void checkCollisions(){
         for(Actor actor : stage.getActors()){
@@ -235,6 +298,15 @@ public class MultiplayerGameScreen implements Screen {
                         if(!currentPlayer.isJumping()){
                             float logRotation = spinLog.getRotation();
                             currentPlayer.updatePosition(logRotation);
+                        }
+                    }
+                }
+            } else if(actor instanceof PlayerSlash){
+                PlayerSlash playerSlash = (PlayerSlash) actor;
+                for (MultiPlayerPlayer currentPlayer : players) {
+                    if(playerSlash.collides(currentPlayer)){
+                        if(!currentPlayer.isJumping() && !playerSlash.getPlayer().equals(currentPlayer)){
+                            currentPlayer.updatePosition(playerSlash.getDirection());
                         }
                     }
                 }
@@ -280,16 +352,21 @@ public class MultiplayerGameScreen implements Screen {
     @Override
     public void dispose() {
         mapRenderer.dispose();
+        font.dispose();
+        batch.dispose();
     }
     public void drawHitboxes(){
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         for(Actor actor : stage.getActors()){
-            if (actor instanceof MultiPlayerPlayer){
-                MultiPlayerPlayer player = (MultiPlayerPlayer) actor;
+            if (actor instanceof Player){
+                Player player = (Player) actor;
                 shapeRenderer.rect(player.getCollisionRect().x, player.getCollisionRect().y, player.getCollisionRect().width, player.getCollisionRect().height);
             } else if (actor instanceof SpinLog){
                 SpinLog spinLog = (SpinLog) actor;
                 shapeRenderer.polygon(spinLog.getCollisionPolygon().getTransformedVertices());
+            } else if(actor instanceof PlayerSlash){
+                PlayerSlash playerSlash = (PlayerSlash) actor;
+                shapeRenderer.rect(playerSlash.getCollisionRect().x, playerSlash.getCollisionRect().y, playerSlash.getCollisionRect().width, playerSlash.getCollisionRect().height);
             }
         }
         shapeRenderer.end();

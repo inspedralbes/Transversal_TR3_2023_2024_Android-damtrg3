@@ -30,7 +30,9 @@ public class MultiplayerGameInputHandler extends GameInputHandler{
             data.put("salaId", this.game.SalaActual);
             data.put("type", "keyDown");
             data.put("keycode", keycode);
-            socket.emit("key", data.toString());
+            if(player.isAlive()){
+                socket.emit("keyDown", data.toString());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -46,7 +48,9 @@ public class MultiplayerGameInputHandler extends GameInputHandler{
             data.put("salaId", this.game.SalaActual);
             data.put("type", "keyUp");
             data.put("keycode", keycode);
-            socket.emit("key", data.toString());
+            if(player.isAlive()){
+                socket.emit("keyUp", data.toString());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
