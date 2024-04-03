@@ -398,7 +398,7 @@ public class MultiplayerGameScreen implements Screen {
             int playerTileY = (int) (currentPlayer.getPosition().y / tileSize);
             TiledMapTileLayer.Cell cell = plataformaLayer.getCell(playerTileX, playerTileY);
             if (cell == null) {
-                if(!currentPlayer.isJumping()){
+                if(!currentPlayer.isJumping() && currentPlayer.isAlive()){
                     if(currentPlayer.isCurrentUser()){
                         JSONObject data = new JSONObject();
                         try {
