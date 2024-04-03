@@ -4,6 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -13,14 +17,21 @@ import org.json.JSONObject;
 public class Broadcast {
     private Socket socket;
     private BitmapFont font;
-    private GlyphLayout layout;
+    private Stage stage;
+    private TextButton button;
+
 
     public Broadcast() {
         connectSocket();
         font = new BitmapFont();
-        layout = new GlyphLayout();
+        stage = new Stage();
+        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
+        textButtonStyle.font = font;
+        button = new TextButton("", textButtonStyle);
+        button.setPosition(Gdx.graphics.getWidth() / 2 - button.getWidth() / 2, Gdx.graphics.getHeight() - button.getHeight()-100);
+        stage.addActor(button);
+        Gdx.input.setInputProcessor(stage);
     }
-
     public void connectSocket() {
         try {
             socket = IO.socket("http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES);
@@ -30,6 +41,7 @@ public class Broadcast {
             System.out.println(e.getMessage());
         }
     }
+
 
     public void configSocketEvents() {
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
@@ -45,7 +57,13 @@ public class Broadcast {
                     String title = obj.getString("title");
                     String message = obj.getString("message");
                     System.out.println("Received broadcast message:\nTitle: " + title + "\nMessage: " + message);
-                   layout.setText(font,"Received broadcast message:\nTitle: " + title + "\nMessage: " + message);
+                    button.setText("Received broadcast message:\nTitle: " + title + "\nMessage: " + message);
+                    button.addListener(new ClickListener() {
+                        @Override
+                        public void clicked(InputEvent event, float x, float y) {
+                            button.setVisible(false);
+                        }
+                    });
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
@@ -53,8 +71,6 @@ public class Broadcast {
         });
     }
     public void draw(SpriteBatch batch) {
-        float x = (Gdx.graphics.getWidth() - layout.width) / 2;
-        float y = (Gdx.graphics.getHeight() + layout.height) / 2;
-        font.draw(batch, layout, x, y);
+        stage.draw();
     }
 }
