@@ -237,7 +237,7 @@ public class MultiplayerGameScreen implements Screen {
                     }
                 }
             }
-        }, 0, 250, TimeUnit.MILLISECONDS);
+        }, 0, 1, TimeUnit.SECONDS);
 
         MenuSalasScreen.socket.on("update_positions", new Emitter.Listener() {
             @Override
@@ -254,6 +254,83 @@ public class MultiplayerGameScreen implements Screen {
                             for (MultiPlayerPlayer player : players) {
                                 if (player.getUser().equals(user)) {
                                     player.setPosition(new Vector2(positionX, positionY));
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+
+        MenuSalasScreen.socket.on("hit_by_log", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        JSONObject data = (JSONObject) args[0];
+                        try {
+                            String user = data.getString("player");
+                            float positionX = (float) data.getDouble("x");
+                            float positionY = (float) data.getDouble("y");
+                            float rotation = (float) data.getDouble("rotation");
+
+                            for (MultiPlayerPlayer player : players) {
+                                if (player.getUser().equals(user)) {
+                                    player.setPosition(new Vector2(positionX, positionY));
+                                    player.updatePosition(rotation);
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+
+        MenuSalasScreen.socket.on("hit_by_player", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        JSONObject data = (JSONObject) args[0];
+                        try {
+                            String user = data.getString("player");
+                            float positionX = (float) data.getDouble("x");
+                            float positionY = (float) data.getDouble("y");
+                            float directionX = (float) data.getDouble("directionX");
+                            float directionY = (float) data.getDouble("directionY");
+
+                            for (MultiPlayerPlayer player : players) {
+                                if (player.getUser().equals(user)) {
+                                    player.setPosition(new Vector2(positionX, positionY));
+                                    player.updatePosition(new Vector2(directionX, directionY));
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+
+        MenuSalasScreen.socket.on("player_dead", new Emitter.Listener(){
+            @Override
+            public void call(Object... args) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        JSONObject data = (JSONObject) args[0];
+                        try {
+                            String user = data.getString("user");
+                            for (MultiPlayerPlayer player : players) {
+                                if (player.getUser().equals(user)) {
+                                    player.remove();
                                 }
                             }
                         } catch (Exception e) {
@@ -297,7 +374,7 @@ public class MultiplayerGameScreen implements Screen {
                     if(spinLog.collides(currentPlayer)){
                         if(!currentPlayer.isJumping()){
                             float logRotation = spinLog.getRotation();
-                            currentPlayer.updatePosition(logRotation);
+                            currentPlayer.updatePosition(logRotation, game.SalaActual);
                         }
                     }
                 }
@@ -306,7 +383,7 @@ public class MultiplayerGameScreen implements Screen {
                 for (MultiPlayerPlayer currentPlayer : players) {
                     if(playerSlash.collides(currentPlayer)){
                         if(!currentPlayer.isJumping() && !playerSlash.getPlayer().equals(currentPlayer)){
-                            currentPlayer.updatePosition(playerSlash.getDirection());
+                            currentPlayer.updatePosition(playerSlash.getDirection(), game.SalaActual);
                         }
                     }
                 }
@@ -322,7 +399,17 @@ public class MultiplayerGameScreen implements Screen {
             TiledMapTileLayer.Cell cell = plataformaLayer.getCell(playerTileX, playerTileY);
             if (cell == null) {
                 if(!currentPlayer.isJumping()){
-                    currentPlayer.remove();
+                    if(currentPlayer.isCurrentUser()){
+                        JSONObject data = new JSONObject();
+                        try {
+                            data.put("salaId", game.SalaActual);
+                            data.put("user", currentPlayer.getUser());
+                            MenuSalasScreen.socket.emit("playerDead", data.toString());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        currentPlayer.remove();
+                    }
                 }
             }
         }
