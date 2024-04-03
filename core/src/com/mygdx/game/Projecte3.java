@@ -8,19 +8,29 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.LoginScreen;
-import com.mygdx.game.utils.User;
+import com.mygdx.game.utils.Broadcast;
 
 public class Projecte3 extends Game {
 
 	public static String nomUsuari;
 	public static String SalaActual;
-
+	private Broadcast broadcast;
+	private SpriteBatch batch;
 
 	@Override
 	public void create () {
 		AssetManager.load();
 		setScreen(new LoginScreen(this));
+		broadcast = new Broadcast();
+		batch = new SpriteBatch();
 
+	}
+	@Override
+	public void render () {
+		super.render();
+		batch.begin();
+		broadcast.draw(batch);
+		batch.end();
 	}
 	@Override
 	public void dispose () {
