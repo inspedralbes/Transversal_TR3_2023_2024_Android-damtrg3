@@ -8,7 +8,11 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.helpers.AssetManager;
+import com.mygdx.game.screens.LoginScreen;
+import com.mygdx.game.screens.MenuSalasScreen;
 import com.mygdx.game.utils.Settings;
+
+import io.socket.client.Socket;
 
 public class Player extends Actor {
     private Vector2 position;
@@ -32,6 +36,9 @@ public class Player extends Actor {
     private float pushForce;
     private Vector2 previousPosition;
     private float score;
+    private boolean isInvulnerable;
+    private float invulnerabilityTime;
+    protected float logHitCooldown;
 
     public Player() {
         position = Settings.PLAYER_START;
@@ -50,6 +57,9 @@ public class Player extends Actor {
         isAlive = true;
         previousPosition = position;
         score = 0;
+        isInvulnerable = false;
+        invulnerabilityTime = 0;
+        logHitCooldown = 0;
 
         shapeRenderer = new ShapeRenderer();
     }
@@ -61,11 +71,12 @@ public class Player extends Actor {
             float elapsedTime = stateTime - jumpStartTime;
             if (elapsedTime < jumpDuration) {
                 float progress = elapsedTime / jumpDuration;
-                position.y = originalY + (float)Math.sin(progress * Math.PI) * jumpHeight;
+                this.position.y = originalY + (float)Math.sin(progress * Math.PI) * jumpHeight;
+                originalY += direction.y * Settings.PLAYER_SPEED * delta;
             } else {
                 jumping = false;
                 jumpCooldown = 0;
-                position.y = originalY;
+                this.position.y = originalY;
             }
         } else {
             this.position.y += direction.y * Settings.PLAYER_SPEED * delta;
@@ -78,16 +89,23 @@ public class Player extends Actor {
 
         collisionRect.set(position.x + 20, position.y + 10, width - 40, height - 50);
 
+        if (isInvulnerable) {
+            invulnerabilityTime -= delta;
+            if (invulnerabilityTime <= 0) {
+                isInvulnerable = false;
+            }
+        }
+
         stateTime += delta;
         jumpCooldown += delta;
         slashCooldown += delta;
+        logHitCooldown += delta;
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
 
-        // Draw the shadow
         batch.end();
         shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -95,15 +113,14 @@ public class Player extends Actor {
         float size1 = width / 2 * 0.5f;
         float size2 = size1 * 0.5f;
         float shadowSize;
-        float shadowY = originalY + 10; // Shadow's y position is the same as the player's starting position
+        float shadowY = originalY + 10;
         if (jumping) {
             if (velocity > 0) {
                 shadowSize = size1 - (size1 - size2) * (jumpHeight - velocity) / jumpHeight;
-                peakShadowSize = shadowSize; // Store the shadow size at the peak of the jump
+                peakShadowSize = shadowSize;
             } else {
-                // Calculate the shadow size based on the player's current position relative to the original position
                 float progress = (originalY - position.y) / jumpHeight;
-                shadowSize = (peakShadowSize + (size1 - peakShadowSize) * progress) + 15; // Interpolate between peakShadowSize and size1
+                shadowSize = (peakShadowSize + (size1 - peakShadowSize) * progress) + 15;
             }
         } else {
             shadowSize = size1;
@@ -113,7 +130,6 @@ public class Player extends Actor {
         shapeRenderer.end();
         batch.begin();
 
-        // Choose the texture or animation based on the direction
         TextureRegion texture;
         if (direction.x > 0) {
             texture = (direction.x == 0 && direction.y == 0) ? AssetManager.cat_idle_right : AssetManager.cat_walk_right_animation.getKeyFrame(stateTime, true);
@@ -141,6 +157,9 @@ public class Player extends Actor {
     }
 
     public void updatePosition(float rotation) {
+        if(logHitCooldown < 1){
+            return;
+        }
         damageTaken += 1;
 
         pushForce = damageTaken * 250;
@@ -148,9 +167,15 @@ public class Player extends Actor {
         float pushDirectionY = (float) Math.sin(Math.toRadians(rotation + 90));
 
         this.pushVelocity.set(pushForce * pushDirectionX, pushForce * pushDirectionY);
+
+        logHitCooldown = 0;
     }
 
     public void updatePosition(Vector2 direction){
+        if(isInvulnerable){
+            return;
+        }
+
         float angle = direction.angleRad();
 
         damageTaken += Settings.PLAYER_DAMAGE_RECIEVED;
@@ -160,6 +185,9 @@ public class Player extends Actor {
         float pushDirectionY = (float) Math.sin(angle);
 
         this.pushVelocity.set(pushForce * pushDirectionX, pushForce * pushDirectionY);
+
+        isInvulnerable = true;
+        invulnerabilityTime = 1;
     }
 
     public void slash(){

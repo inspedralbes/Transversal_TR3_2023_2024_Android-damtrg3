@@ -70,6 +70,26 @@ public class SalasScreen implements Screen {
         Table contentTable = new Table();
         contentTable.center();
 
+        startButton = new TextButton("Start", AssetManager.lava_skin);
+        startButton.setSize(100, 100);
+        startButton.setPosition(100, 100);
+
+        startButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                JSONObject salaInfo = new JSONObject();
+                try {
+                    salaInfo.put("idSala", game.SalaActual);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(game.SalaActual);
+                System.out.println(salaInfo.toString());
+                MenuSalasScreen.socket.emit("START_GAME", salaInfo);
+            }
+        });
+
+        stage.addActor(startButton);
 
         textSala = new Label("Sala id:"+ game.SalaActual , AssetManager.lava_skin);
         textSalaCreador = new Label("Creador:" + game.nomUsuari , AssetManager.lava_skin);
@@ -96,6 +116,12 @@ public class SalasScreen implements Screen {
                                 textSala.setText("Sala id: " + idSala);
                                 textSalaCreador.setText("Creador: " + creador);
                                 textSalaJugadors.setText("Jugadores: " + jugadores.toString());
+
+                                if(game.nomUsuari.equals(creador)){
+                                    startButton.setVisible(true);
+                                } else {
+                                    startButton.setVisible(false);
+                                }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                                 // Manejar la excepción si alguna de las claves no está presente en el objeto salaInfo
@@ -103,9 +129,6 @@ public class SalasScreen implements Screen {
                         }
                     }
                 });
-
-
-
 
         contentTable.add(textSala);
         contentTable.row();
@@ -131,28 +154,6 @@ public class SalasScreen implements Screen {
 
 
         stage.addActor(popupTable); // Añadir la tabla del pop-up al escenario después de la tabla de envoltura
-
-        startButton = new TextButton("Start", AssetManager.lava_skin);
-        startButton.setSize(100, 100);
-        startButton.setPosition(100, 100);
-
-        startButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                JSONObject salaInfo = new JSONObject();
-                try {
-                    salaInfo.put("idSala", game.SalaActual);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                System.out.println(game.SalaActual);
-                System.out.println(salaInfo.toString());
-                MenuSalasScreen.socket.emit("START_GAME", salaInfo);
-            }
-        });
-
-        stage.addActor(startButton);
-
         MenuSalasScreen.socket.on("GAME_STARTED", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
