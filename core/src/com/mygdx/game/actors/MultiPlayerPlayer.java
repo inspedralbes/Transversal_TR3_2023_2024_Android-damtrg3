@@ -41,7 +41,7 @@ public class MultiPlayerPlayer extends Player{
     }
 
     public void updatePosition(Vector2 direction, String salaId){
-        if(isCurrentUser){
+        if(isCurrentUser && !isInvulnerable){
             super.updatePosition(direction);
 
             JSONObject data = new JSONObject();

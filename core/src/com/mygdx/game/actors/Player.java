@@ -36,7 +36,7 @@ public class Player extends Actor {
     private float pushForce;
     private Vector2 previousPosition;
     private float score;
-    private boolean isInvulnerable;
+    protected boolean isInvulnerable;
     private float invulnerabilityTime;
     protected float logHitCooldown;
 
