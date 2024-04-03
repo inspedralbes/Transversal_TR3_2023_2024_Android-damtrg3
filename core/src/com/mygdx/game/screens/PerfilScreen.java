@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -35,6 +36,8 @@ public class PerfilScreen implements Screen {
     private Batch batch;
 
     private ImageButton.ImageButtonStyle[] normalStyle, selectedStyle;
+
+    private ImageButton.ImageButtonStyle lockedStyle;
 
     private ImageButton selectedImageButton = null;
 
@@ -62,34 +65,36 @@ public class PerfilScreen implements Screen {
         Table recyclerView = new Table();
         int numberOfRows = 2;
         for (int i = 0; i < numberOfRows; i++) {
-            ImageButton[] imageButtons = new ImageButton[3];
             for (int j = 0; j < 3; j++) {
                 final int index = j;
-                ImageButton imageButton = new ImageButton(normalStyle[j]);
+                ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle(normalStyle[j]); // Crear una nueva instancia de estilo
+                ImageButton imageButton = new ImageButton(style);
+                Stack stack = new Stack(); // Crear un Stack para superponer las imágenes
+
+                if (i == 0 && j < 2) {
+                    stack.add(imageButton); // Agregar la skin al Stack
+                } else {
+                    ImageButton lockButton = new ImageButton(new ImageButton.ImageButtonStyle(lockedStyle)); // Crear un botón con la imagen del candado
+                    lockButton.setDisabled(true); // Deshabilitar el botón del candado
+
+                    stack.add(imageButton); // Agregar la skin al Stack
+                    stack.add(lockButton); // Agregar el candado encima de la skin
+                }
+
                 imageButton.addListener(new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
                         if (selectedImageButton != null) {
-                            for (int k = 0; k < normalStyle.length; k++) {
-                                if (selectedImageButton.getStyle().equals(selectedStyle[k])) {
-                                    selectedImageButton.setStyle(normalStyle[k]);
-                                    break;
-                                }
-                            }
+                            selectedImageButton.getStyle().imageUp = null;
                         }
                         selectedImageButton = imageButton;
-                        for (int k = 0; k < imageButtons.length; k++) {
-                            if (k == index) {
-                                imageButtons[k].setStyle(selectedStyle[k]);
-                            } else {
-                                imageButtons[k].setStyle(normalStyle[k]);
-                            }
-                        }
+                        imageButton.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Perfil/Cuadre.png"))));
                     }
                 });
-                imageButtons[j] = imageButton;
-                recyclerView.add(imageButton).width(80).height(80).pad(10);
-            }
+
+                recyclerView.add(stack).width(80).height(80).pad(10); // Agregar el Stack al RecyclerView en lugar del ImageButton
+
+        }
             recyclerView.row();
         }
 
@@ -101,8 +106,8 @@ public class PerfilScreen implements Screen {
         // Limitar el alto del ScrollPane para mostrar solo dos filas
         scrollPane.setHeight(2 * 80 + 2 * 10); // Altura de dos filas (80 es la altura de un botón y 10 es el padding)
 
-// Agregar el ScrollPane a la tabla principal
-        contentTable.add(scrollPane).colspan(3).padBottom(10).width(750).height(2 * 80 + 2 * 14);
+        // Agregar el ScrollPane a la tabla principal
+        contentTable.add(scrollPane).colspan(3).padBottom(0).width(750).height(2 * 80 + 2 * 14);
 
         TextButton backButton = new TextButton("Enrere", AssetManager.lava_skin);
         backButton.addListener(new ClickListener() {
@@ -130,6 +135,7 @@ public class PerfilScreen implements Screen {
     private void setupButtonStyles() {
         normalStyle = new ImageButton.ImageButtonStyle[3];
         selectedStyle = new ImageButton.ImageButtonStyle[3];
+        lockedStyle = new ImageButton.ImageButtonStyle(); // Este es el nuevo estilo para las skins bloqueadas
 
         String[] imageFiles = {"GameMode/SoloLogo6.png", "GameMode/soloDos.png", "GameMode/soloTres.png"};
 
@@ -141,7 +147,10 @@ public class PerfilScreen implements Screen {
             selectedStyle[i].up = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(imageFiles[i]))));
             selectedStyle[i].imageUp = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Perfil/Cuadre.png"))));
         }
+
+        lockedStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Perfil/candado.png"))));
     }
+
 
 
 
