@@ -17,21 +17,15 @@ import org.json.JSONObject;
 public class Broadcast {
     private Socket socket;
     private BitmapFont font;
-    private Stage stage;
-    private TextButton button;
-
+    private GlyphLayout layout;
+    private float messageTime = 0;
 
     public Broadcast() {
         connectSocket();
         font = new BitmapFont();
-        stage = new Stage();
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.font = font;
-        button = new TextButton("", textButtonStyle);
-        button.setPosition(Gdx.graphics.getWidth() / 2 - button.getWidth() / 2, Gdx.graphics.getHeight() - button.getHeight()-100);
-        stage.addActor(button);
-        Gdx.input.setInputProcessor(stage);
+        layout = new GlyphLayout();
     }
+
     public void connectSocket() {
         try {
             socket = IO.socket("http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES);
@@ -41,7 +35,6 @@ public class Broadcast {
             System.out.println(e.getMessage());
         }
     }
-
 
     public void configSocketEvents() {
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
@@ -57,20 +50,23 @@ public class Broadcast {
                     String title = obj.getString("title");
                     String message = obj.getString("message");
                     System.out.println("Received broadcast message:\nTitle: " + title + "\nMessage: " + message);
-                    button.setText("Received broadcast message:\nTitle: " + title + "\nMessage: " + message);
-                    button.addListener(new ClickListener() {
-                        @Override
-                        public void clicked(InputEvent event, float x, float y) {
-                            button.setVisible(false);
-                        }
-                    });
+                    layout.setText(font,"Received broadcast message:\nTitle: " + title + "\nMessage: " + message);
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
             }
         });
     }
-    public void draw(SpriteBatch batch) {
-        stage.draw();
+    public void draw(SpriteBatch batch, float deltaTime) {
+        messageTime += deltaTime; // Incrementa el contador de tiempo
+
+        if (messageTime <= 5) { // Si el contador es menor o igual a 5 segundos
+            float x = (Gdx.graphics.getWidth() - layout.width) / 2;
+            float y = (Gdx.graphics.getHeight() + layout.height) -100;
+            font.draw(batch, layout, x, y);
+        } else {
+            layout.setText(font, ""); // Restablece el texto del layout
+            messageTime = 0; // Restablece el contador de tiempo
+        }
     }
 }
