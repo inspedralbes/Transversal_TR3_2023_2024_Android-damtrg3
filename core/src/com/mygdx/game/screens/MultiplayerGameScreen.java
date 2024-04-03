@@ -2,6 +2,7 @@ package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -16,7 +17,10 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.actors.MultiPlayerPlayer;
@@ -51,6 +55,7 @@ public class MultiplayerGameScreen implements Screen {
     private MultiPlayerPlayer[] players;
     private BitmapFont font;
     private SpriteBatch batch;
+    private TextButton playAgainButton;
 
     public MultiplayerGameScreen(Projecte3 game, String[] jugadors) {
         font = new BitmapFont();
@@ -77,6 +82,8 @@ public class MultiplayerGameScreen implements Screen {
         RectangleMapObject spawnObject = (RectangleMapObject) spawnLayer.get("spawn");
         Rectangle spawnRectangle = spawnObject.getRectangle();
 
+        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+
         players = new MultiPlayerPlayer[jugadors.length];
         for (int i = 0; i < jugadors.length; i++) {
             players[i] = new MultiPlayerPlayer(jugadors[i]);
@@ -93,9 +100,13 @@ public class MultiplayerGameScreen implements Screen {
 
             if (jugadors[i].equals(game.nomUsuari)) {
                 players[i].setIsCurrentUser(true);
-                Gdx.input.setInputProcessor(new MultiplayerGameInputHandler(players[i], this.game));
+                inputMultiplexer.addProcessor(new MultiplayerGameInputHandler(players[i], this.game));
             }
         }
+        inputMultiplexer.addProcessor(stage);
+
+        Gdx.input.setInputProcessor(inputMultiplexer);
+
         System.out.println("Jugadors: " + players.length);
         plataformaLayer = (TiledMapTileLayer) AssetManager.tiledMap.getLayers().get("plataforma");
 
@@ -128,7 +139,24 @@ public class MultiplayerGameScreen implements Screen {
                 }
             }
         }
-        
+
+        playAgainButton = new TextButton("Play Again", AssetManager.neon_skin);
+        playAgainButton.setVisible(false);
+        stage.addActor(playAgainButton);
+        playAgainButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                JSONObject salaInfo = new JSONObject();
+                try {
+                    salaInfo.put("idSala", game.SalaActual);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(game.SalaActual);
+                System.out.println(salaInfo.toString());
+                MenuSalasScreen.socket.emit("START_GAME", salaInfo);
+            }
+        });
     }
 
     @Override
@@ -347,6 +375,7 @@ public class MultiplayerGameScreen implements Screen {
     public void render(float delta) {
         checkCollisions();
         checkInPlatform();
+        checkAllDead();
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -367,6 +396,19 @@ public class MultiplayerGameScreen implements Screen {
         }
         batch.end();
     }
+
+    public void checkAllDead(){
+        boolean allDead = true;
+        for(MultiPlayerPlayer player : players){
+            if(player.isAlive()){
+                allDead = false;
+            }
+        }
+        if(allDead){
+            playAgainButton.setVisible(true);
+        }
+    }
+
     public void checkCollisions(){
         for(Actor actor : stage.getActors()){
             if(actor instanceof SpinLog){
