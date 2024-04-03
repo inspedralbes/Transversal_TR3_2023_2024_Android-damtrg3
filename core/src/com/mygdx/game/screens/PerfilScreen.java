@@ -107,9 +107,9 @@ public class PerfilScreen implements Screen {
         scrollPane.setHeight(2 * 80 + 2 * 10); // Altura de dos filas (80 es la altura de un botón y 10 es el padding)
 
         // Agregar el ScrollPane a la tabla principal
-        contentTable.add(scrollPane).colspan(3).padBottom(0).width(750).height(2 * 80 + 2 * 14);
+        contentTable.add(scrollPane).colspan(3).width(750).height(2 * 80 + 2 * 14).padBottom(20);
 
-        TextButton backButton = new TextButton("Enrere", AssetManager.lava_skin);
+        TextButton backButton = new TextButton("<-", AssetManager.lava_skin);
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -117,16 +117,18 @@ public class PerfilScreen implements Screen {
             }
         });
 
-        TextButton guardarCanvisButton = new TextButton("Guardar Canvis", AssetManager.lava_skin);
+        TextButton guardarCanvisButton = new TextButton("Guardar", AssetManager.lava_skin);
         guardarCanvisButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
             }
         });
 
-        contentTable.row();
-        contentTable.add(backButton);
-        contentTable.add(guardarCanvisButton).colspan(2);
+
+        contentTable.add(backButton).colspan(2).padRight(400);
+        //contentTable.row();
+        //contentTable.add(guardarCanvisButton).padLeft(500);
+
 
         wrapperTable.add(contentTable).center();
         stage.addActor(wrapperTable);
