@@ -3,6 +3,7 @@ package com.mygdx.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -56,8 +57,10 @@ public class MultiplayerGameScreen implements Screen {
     private BitmapFont font;
     private SpriteBatch batch;
     private TextButton playAgainButton;
+    private boolean scoreSent;
 
     public MultiplayerGameScreen(Projecte3 game, String[] jugadors) {
+        scoreSent = false;
         font = new BitmapFont();
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
@@ -398,15 +401,46 @@ public class MultiplayerGameScreen implements Screen {
     }
 
     public void checkAllDead(){
-        boolean allDead = true;
+        int alive = 0;
+        MultiPlayerPlayer winner = null;
         for(MultiPlayerPlayer player : players){
             if(player.isAlive()){
-                allDead = false;
+                ++alive;
+                winner = player;
             }
         }
-        if(allDead){
+        if(alive == 1 && !scoreSent && winner.isCurrentUser()){
+            sendScore(winner.getUser());
+            scoreSent = true;
+        }
+        if(alive == 0){
             playAgainButton.setVisible(true);
         }
+    }
+
+    public void sendScore(String user){
+        final String URL = "http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/score";
+        Net.HttpRequest request = new Net.HttpRequest(Net.HttpMethods.POST);
+        request.setUrl(URL);
+        request.setHeader("Content-Type", "application/json");
+        request.setContent("{\"score\":" + 50 + ", \"username\":\"" + user + "\"}");
+
+        Gdx.net.sendHttpRequest(request, new Net.HttpResponseListener() {
+            @Override
+            public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                Gdx.app.log("SCORE", "Score sent successfully");
+            }
+
+            @Override
+            public void failed(Throwable t) {
+                Gdx.app.error("SCORE", "Failed to send score: " + t.getMessage());
+            }
+
+            @Override
+            public void cancelled() {
+                Gdx.app.error("SCORE", "Request cancelled");
+            }
+        });
     }
 
     public void checkCollisions(){
