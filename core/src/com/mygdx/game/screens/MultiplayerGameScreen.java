@@ -329,7 +329,8 @@ public class MultiplayerGameScreen implements Screen {
                         try {
                             String user = data.getString("user");
                             for (MultiPlayerPlayer player : players) {
-                                if (player.getUser().equals(user)) {
+                                if (player.getUser().equals(user) && player.isAlive()) {
+                                    player.setAlive(false);
                                     player.remove();
                                 }
                             }
@@ -398,8 +399,8 @@ public class MultiplayerGameScreen implements Screen {
             int playerTileY = (int) (currentPlayer.getPosition().y / tileSize);
             TiledMapTileLayer.Cell cell = plataformaLayer.getCell(playerTileX, playerTileY);
             if (cell == null) {
-                if(!currentPlayer.isJumping() && currentPlayer.isAlive()){
-                    if(currentPlayer.isCurrentUser()){
+                if(!currentPlayer.isJumping()){
+                    if(currentPlayer.isCurrentUser() && currentPlayer.isAlive()){
                         JSONObject data = new JSONObject();
                         try {
                             data.put("salaId", game.SalaActual);
@@ -408,6 +409,7 @@ public class MultiplayerGameScreen implements Screen {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        currentPlayer.setAlive(false);
                         currentPlayer.remove();
                     }
                 }
