@@ -191,7 +191,7 @@ public class Player extends Actor {
     }
 
     public void slash(){
-        if(isAlive && slashCooldown >= 1.5){
+        if(isAlive && slashCooldown >= 1.5 && !jumping){
             PlayerSlash slash = new PlayerSlash(this);
             getStage().addActor(slash);
             slashCooldown = 0;
