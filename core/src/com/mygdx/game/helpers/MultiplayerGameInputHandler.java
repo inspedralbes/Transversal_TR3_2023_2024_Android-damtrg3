@@ -28,7 +28,6 @@ public class MultiplayerGameInputHandler extends GameInputHandler{
         try {
             data.put("player", this.player.getUser());
             data.put("salaId", this.game.SalaActual);
-            data.put("type", "keyDown");
             data.put("keycode", keycode);
             if(player.isAlive()){
                 socket.emit("keyDown", data.toString());
@@ -46,7 +45,6 @@ public class MultiplayerGameInputHandler extends GameInputHandler{
         try {
             data.put("player", this.player.getUser());
             data.put("salaId", this.game.SalaActual);
-            data.put("type", "keyUp");
             data.put("keycode", keycode);
             if(player.isAlive()){
                 socket.emit("keyUp", data.toString());

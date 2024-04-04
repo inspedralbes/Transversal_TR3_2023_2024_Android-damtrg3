@@ -304,7 +304,7 @@ public class MultiplayerGameScreen implements Screen {
                             float positionY = (float) data.getDouble("positionY");
 
                             for (MultiPlayerPlayer player : players) {
-                                if (player.getUser().equals(user)) {
+                                if (player.getUser().equals(user) && !player.isCurrentUser()) {
                                     player.setPosition(new Vector2(positionX, positionY));
                                 }
                             }
@@ -540,6 +540,7 @@ public class MultiplayerGameScreen implements Screen {
         mapRenderer.dispose();
         font.dispose();
         batch.dispose();
+        stage.dispose();
     }
     public void drawHitboxes(){
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
