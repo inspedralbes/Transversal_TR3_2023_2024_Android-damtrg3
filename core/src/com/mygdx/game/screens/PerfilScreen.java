@@ -149,7 +149,7 @@ public class PerfilScreen implements Screen {
             selectedStyle[i].imageUp = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Perfil/Cuadre.png"))));
         }
 
-        lockedStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Perfil/candado.png"))));
+        lockedStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Perfil/candoado6.png"))));
     }
 
 
