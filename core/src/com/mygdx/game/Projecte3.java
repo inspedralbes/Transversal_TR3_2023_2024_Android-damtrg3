@@ -40,8 +40,4 @@ public class Projecte3 extends Game {
 		AssetManager.dispose();
 		batch.dispose();
 	}
-
-	public void setGameScreen(String[] jugadors){
-		this.setScreen(new MultiplayerGameScreen(this, jugadors));
-	}
 }

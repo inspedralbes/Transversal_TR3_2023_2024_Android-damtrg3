@@ -60,6 +60,7 @@ public class MultiplayerGameScreen implements Screen {
     private boolean scoreSent;
     private boolean leftPressed, rightPressed, upPressed, downPressed;
     private String[] jugadorsIn;
+    private MultiPlayerPlayer ganadorRonda;
 
     public MultiplayerGameScreen(Projecte3 game, String[] jugadors) {
         jugadorsIn = jugadors;
@@ -137,10 +138,8 @@ public class MultiplayerGameScreen implements Screen {
                     data.put("positionX", position.x);
                     data.put("positionY", position.y);
 
-                    if(!position.equals(player.getPreviousPosition())){
-                        MenuSalasScreen.socket.emit("user_position", data);
-                        player.setPreviousPosition(position);
-                    }
+                    MenuSalasScreen.socket.emit("user_position", data);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -153,6 +152,15 @@ public class MultiplayerGameScreen implements Screen {
         playAgainButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                JSONObject data = new JSONObject();
+                try {
+                    data.put("salaId", game.SalaActual);
+                    data.put("user", ganadorRonda.getUser());
+                    MenuSalasScreen.socket.emit("playerDead", data.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 JSONObject salaInfo = new JSONObject();
                 try {
                     salaInfo.put("idSala", game.SalaActual);
@@ -304,7 +312,7 @@ public class MultiplayerGameScreen implements Screen {
                             float positionY = (float) data.getDouble("positionY");
 
                             for (MultiPlayerPlayer player : players) {
-                                if (player.getUser().equals(user) && !player.isCurrentUser()) {
+                                if (player.getUser().equals(user)) {
                                     player.setPosition(new Vector2(positionX, positionY));
                                 }
                             }
@@ -400,7 +408,9 @@ public class MultiplayerGameScreen implements Screen {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        game.setGameScreen(jugadorsIn);
+                        dispose();
+
+                        game.setScreen(new MultiplayerGameScreen(game, jugadorsIn));
                     }
                 });
             }
@@ -431,6 +441,7 @@ public class MultiplayerGameScreen implements Screen {
             }
         }
         batch.end();
+
     }
 
     public void checkAllDead(){
@@ -447,6 +458,7 @@ public class MultiplayerGameScreen implements Screen {
                 sendScore(winner.getUser());
                 scoreSent = true;
             }
+            ganadorRonda = winner;
             playAgainButton.setVisible(true);
         }
     }
@@ -518,8 +530,6 @@ public class MultiplayerGameScreen implements Screen {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        currentPlayer.setAlive(false);
-                        currentPlayer.remove();
                     }
                 }
             }
@@ -553,6 +563,13 @@ public class MultiplayerGameScreen implements Screen {
         font.dispose();
         batch.dispose();
         stage.dispose();
+        MenuSalasScreen.socket.off("key_down");
+        MenuSalasScreen.socket.off("key_up");
+        MenuSalasScreen.socket.off("update_positions");
+        MenuSalasScreen.socket.off("hit_by_log");
+        MenuSalasScreen.socket.off("hit_by_player");
+        MenuSalasScreen.socket.off("player_dead");
+        MenuSalasScreen.socket.off("PLAY_AGAIN");
     }
     public void drawHitboxes(){
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
