@@ -141,6 +141,13 @@ public class RegisterScreen implements Screen {
                                             game.setScreen(new LoginScreen(game));
                                         }
                                     });
+                                } else {
+                                    Gdx.app.postRunnable(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            showToastMessage("Error: El nombre de usuario ya existe.");
+                                        }
+                                    });
                                 }
                             } else {
                                 Gdx.app.error("ERROR", "Gorda");
@@ -153,8 +160,7 @@ public class RegisterScreen implements Screen {
                     });
                 }
             }
-        }
-        );
+        });
 
         movetoLogin.addListener(new ClickListener() {
             @Override

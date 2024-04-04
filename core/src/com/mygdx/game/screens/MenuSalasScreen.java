@@ -3,14 +3,17 @@ package com.mygdx.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -275,17 +278,27 @@ public class MenuSalasScreen implements Screen {
         Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        System.out.println("Te has unido a la sala!");
+                if (httpResponse.getStatus().getStatusCode() == 200) {
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            System.out.println("Te has unido a la sala!");
 
-                        //Connexió al servidor de Socket.IO
+                            //Connexió al servidor de Socket.IO
 
-                        socket.emit("unirSala", idSala);
-                        game.setScreen(new SalasScreen(game));
-                    }
-                });
+                            socket.emit("unirSala", idSala);
+                            game.setScreen(new SalasScreen(game));
+                        }
+                    });
+                }else {
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            System.out.println("Error al unirse a la sala: La sala no existe");
+                            showToastMessage("La sala " + idSala + " no existe");
+                        }
+                    });
+                }
             }
 
             @Override
@@ -314,6 +327,19 @@ public class MenuSalasScreen implements Screen {
         // Conectar al servidor
         socket.connect();
     }
+
+    public void showToastMessage(String message) {
+        Label.LabelStyle style = new Label.LabelStyle();
+        style.font = new BitmapFont();
+        style.fontColor = Color.WHITE;
+
+        Label label = new Label(message, style);
+        label.setPosition(Gdx.graphics.getWidth() / 2 - label.getWidth() / 2, Gdx.graphics.getHeight() / 2 - label.getHeight() / 2);
+        label.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(0.5f), Actions.delay(2), Actions.fadeOut(0.5f), Actions.removeActor()));
+
+        stage.addActor(label);
+    }
+
 
     public String generarSalaId() {
         Random random = new Random();
@@ -360,4 +386,5 @@ public class MenuSalasScreen implements Screen {
             }
         });
     }
+
 }
