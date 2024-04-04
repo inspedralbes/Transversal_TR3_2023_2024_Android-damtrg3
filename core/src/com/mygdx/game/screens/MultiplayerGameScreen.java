@@ -279,10 +279,7 @@ public class MultiplayerGameScreen implements Screen {
                             data.put("positionX", position.x);
                             data.put("positionY", position.y);
 
-                            if(!position.equals(player.getPreviousPosition())){
-                                MenuSalasScreen.socket.emit("user_position", data);
-                                player.setPreviousPosition(position);
-                            }
+                            MenuSalasScreen.socket.emit("user_position", data);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
