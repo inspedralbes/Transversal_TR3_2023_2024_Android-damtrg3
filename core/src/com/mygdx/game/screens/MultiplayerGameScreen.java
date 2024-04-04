@@ -58,6 +58,7 @@ public class MultiplayerGameScreen implements Screen {
     private SpriteBatch batch;
     private TextButton playAgainButton;
     private boolean scoreSent;
+    private boolean leftPressed, rightPressed, upPressed, downPressed;
 
     public MultiplayerGameScreen(Projecte3 game, String[] jugadors) {
         scoreSent = false;
@@ -179,15 +180,19 @@ public class MultiplayerGameScreen implements Screen {
                                 if(currentPlayer.getUser().equals(player)){
                                     switch (keycode) {
                                         case Input.Keys.UP:
+                                            upPressed = true;
                                             currentPlayer.getDirection().y = 1;
                                             break;
                                         case Input.Keys.DOWN:
+                                            downPressed = true;
                                             currentPlayer.getDirection().y = -1;
                                             break;
                                         case Input.Keys.LEFT:
+                                            leftPressed = true;
                                             currentPlayer.getDirection().x = -1;
                                             break;
                                         case Input.Keys.RIGHT:
+                                            rightPressed = true;
                                             currentPlayer.getDirection().x = 1;
                                             break;
                                         case Input.Keys.SPACE:
@@ -222,12 +227,28 @@ public class MultiplayerGameScreen implements Screen {
                                 if(currentPlayer.getUser().equals(player)){
                                     switch (keycode) {
                                         case Input.Keys.UP:
+                                            upPressed = false;
+                                            if(!downPressed){
+                                                currentPlayer.getDirection().y = 0;
+                                            }
+                                            break;
                                         case Input.Keys.DOWN:
-                                            currentPlayer.getDirection().y = 0;
+                                            downPressed = false;
+                                            if(!upPressed){
+                                                currentPlayer.getDirection().y = 0;
+                                            }
                                             break;
                                         case Input.Keys.LEFT:
+                                            leftPressed = false;
+                                            if(!rightPressed){
+                                                currentPlayer.getDirection().x = 0;
+                                            }
+                                            break;
                                         case Input.Keys.RIGHT:
-                                            currentPlayer.getDirection().x = 0;
+                                            rightPressed = false;
+                                            if(!leftPressed){
+                                                currentPlayer.getDirection().x = 0;
+                                            }
                                             break;
                                     }
                                 }
@@ -409,11 +430,11 @@ public class MultiplayerGameScreen implements Screen {
                 winner = player;
             }
         }
-        if(alive == 1 && !scoreSent && winner.isCurrentUser()){
-            sendScore(winner.getUser());
-            scoreSent = true;
-        }
-        if(alive == 0){
+        if(alive == 1 && !scoreSent){
+            if(winner.isCurrentUser()){
+                sendScore(winner.getUser());
+                scoreSent = true;
+            }
             playAgainButton.setVisible(true);
         }
     }

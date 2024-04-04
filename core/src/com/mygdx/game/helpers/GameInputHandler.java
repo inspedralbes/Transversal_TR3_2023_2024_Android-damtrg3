@@ -10,6 +10,7 @@ import com.mygdx.game.screens.GameScreen;
 public class GameInputHandler implements InputProcessor {
 
     private Player player;
+    private boolean leftPressed, rightPressed, upPressed, downPressed;
 
     public GameInputHandler(Player player){
         this.player = player;
@@ -19,15 +20,19 @@ public class GameInputHandler implements InputProcessor {
     public boolean keyDown(int keycode) {
         switch (keycode) {
             case Input.Keys.UP:
+                upPressed = true;
                 player.getDirection().y = 1;
                 break;
             case Input.Keys.DOWN:
+                downPressed = true;
                 player.getDirection().y = -1;
                 break;
             case Input.Keys.LEFT:
+                leftPressed = true;
                 player.getDirection().x = -1;
                 break;
             case Input.Keys.RIGHT:
+                rightPressed = true;
                 player.getDirection().x = 1;
                 break;
             case Input.Keys.SPACE:
@@ -44,12 +49,28 @@ public class GameInputHandler implements InputProcessor {
     public boolean keyUp(int keycode) {
         switch (keycode) {
             case Input.Keys.UP:
+                upPressed = false;
+                if (!downPressed) {
+                    player.getDirection().y = 0;
+                }
+                break;
             case Input.Keys.DOWN:
-                player.getDirection().y = 0;
+                downPressed = false;
+                if (!upPressed) {
+                    player.getDirection().y = 0;
+                }
                 break;
             case Input.Keys.LEFT:
+                leftPressed = false;
+                if (!rightPressed) {
+                    player.getDirection().x = 0;
+                }
+                break;
             case Input.Keys.RIGHT:
-                player.getDirection().x = 0;
+                rightPressed = false;
+                if (!leftPressed) {
+                    player.getDirection().x = 0;
+                }
                 break;
         }
         return false;
