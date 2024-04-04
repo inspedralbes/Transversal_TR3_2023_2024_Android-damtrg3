@@ -128,19 +128,27 @@ public class LoginScreen implements Screen {
                                 Resposta r = response.body();
                                 System.out.println(r.isAutoritzacio());
                                 if (r.isAutoritzacio()) {
-
-                                    Gdx.app.error("nomUsuari", nomUsuari);
-                                    game.nomUsuari = nomUsuari;
                                     Gdx.app.postRunnable(new Runnable() {
                                         @Override
                                         public void run() {
                                             game.setScreen(new GameModeScreen(game));
-
+                                        }
+                                    });
+                                } else {
+                                    Gdx.app.postRunnable(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            showToastMessage("Error: Datos incorrectos. Por favor, inténtalo de nuevo.");
                                         }
                                     });
                                 }
                             } else {
-                                Gdx.app.error("ERROR", "Gorda");
+                                Gdx.app.postRunnable(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showToastMessage("Error: No se pudo iniciar sesión. Por favor, inténtalo de nuevo.");
+                                    }
+                                });
                             }
                         }
 
