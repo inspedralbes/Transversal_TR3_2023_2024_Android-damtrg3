@@ -47,7 +47,7 @@ public class MultiplayerGameScreen implements Screen {
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera;
     private Projecte3 game;
-    private Stage stage = new Stage();
+    private Stage stage;
     private Player player;
     private ShapeRenderer shapeRenderer;
 
@@ -59,8 +59,11 @@ public class MultiplayerGameScreen implements Screen {
     private TextButton playAgainButton;
     private boolean scoreSent;
     private boolean leftPressed, rightPressed, upPressed, downPressed;
+    private String[] jugadorsIn;
 
     public MultiplayerGameScreen(Projecte3 game, String[] jugadors) {
+        jugadorsIn = jugadors;
+        stage = new Stage();
         scoreSent = false;
         font = new BitmapFont();
         batch = new SpriteBatch();
@@ -158,7 +161,7 @@ public class MultiplayerGameScreen implements Screen {
                 }
                 System.out.println(game.SalaActual);
                 System.out.println(salaInfo.toString());
-                MenuSalasScreen.socket.emit("START_GAME", salaInfo);
+                MenuSalasScreen.socket.emit("playAgain", salaInfo);
             }
         });
     }
@@ -386,6 +389,18 @@ public class MultiplayerGameScreen implements Screen {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                    }
+                });
+            }
+        });
+
+        MenuSalasScreen.socket.on("PLAY_AGAIN", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        game.setGameScreen(jugadorsIn);
                     }
                 });
             }

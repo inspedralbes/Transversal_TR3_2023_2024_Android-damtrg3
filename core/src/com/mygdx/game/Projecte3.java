@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.LoginScreen;
+import com.mygdx.game.screens.MultiplayerGameScreen;
 import com.mygdx.game.utils.Broadcast;
 
 public class Projecte3 extends Game {
@@ -37,5 +38,10 @@ public class Projecte3 extends Game {
 	public void dispose () {
 		super.dispose();
 		AssetManager.dispose();
+		batch.dispose();
+	}
+
+	public void setGameScreen(String[] jugadors){
+		this.setScreen(new MultiplayerGameScreen(this, jugadors));
 	}
 }
