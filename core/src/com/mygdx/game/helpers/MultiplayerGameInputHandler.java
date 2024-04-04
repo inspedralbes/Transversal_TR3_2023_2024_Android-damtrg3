@@ -26,10 +26,10 @@ public class MultiplayerGameInputHandler extends GameInputHandler{
         JSONObject data = new JSONObject();
         super.keyDown(keycode);
         try {
-            data.put("player", this.player.getUser());
-            data.put("salaId", this.game.SalaActual);
-            data.put("keycode", keycode);
             if(player.isAlive()){
+                data.put("player", this.player.getUser());
+                data.put("salaId", this.game.SalaActual);
+                data.put("keycode", keycode);
                 socket.emit("keyDown", data.toString());
             }
         } catch (Exception e) {
@@ -43,10 +43,10 @@ public class MultiplayerGameInputHandler extends GameInputHandler{
         JSONObject data = new JSONObject();
         super.keyUp(keycode);
         try {
-            data.put("player", this.player.getUser());
-            data.put("salaId", this.game.SalaActual);
-            data.put("keycode", keycode);
             if(player.isAlive()){
+                data.put("player", this.player.getUser());
+                data.put("salaId", this.game.SalaActual);
+                data.put("keycode", keycode);
                 socket.emit("keyUp", data.toString());
             }
         } catch (Exception e) {
