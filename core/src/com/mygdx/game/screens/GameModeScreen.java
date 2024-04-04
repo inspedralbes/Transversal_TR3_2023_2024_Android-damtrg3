@@ -87,6 +87,7 @@ public class GameModeScreen implements Screen {
         // Crear un TextButton con texto
         TextButton SoloButton = new TextButton("Inidividual", skin);
         TextButton MultiButton = new TextButton("Multijugador", skin);
+        TextButton Ranking = new TextButton("Ranking", skin);
 
         SoloButton.addListener(new ClickListener() {
             @Override
@@ -113,6 +114,19 @@ public class GameModeScreen implements Screen {
                 });
             }
         });
+        Ranking.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // Aquí va el código que se ejecutará cuando se haga clic en el TextButton
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        game.setScreen(new RankingSreen(game));
+                    }
+                });
+            }
+        });
+
 
         // Añadir la imagen (dentro del contenedor) como actor al botón
         SoloButton.add(imageContainer);
@@ -242,6 +256,8 @@ public class GameModeScreen implements Screen {
         contentTable.add(SoloButton).left().padBottom(10);
         contentTable.row();
         contentTable.add(MultiButton).left().padBottom(10);
+        contentTable.row();
+        contentTable.add(Ranking).left().padBottom(10);
 
 
 
