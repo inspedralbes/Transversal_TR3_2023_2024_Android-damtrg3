@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.actors.Player;
@@ -23,9 +24,13 @@ import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.helpers.GameInputHandler;
 import com.mygdx.game.utils.Settings;
 
+import java.util.concurrent.TimeUnit;
+
 
 public class GameScreen implements Screen {
-
+    private boolean isPlayerAlive = true;
+    private Label timerLabel;
+    private long startTime;
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera;
     private Projecte3 game;
@@ -66,6 +71,13 @@ public class GameScreen implements Screen {
         plataformaLayer = (TiledMapTileLayer) AssetManager.tiledMap.getLayers().get("plataforma");
 
         Gdx.input.setInputProcessor(new GameInputHandler(player));
+
+        startTime = TimeUtils.millis();
+
+        // Crear la etiqueta del cronómetro y añadirla al escenario
+        timerLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        timerLabel.setPosition(10, Gdx.graphics.getHeight() - 30);
+        stage.addActor(timerLabel);
     }
 
     @Override
@@ -91,6 +103,17 @@ public class GameScreen implements Screen {
         stage.draw();
 
         drawHitboxes();
+
+        if (isPlayerAlive) {
+            long timeElapsedMillis = TimeUtils.timeSinceMillis(startTime);
+            long hours = TimeUnit.MILLISECONDS.toHours(timeElapsedMillis);
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(timeElapsedMillis) % 60;
+            long seconds = TimeUnit.MILLISECONDS.toSeconds(timeElapsedMillis) % 60;
+            long milliseconds = timeElapsedMillis % 1000;
+
+            // Actualizar la etiqueta del cronómetro
+            timerLabel.setText(String.format("Tiempo: %02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds));
+        }
     }
 
     public void checkCollisions(){
@@ -115,8 +138,9 @@ public class GameScreen implements Screen {
         if (cell == null) {
             if(!player.isJumping()){
                 player.remove();
+                // Cuando el jugador "muere", detén el cronómetro y guarda el tiempo transcurrido
+                isPlayerAlive = false;
             }
-
         }
     }
 
