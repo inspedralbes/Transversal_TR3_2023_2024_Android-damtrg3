@@ -66,8 +66,8 @@ public class PerfilScreen implements Screen {
         int numberOfRows = 2;
         for (int i = 0; i < numberOfRows; i++) {
             for (int j = 0; j < 3; j++) {
-                final int index = j;
-                ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle(normalStyle[j]); // Crear una nueva instancia de estilo
+                final int index = i * 3 + j; // Cambiar a esto para usar las imágenes correctas
+                ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle(normalStyle[index]); // Usar 'index' en lugar de 'j'
                 ImageButton imageButton = new ImageButton(style);
                 Stack stack = new Stack(); // Crear un Stack para superponer las imágenes
 
@@ -93,8 +93,7 @@ public class PerfilScreen implements Screen {
                 });
 
                 recyclerView.add(stack).width(80).height(80).pad(10); // Agregar el Stack al RecyclerView en lugar del ImageButton
-
-        }
+            }
             recyclerView.row();
         }
 
@@ -135,13 +134,13 @@ public class PerfilScreen implements Screen {
     }
 
     private void setupButtonStyles() {
-        normalStyle = new ImageButton.ImageButtonStyle[3];
-        selectedStyle = new ImageButton.ImageButtonStyle[3];
+        normalStyle = new ImageButton.ImageButtonStyle[6]; // Cambiar a 6 para incluir todas las imágenes
+        selectedStyle = new ImageButton.ImageButtonStyle[6]; // Cambiar a 6 para incluir todas las imágenes
         lockedStyle = new ImageButton.ImageButtonStyle(); // Este es el nuevo estilo para las skins bloqueadas
 
-        String[] imageFiles = {"GameMode/SoloLogo6.png", "GameMode/soloDos.png", "GameMode/soloTres.png"};
+        String[] imageFiles = {"GameMode/SoloLogo6.png", "GameMode/soloDos.png", "GameMode/soloTres.png", "GameMode/personaje4.png", "GameMode/personaje5.png", "GameMode/personaje6.png"};
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 6; i++) { // Cambiar a 6 para incluir todas las imágenes
             normalStyle[i] = new ImageButton.ImageButtonStyle();
             normalStyle[i].up = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal(imageFiles[i]))));
 
