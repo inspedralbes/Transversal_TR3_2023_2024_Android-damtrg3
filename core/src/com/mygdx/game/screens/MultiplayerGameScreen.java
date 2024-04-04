@@ -430,11 +430,11 @@ public class MultiplayerGameScreen implements Screen {
                 winner = player;
             }
         }
-        if(alive == 1 && !scoreSent && winner.isCurrentUser()){
-            sendScore(winner.getUser());
-            scoreSent = true;
-        }
-        if(alive == 0){
+        if(alive == 1 && !scoreSent){
+            if(winner.isCurrentUser()){
+                sendScore(winner.getUser());
+                scoreSent = true;
+            }
             playAgainButton.setVisible(true);
         }
     }
