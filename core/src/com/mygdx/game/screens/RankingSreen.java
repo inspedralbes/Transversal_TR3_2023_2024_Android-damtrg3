@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -24,17 +25,76 @@ import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.Settings;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URISyntaxException;
+
+import javax.swing.text.View;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
+
 public class RankingSreen implements Screen {
+    private Table recyclerView;
     private Projecte3 game;
     private Stage stage;
     private TextButton backButton;
+
+    private TextButton actualizar;
     private Batch batch;
+    public static Socket socket;
     public RankingSreen(Projecte3 game) {
         this.game = game;
+        try {
+            connectToSocketServer();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void show() {
+
+        actualizar = new TextButton("Actualitzar", AssetManager.lava_skin);
+        actualizar.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                socket.emit("reqRanking");
+            }
+        });
+
+        socket.on("actualitzarRanking", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                if (args.length > 0) {
+                    JSONArray rankingInfo = (JSONArray) args[0];
+                    System.out.println(rankingInfo.toString());
+
+                    // Limpiar el RecyclerView
+                    recyclerView.clearChildren();
+
+                    // Acceder directamente a las claves en el objeto salaInfo
+                    try {
+                        for (int i = 0; i < rankingInfo.length(); i++) {
+                            JSONObject jugador = rankingInfo.getJSONObject(i);
+                            String nombre = jugador.getString("username");
+                            int puntuacion = jugador.getInt("elapsedTime");
+
+                            Label label = new Label(nombre + ": " + puntuacion, AssetManager.lava_skin);
+                            recyclerView.add(label).pad(10);
+                            recyclerView.row(); // Esto crea una nueva fila, por lo que cada texto estará en su propia línea.
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        // Manejar la excepción si alguna de las claves no está presente en el objeto salaInfo
+                    }
+                }
+            }
+        });
+
         // Crear un nuevo SpriteBatch
         batch = new SpriteBatch();
 
@@ -55,14 +115,7 @@ public class RankingSreen implements Screen {
         backButton = new TextButton("Back", AssetManager.lava_skin);
 
         // Crear un nuevo Table que actuará como nuestro RecyclerView.
-        Table recyclerView = new Table();
-
-        // Añadir algunos elementos de texto al recyclerView.
-        for (int i = 0; i < 20; i++) {
-            Label label = new Label("Texto " + (i + 1), AssetManager.lava_skin);
-            recyclerView.add(label).pad(10);
-            recyclerView.row(); // Esto crea una nueva fila, por lo que cada texto estará en su propia línea.
-        }
+        recyclerView = new Table();
 
         // Crear un ScrollPane que contenga nuestro recyclerView.
         ScrollPane scrollPane = new ScrollPane(recyclerView);
@@ -76,6 +129,8 @@ public class RankingSreen implements Screen {
         // Agrega los actores al contentTable
         contentTable.add(backButton).pad(10).right().padRight(130); // Alinea el botón de retroceso a la derecha y añade espacio a la izquierda
         contentTable.row();
+        contentTable.add(actualizar).pad(10).right().padRight(130); // Alinea el botón de retroceso a la derecha y añade espacio a la izquierda
+        contentTable.row();
 
         wrapperTable.add(contentTable).expand().fill(); // Agrega el Table de contenido dentro del Table de envoltura
 
@@ -88,7 +143,18 @@ public class RankingSreen implements Screen {
             }
         });
     }
+    private void connectToSocketServer() throws URISyntaxException {
+        socket = IO.socket("http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES);
+        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                System.out.println("Conectado al servidor de Socket.IO");
+            }
+        });
 
+        // Conectar al servidor
+        socket.connect();
+    }
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
