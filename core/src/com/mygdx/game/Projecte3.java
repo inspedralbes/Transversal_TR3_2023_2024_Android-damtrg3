@@ -15,12 +15,18 @@ import com.mygdx.game.utils.Broadcast;
 public class Projecte3 extends Game {
 
 	public static String nomUsuari;
+
+	public static int Skin;
 	public static String SalaActual;
 	private Broadcast broadcast;
 	private SpriteBatch batch;
 
+	public static Texture cat_spritesheet;
+
+
 	@Override
 	public void create () {
+		cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite2.png"));
 		AssetManager.load();
 		setScreen(new LoginScreen(this));
 		broadcast = new Broadcast();
