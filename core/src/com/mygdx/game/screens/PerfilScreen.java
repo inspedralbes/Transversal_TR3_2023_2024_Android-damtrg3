@@ -177,7 +177,10 @@ public class PerfilScreen implements Screen {
                             selectedImageButton = imageButton;
                             imageButton.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Perfil/Cuadre.png"))));
                             game.Skin = index + 1;
+                            cargarTexturasPersonaje();
+                            System.out.println(game.cat_spritesheet);
                             System.out.println(game.Skin);
+                            AssetManager.load();
                         }
                     });
                 }
@@ -208,12 +211,34 @@ public class PerfilScreen implements Screen {
         stage.addActor(wrapperTable);
     }
 
+    private void cargarTexturasPersonaje() {
+        switch (game.Skin) {
+            case 1:
+                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite2.png"));
+                break;
+            case 2:
+                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite1.png"));
+                break;
+            case 3:
+                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite3.png"));
+                break;
+            case 4:
+                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite4.png"));
+                break;
+            case 5:
+                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite4.png"));
+                break;
+            case 6:
+                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite4.png"));
+                break;
+            default:
+                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite2.png"));
+                break;
+        }
 
-
-
-
-
-
+        // Luego, carga las texturas de animación como lo haces actualmente
+        // ...
+    }
 
     @Override
     public void render(float delta) {
