@@ -226,10 +226,10 @@ public class PerfilScreen implements Screen {
                 game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite4.png"));
                 break;
             case 5:
-                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite4.png"));
+                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite5.png"));
                 break;
             case 6:
-                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite4.png"));
+                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite6.png"));
                 break;
             default:
                 game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite2.png"));
