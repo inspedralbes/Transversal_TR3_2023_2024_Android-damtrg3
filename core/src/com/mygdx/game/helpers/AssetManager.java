@@ -15,7 +15,6 @@ public class AssetManager {
 
     public static Skin lava_skin;
 
-    public static Skin lava2_skin;
     public static Texture menu_bg;
 
     public static Texture menu_bg2;
