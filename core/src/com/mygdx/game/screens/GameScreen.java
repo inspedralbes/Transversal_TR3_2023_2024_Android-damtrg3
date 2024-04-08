@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.actors.Player;
@@ -25,9 +26,23 @@ import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.helpers.GameInputHandler;
 import com.mygdx.game.utils.Settings;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+
+import java.util.concurrent.TimeUnit;
+
 
 public class GameScreen implements Screen {
-
+    private boolean isElapsedTimeSent = false;
+    private long elapsedTimeWhenPlayerDied = 0;
+    private boolean isPlayerAlive = true;
+    private Label timerLabel;
+    private long startTime;
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera;
     private Projecte3 game;
@@ -73,6 +88,13 @@ public class GameScreen implements Screen {
         plataformaLayer = (TiledMapTileLayer) AssetManager.tiledMap.getLayers().get("plataforma");
 
         Gdx.input.setInputProcessor(new GameInputHandler(player));
+
+        startTime = TimeUtils.millis();
+
+        // Crear la etiqueta del cronómetro y añadirla al escenario
+        timerLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        timerLabel.setPosition(10, Gdx.graphics.getHeight() - 30);
+        stage.addActor(timerLabel);
     }
 
     @Override
@@ -100,6 +122,17 @@ public class GameScreen implements Screen {
         stage.draw();
 
         drawHitboxes();
+
+        if (isPlayerAlive) {
+            long timeElapsedMillis = TimeUtils.timeSinceMillis(startTime);
+            long hours = TimeUnit.MILLISECONDS.toHours(timeElapsedMillis);
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(timeElapsedMillis) % 60;
+            long seconds = TimeUnit.MILLISECONDS.toSeconds(timeElapsedMillis) % 60;
+            long milliseconds = timeElapsedMillis % 1000;
+
+            // Actualizar la etiqueta del cronómetro
+            timerLabel.setText(String.format("Tiempo: %02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds));
+        }
         player.increaseScore(delta);
     }
 
@@ -123,13 +156,61 @@ public class GameScreen implements Screen {
         int playerTileY = (int) (player.getPosition().y / tileSize);
         TiledMapTileLayer.Cell cell = plataformaLayer.getCell(playerTileX, playerTileY);
         if (cell == null) {
-            if(!player.isJumping() && player.isAlive()){
-                sendScore(player.getScore());
-                player.setAlive(false);
+            if(!player.isJumping()){
                 player.remove();
+                // Cuando el jugador "muere", detén el cronómetro y guarda el tiempo transcurrido
+                isPlayerAlive = false;
+                sendScore(player.getScore());
+                // Guardar el tiempo transcurrido cuando el jugador muere
+                elapsedTimeWhenPlayerDied = TimeUtils.timeSinceMillis(startTime);
+                // Enviar el tiempo transcurrido al servidor solo si aún no se ha enviado
+                if (!isElapsedTimeSent) {
+                    sendElapsedTimeToServer(elapsedTimeWhenPlayerDied);
+                    isElapsedTimeSent = true;
+                }
             }
         }
     }
+
+    public void sendElapsedTimeToServer(long elapsedTime) {
+        JSONObject dataJSON = new JSONObject();
+        try {
+            dataJSON.put("elapsedTime", elapsedTime);
+            dataJSON.put("username", game.nomUsuari);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        Net.HttpRequest httpRequest = new Net.HttpRequest(Net.HttpMethods.POST);
+        httpRequest.setUrl("http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/cronometreYuser");
+        String data = dataJSON.toString();
+        httpRequest.setContent(data);
+        httpRequest.setHeader("Content-Type", "application/json");
+
+        Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
+            @Override
+            public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("Elapsed time and username sent!");
+                    }
+                });
+            }
+
+            @Override
+            public void failed(Throwable t) {
+                System.out.println("Error sending elapsed time and username: " + t.getMessage());
+            }
+
+            @Override
+            public void cancelled() {
+                System.out.println("Elapsed time and username send cancelled");
+            }
+        });
+    }
+
+
 
     @Override
     public void resize(int width, int height) {
