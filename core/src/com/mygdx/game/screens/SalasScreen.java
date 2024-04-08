@@ -41,6 +41,7 @@ public class SalasScreen implements Screen {
     private Label textSalaJugadors;
     private TextButton startButton;
     private String[] jugadorsSala;
+    private String creador = "";
 
     public SalasScreen(Projecte3 game) {
         this.game = game;
@@ -106,16 +107,27 @@ public class SalasScreen implements Screen {
                             // Acceder directamente a las claves en el objeto salaInfo
                             try {
                                 String idSala = salaInfo.getString("idSala");
-                                String creador = salaInfo.getString("creador");
+                                creador = salaInfo.getString("creador");
                                 JSONArray jugadores = salaInfo.getJSONArray("jugadores");
                                 jugadorsSala = new String[jugadores.length()];
                                 for (int i = 0; i < jugadores.length(); i++) {
-                                    jugadorsSala[i] = jugadores.getString(i);
+                                    JSONObject jugador = jugadores.getJSONObject(i);
+                                    String nomJugador = jugador.getString("nom");
+                                    jugadorsSala[i] = nomJugador;
                                 }
 
                                 textSala.setText("Sala id: " + idSala);
                                 textSalaCreador.setText("Creador: " + creador);
-                                textSalaJugadors.setText("Jugadores: " + jugadores.toString());
+                                StringBuilder jugadoresNombres = new StringBuilder();
+                                for (int i = 0; i < jugadores.length(); i++) {
+                                    JSONObject jugador = jugadores.getJSONObject(i);
+                                    String nomJugador = jugador.getString("nom");
+                                    jugadoresNombres.append(nomJugador);
+                                    if (i < jugadores.length() - 1) {
+                                        jugadoresNombres.append(", ");
+                                    }
+                                }
+                                textSalaJugadors.setText("Jugadores: " + jugadoresNombres.toString());
 
                                 if(game.nomUsuari.equals(creador)){
                                     startButton.setVisible(true);
@@ -161,7 +173,7 @@ public class SalasScreen implements Screen {
                     @Override
                     public void run() {
                         System.out.println("GAME_STARTED");
-                        game.setScreen(new MultiplayerGameScreen(game, jugadorsSala));
+                        game.setScreen(new MultiplayerGameScreen(game, jugadorsSala, creador));
                     }
                 });
             }

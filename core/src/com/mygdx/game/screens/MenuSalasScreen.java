@@ -212,7 +212,10 @@ public class MenuSalasScreen implements Screen {
                         roomJSON.put("creadorSala", game.nomUsuari);
                         roomJSON.put("estatSala", "En espera");
                         JSONArray jugadores = new JSONArray();
-                        jugadores.put(game.nomUsuari);
+                        JSONObject jugador = new JSONObject();
+                        jugador.put("nom", game.nomUsuari);
+                        jugador.put("wins", 0);
+                        jugadores.put(jugador);
 
                         roomJSON.put("jugadores", jugadores);
                     } catch (JSONException e) {

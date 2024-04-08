@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.actors.MultiPlayerPlayer;
@@ -30,11 +31,16 @@ import com.mygdx.game.actors.PlayerSlash;
 import com.mygdx.game.actors.obstacles.SpinLog;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.helpers.MultiplayerGameInputHandler;
+import com.mygdx.game.stats.PlayerStats;
 import com.mygdx.game.utils.Settings;
+import com.sun.org.apache.xpath.internal.operations.Mult;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -56,19 +62,25 @@ public class MultiplayerGameScreen implements Screen {
     private MultiPlayerPlayer[] players;
     private BitmapFont font;
     private SpriteBatch batch;
-    private TextButton playAgainButton;
+    private TextButton playAgainButton, endGameButton;
     private boolean scoreSent;
     private boolean leftPressed, rightPressed, upPressed, downPressed;
     private String[] jugadorsIn;
     private MultiPlayerPlayer ganadorRonda;
+    private String creadorSala;
+    private ArrayList<PlayerStats> player_stats;
+    private int position;
 
-    public MultiplayerGameScreen(Projecte3 game, String[] jugadors) {
+    public MultiplayerGameScreen(Projecte3 game, String[] jugadors, String creador) {
+        creadorSala = creador;
         jugadorsIn = jugadors;
         stage = new Stage();
         scoreSent = false;
         font = new BitmapFont();
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
+        player_stats = new ArrayList<>();
+        position = jugadors.length;
 
         this.game = game;
 
@@ -147,6 +159,7 @@ public class MultiplayerGameScreen implements Screen {
         }
 
         playAgainButton = new TextButton("Play Again", AssetManager.neon_skin);
+        playAgainButton.setPosition(Settings.SCREEN_WIDTH / 2 - playAgainButton.getWidth() / 2, Settings.SCREEN_HEIGHT / 2 - playAgainButton.getHeight() / 2);
         playAgainButton.setVisible(false);
         stage.addActor(playAgainButton);
         playAgainButton.addListener(new ClickListener() {
@@ -170,6 +183,27 @@ public class MultiplayerGameScreen implements Screen {
                 System.out.println(game.SalaActual);
                 System.out.println(salaInfo.toString());
                 MenuSalasScreen.socket.emit("playAgain", salaInfo);
+            }
+        });
+
+        endGameButton = new TextButton("End Game", AssetManager.neon_skin);
+        endGameButton.setPosition(Settings.SCREEN_WIDTH / 2 - endGameButton.getWidth() / 2, Settings.SCREEN_HEIGHT / 2 - endGameButton.getHeight() / 2 - 100);
+        endGameButton.setVisible(false);
+        stage.addActor(endGameButton);
+        endGameButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                JSONObject data = new JSONObject();
+                JSONObject data2 = new JSONObject();
+                try {
+                    data.put("salaId", game.SalaActual);
+                    data.put("user", ganadorRonda.getUser());
+                    MenuSalasScreen.socket.emit("playerDead", data.toString());
+                    data2.put("salaId", game.SalaActual);
+                    MenuSalasScreen.socket.emit("endGame", data2.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -391,6 +425,9 @@ public class MultiplayerGameScreen implements Screen {
                             for (MultiPlayerPlayer player : players) {
                                 if (player.getUser().equals(user) && player.isAlive()) {
                                     player.setAlive(false);
+                                    PlayerStats playerStats = new PlayerStats(player.getUser(), position, player.getDamageTaken());
+                                    --position;
+                                    player_stats.add(playerStats);
                                     player.remove();
                                 }
                             }
@@ -410,7 +447,20 @@ public class MultiplayerGameScreen implements Screen {
                     public void run() {
                         dispose();
 
-                        game.setScreen(new MultiplayerGameScreen(game, jugadorsIn));
+                        game.setScreen(new MultiplayerGameScreen(game, jugadorsIn, creadorSala));
+                    }
+                });
+            }
+        });
+
+        MenuSalasScreen.socket.on("GAME_ENDED", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        dispose();
+                        game.setScreen(new GameEndedScreen(game));
                     }
                 });
             }
@@ -447,28 +497,90 @@ public class MultiplayerGameScreen implements Screen {
     public void checkAllDead(){
         int alive = 0;
         MultiPlayerPlayer winner = null;
+        MultiPlayerPlayer currentUser = null;
         for(MultiPlayerPlayer player : players){
             if(player.isAlive()){
                 ++alive;
                 winner = player;
             }
+            if(player.isCurrentUser()){
+                currentUser = player;
+            }
         }
-        if(alive == 1 && !scoreSent){
-            if(winner.isCurrentUser()){
-                sendScore(winner.getUser());
+
+        if(alive == 1){
+            if(winner.isCurrentUser() && !scoreSent){
+                sendScore(winner.getUser(), game.SalaActual);
+                PlayerStats playerStats = new PlayerStats(winner.getUser(), position, winner.getDamageTaken());
+                player_stats.add(playerStats);
+                sendStats();
                 scoreSent = true;
             }
+
             ganadorRonda = winner;
-            playAgainButton.setVisible(true);
+            if(currentUser.getUser().equals(creadorSala)){
+                playAgainButton.setVisible(true);
+                endGameButton.setVisible(true);
+            }
         }
     }
 
-    public void sendScore(String user){
+    public void sendStats(){
+        final String URL = "http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/stats";
+        Net.HttpRequest request = new Net.HttpRequest(Net.HttpMethods.POST);
+        request.setUrl(URL);
+        request.setHeader("Content-Type", "application/json");
+
+        JSONArray playerStatsArray = new JSONArray();
+
+        for (PlayerStats playerStats : player_stats) {
+            JSONObject playerStatsObject = new JSONObject();
+            try {
+                playerStatsObject.put("playerName", playerStats.getPlayerName());
+                playerStatsObject.put("position", playerStats.getPosition());
+                playerStatsObject.put("damageReceived", playerStats.getDamageReceived());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            playerStatsArray.put(playerStatsObject);
+        }
+
+        Date currentTime = new Date();
+
+        JSONObject data = new JSONObject();
+        try {
+            data.put("playerStats", playerStatsArray);
+            data.put("time", currentTime);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        request.setContent(data.toString());
+
+        Gdx.net.sendHttpRequest(request, new Net.HttpResponseListener() {
+            @Override
+            public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                Gdx.app.log("STATS", "Stats sent successfully");
+            }
+
+            @Override
+            public void failed(Throwable t) {
+                Gdx.app.error("STATS", "Failed to send stats: " + t.getMessage());
+            }
+
+            @Override
+            public void cancelled() {
+                Gdx.app.error("STATS", "Request cancelled");
+            }
+        });
+    }
+
+    public void sendScore(String user, String lobbyId){
         final String URL = "http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/score";
         Net.HttpRequest request = new Net.HttpRequest(Net.HttpMethods.POST);
         request.setUrl(URL);
         request.setHeader("Content-Type", "application/json");
-        request.setContent("{\"score\":" + 50 + ", \"username\":\"" + user + "\"}");
+        request.setContent("{\"score\":" + 50 + ", \"username\":\"" + user + "\", \"lobbyId\":\"" + lobbyId + "\"}");
 
         Gdx.net.sendHttpRequest(request, new Net.HttpResponseListener() {
             @Override
