@@ -1,6 +1,7 @@
 package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
@@ -26,6 +27,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.Settings;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class PerfilScreen implements Screen {
     private Projecte3 game;
@@ -150,6 +154,44 @@ public class PerfilScreen implements Screen {
         }
 
         lockedStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Perfil/candoado6.png"))));
+    }
+
+    public void getInventari(final String nomUsuari) {
+
+        JSONObject requestData = new JSONObject();
+        try {
+            requestData.put("nomUsuari", nomUsuari);
+            Gdx.app.error("Usuari", game.nomUsuari);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Net.HttpRequest httpRequest = new Net.HttpRequest(Net.HttpMethods.POST);
+        httpRequest.setUrl("http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/getInventari");
+        httpRequest.setContent(requestData.toString());
+        httpRequest.setHeader("Content-Type", "application/json");
+
+        Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
+            @Override
+            public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("Informacio del inventari Rebuda!");
+                    }
+                });
+            }
+
+            @Override
+            public void failed(Throwable t) {
+                System.out.println("Error al rebre la nformació del inventari: " + t.getMessage());
+            }
+
+            @Override
+            public void cancelled() {
+                System.out.println("Operació Cancelada");
+            }
+        });
     }
 
 
