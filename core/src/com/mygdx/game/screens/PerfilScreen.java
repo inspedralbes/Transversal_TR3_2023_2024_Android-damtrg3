@@ -28,8 +28,12 @@ import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.Settings;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
+import java.util.ArrayList;
 
 public class PerfilScreen implements Screen {
     private Projecte3 game;
@@ -45,6 +49,11 @@ public class PerfilScreen implements Screen {
 
     private ImageButton selectedImageButton = null;
 
+
+    private List<Integer> productIds = new ArrayList<>();
+
+    private boolean inventarioCargado = false;
+
     public PerfilScreen(Projecte3 game) {
         this.game = game;
     }
@@ -55,86 +64,7 @@ public class PerfilScreen implements Screen {
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
         setupButtonStyles();
-
-        Table wrapperTable = new Table();
-        wrapperTable.setSize(750, 880);
-        wrapperTable.setPosition((Gdx.graphics.getWidth() - wrapperTable.getWidth()) / 2, (Gdx.graphics.getHeight() - wrapperTable.getHeight()) / 2);
-        Texture backgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
-        TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
-        wrapperTable.setBackground(backgroundDrawable);
-
-        Table contentTable = new Table();
-        contentTable.pad(20);
-
-        Table recyclerView = new Table();
-        int numberOfRows = 2;
-        for (int i = 0; i < numberOfRows; i++) {
-            for (int j = 0; j < 3; j++) {
-                final int index = i * 3 + j; // Cambiar a esto para usar las imágenes correctas
-                ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle(normalStyle[index]); // Usar 'index' en lugar de 'j'
-                ImageButton imageButton = new ImageButton(style);
-                Stack stack = new Stack(); // Crear un Stack para superponer las imágenes
-
-                if (i == 0 && j < 2) {
-                    stack.add(imageButton); // Agregar la skin al Stack
-                } else {
-                    ImageButton lockButton = new ImageButton(new ImageButton.ImageButtonStyle(lockedStyle)); // Crear un botón con la imagen del candado
-                    lockButton.setDisabled(true); // Deshabilitar el botón del candado
-
-                    stack.add(imageButton); // Agregar la skin al Stack
-                    stack.add(lockButton); // Agregar el candado encima de la skin
-                }
-
-                imageButton.addListener(new ClickListener() {
-                    @Override
-                    public void clicked(InputEvent event, float x, float y) {
-                        if (selectedImageButton != null) {
-                            selectedImageButton.getStyle().imageUp = null;
-                        }
-                        selectedImageButton = imageButton;
-                        imageButton.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Perfil/Cuadre.png"))));
-                    }
-                });
-
-                recyclerView.add(stack).width(80).height(80).pad(10); // Agregar el Stack al RecyclerView en lugar del ImageButton
-            }
-            recyclerView.row();
-        }
-
-        // Crear el ScrollPane
-        ScrollPane scrollPane = new ScrollPane(recyclerView);
-        scrollPane.setFlickScroll(true);
-        scrollPane.setScrollingDisabled(true, false); // Deshabilitar el desplazamiento horizontal
-
-        // Limitar el alto del ScrollPane para mostrar solo dos filas
-        scrollPane.setHeight(2 * 80 + 2 * 10); // Altura de dos filas (80 es la altura de un botón y 10 es el padding)
-
-        // Agregar el ScrollPane a la tabla principal
-        contentTable.add(scrollPane).colspan(3).width(750).height(2 * 80 + 2 * 14).padBottom(20);
-
-        TextButton backButton = new TextButton("<-", AssetManager.lava_skin);
-        backButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new GameModeScreen(game));
-            }
-        });
-
-        TextButton guardarCanvisButton = new TextButton("Guardar", AssetManager.lava_skin);
-        guardarCanvisButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-            }
-        });
-
-
-        contentTable.add(backButton).colspan(2).padRight(400);
-        //contentTable.row();
-        //contentTable.add(guardarCanvisButton).padLeft(500);
-
-
-        wrapperTable.add(contentTable).center();
-        stage.addActor(wrapperTable);
+        getInventari(game.nomUsuari);
     }
 
     private void setupButtonStyles() {
@@ -157,7 +87,6 @@ public class PerfilScreen implements Screen {
     }
 
     public void getInventari(final String nomUsuari) {
-
         JSONObject requestData = new JSONObject();
         try {
             requestData.put("nomUsuari", nomUsuari);
@@ -174,25 +103,112 @@ public class PerfilScreen implements Screen {
         Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                final String responseResult = httpResponse.getResultAsString();
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        System.out.println("Informacio del inventari Rebuda!");
+                        try {
+                            JSONArray jsonArray = new JSONArray(responseResult);
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                int productId = jsonObject.getInt("product_id");
+                                productIds.add(productId);
+                            }
+                            inventarioCargado = true;
+                            setupRecyclerView();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             }
 
             @Override
             public void failed(Throwable t) {
-                System.out.println("Error al rebre la nformació del inventari: " + t.getMessage());
+                System.out.println("Error al recibir la información del inventario: " + t.getMessage());
             }
 
             @Override
             public void cancelled() {
-                System.out.println("Operació Cancelada");
+                System.out.println("Operación Cancelada");
             }
         });
     }
+
+    private void setupRecyclerView() {
+        if (!inventarioCargado) {
+            return;
+        }
+
+        Table wrapperTable = new Table();
+        wrapperTable.setSize(750, 880);
+        wrapperTable.setPosition((Gdx.graphics.getWidth() - wrapperTable.getWidth()) / 2, (Gdx.graphics.getHeight() - wrapperTable.getHeight()) / 2);
+        Texture backgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
+        TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
+        wrapperTable.setBackground(backgroundDrawable);
+
+        Table contentTable = new Table();
+        contentTable.pad(20);
+
+        Table recyclerView = new Table();
+        int numberOfRows = 2;
+        for (int i = 0; i < numberOfRows; i++) {
+            for (int j = 0; j < 3; j++) {
+                final int index = i * 3 + j;
+                ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle(normalStyle[index]);
+                ImageButton imageButton = new ImageButton(style);
+                Stack stack = new Stack();
+
+                stack.add(imageButton);
+
+                if (!(i == 0 && j < 2) && !productIds.contains(index + 1)) {
+                    ImageButton lockButton = new ImageButton(new ImageButton.ImageButtonStyle(lockedStyle));
+                    lockButton.setDisabled(true);
+                    stack.add(lockButton);
+                } else {
+                    // Agregar el comportamiento de selección solo si el ítem está desbloqueado
+                    imageButton.addListener(new ClickListener() {
+                        @Override
+                        public void clicked(InputEvent event, float x, float y) {
+                            // Lógica de selección del botón
+                            if (selectedImageButton != null) {
+                                selectedImageButton.getStyle().imageUp = null;
+                            }
+                            selectedImageButton = imageButton;
+                            imageButton.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Perfil/Cuadre.png"))));
+                            game.Skin = index + 1;
+                            System.out.println(game.Skin);
+                        }
+                    });
+                }
+
+                recyclerView.add(stack).width(80).height(80).pad(10);
+            }
+            recyclerView.row();
+        }
+
+        ScrollPane scrollPane = new ScrollPane(recyclerView);
+        scrollPane.setFlickScroll(true);
+        scrollPane.setScrollingDisabled(true, false);
+        scrollPane.setHeight(2 * 80 + 2 * 10);
+
+        contentTable.add(scrollPane).colspan(3).width(750).height(2 * 80 + 2 * 14).padBottom(20);
+
+        TextButton backButton = new TextButton("<-", AssetManager.lava_skin);
+        backButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new GameModeScreen(game));
+            }
+        });
+
+        contentTable.add(backButton).colspan(2).padRight(400);
+
+        wrapperTable.add(contentTable).center();
+        stage.addActor(wrapperTable);
+    }
+
+
 
 
 

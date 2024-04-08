@@ -13,6 +13,8 @@ import com.mygdx.game.utils.User;
 public class Projecte3 extends Game {
 
 	public static String nomUsuari;
+
+	public static int Skin;
 	public static String SalaActual;
 
 
