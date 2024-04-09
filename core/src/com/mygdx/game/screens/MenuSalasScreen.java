@@ -215,6 +215,7 @@ public class MenuSalasScreen implements Screen {
                         JSONObject jugador = new JSONObject();
                         jugador.put("nom", game.nomUsuari);
                         jugador.put("wins", 0);
+                        jugador.put("skin", game.Skin);
                         jugadores.put(jugador);
 
                         roomJSON.put("jugadores", jugadores);
@@ -269,6 +270,7 @@ public class MenuSalasScreen implements Screen {
             requestData.put("idSala", idSala);
             Gdx.app.error("Usuari", game.nomUsuari);
             requestData.put("nomUsuari", game.nomUsuari);
+            requestData.put("skin", game.Skin);
         } catch (JSONException e) {
             e.printStackTrace();
         }
