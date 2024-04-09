@@ -177,7 +177,6 @@ public class PerfilScreen implements Screen {
                             selectedImageButton = imageButton;
                             imageButton.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Perfil/Cuadre.png"))));
                             game.Skin = index + 1;
-                            game.setSkinParaUsuario(game.nomUsuari, index + 1);
                             cargarTexturasPersonaje();
                             System.out.println(game.cat_spritesheet);
                             System.out.println(game.Skin);
@@ -213,8 +212,7 @@ public class PerfilScreen implements Screen {
     }
 
     private void cargarTexturasPersonaje() {
-        int skin = game.getSkinParaUsuario(game.nomUsuari);
-        switch (skin) {
+        switch (game.Skin) {
             case 1:
                 game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite2.png"));
                 break;
