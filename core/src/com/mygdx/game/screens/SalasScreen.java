@@ -90,7 +90,6 @@ public class SalasScreen implements Screen {
             }
         });
 
-        stage.addActor(startButton);
 
         textSala = new Label("Sala id:"+ game.SalaActual , AssetManager.lava_skin);
         textSalaCreador = new Label("Creador:" + game.nomUsuari , AssetManager.lava_skin);
@@ -146,7 +145,9 @@ public class SalasScreen implements Screen {
         contentTable.row();
         contentTable.add(textSalaCreador).padBottom(20);
         contentTable.row();
-        contentTable.add(textSalaJugadors).padBottom(30);;
+        contentTable.add(textSalaJugadors).padBottom(30);
+        contentTable.row();
+        contentTable.add(startButton);
 
         wrapperTable.add(contentTable); // Agrega el Table de contenido dentro del Table de envoltura
         stage.addActor(wrapperTable); // Agrega el Table de envoltura al Stage
