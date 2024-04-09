@@ -3,12 +3,15 @@ package com.mygdx.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.Settings;
@@ -101,13 +104,22 @@ public class GameEndedScreen implements Screen {
 
         Table rankingsTable = new Table();
         rankingsTable.setFillParent(true);
-        rankingsTable.pad(10).defaults().expandX().space(4);
+        rankingsTable.setPosition((Gdx.graphics.getWidth() - rankingsTable.getWidth()) / 2, (Gdx.graphics.getHeight() - rankingsTable.getHeight()) / 2); // Centra la tabla en la pantalla
+
+        Texture backgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
+        TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
+        rankingsTable.setBackground(backgroundDrawable);
+
+        Table contentTable = new Table();
+        contentTable.center();
+
 
         Label nameLabel = new Label("Player", AssetManager.lava_skin);
         Label winsLabel = new Label("Wins", AssetManager.lava_skin);
-        rankingsTable.add(nameLabel);
-        rankingsTable.add(winsLabel);
-        rankingsTable.row();
+
+        contentTable.add(nameLabel);
+        contentTable.add(winsLabel);
+        contentTable.row();
 
         for (Map.Entry<String, Integer> player : sortedPlayers) {
             Label playerNameLabel = new Label(player.getKey(), AssetManager.lava_skin);
@@ -125,9 +137,10 @@ public class GameEndedScreen implements Screen {
             }
         });
 
-        rankingsTable.add(returnButton).colspan(2).padTop(10);
+        contentTable.add(returnButton).colspan(2).padTop(10);
 
         // Add the table to the stage
+        rankingsTable.add(contentTable);
         stage.addActor(rankingsTable);
     }
 
