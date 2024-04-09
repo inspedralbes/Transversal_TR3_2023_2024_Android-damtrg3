@@ -7,12 +7,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -28,10 +25,6 @@ import com.mygdx.game.utils.Settings;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 
 import java.util.concurrent.TimeUnit;
@@ -49,7 +42,7 @@ public class GameScreen implements Screen {
     private Stage stage = new Stage();
     private Player player;
     private ShapeRenderer shapeRenderer;
-
+    private OptionsScreen.AudioManager audioManager;
     private TiledMapTileLayer plataformaLayer;
 
     private Label forceLabel;
@@ -59,6 +52,7 @@ public class GameScreen implements Screen {
         shapeRenderer = new ShapeRenderer();
 
         this.game = game;
+        this.audioManager = audioManager;
 
         camera = new OrthographicCamera(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
         camera.setToOrtho(false);
@@ -100,6 +94,9 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(new GameInputHandler(player));
+        if (audioManager.isMusicEnabled()) {
+            audioManager.getMusic().play();
+        }
     }
 
     @Override

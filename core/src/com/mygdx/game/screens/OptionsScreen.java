@@ -30,7 +30,15 @@ public class OptionsScreen implements Screen {
     private TextButton backButton;
     private CheckBox musicCheckBox;
     private Batch batch;
+
     public class AudioManager {
+        public boolean isMusicEnabled() {
+            return isMusicEnabled;
+        }
+
+        public Music getMusic() {
+            return music;
+        }
         private Music music;
         private boolean isMusicEnabled = true;
 
@@ -56,44 +64,40 @@ public class OptionsScreen implements Screen {
             }
         }
 
-        // Asegúrate de llamar a este método cuando cargues tu música
         public void setMusic(Music music) {
             this.music = music;
         }
     }
 
     private AudioManager audioManager = new AudioManager();
+
     public OptionsScreen(Projecte3 game) {
         this.game = game;
-
-
     }
 
     @Override
     public void show() {
-        // Crear un nuevo SpriteBatch
         batch = new SpriteBatch();
 
-        stage = new Stage(); // Initialize stage first
-        Gdx.input.setInputProcessor(stage); // Set InputProcessor after stage initialization
+        stage = new Stage();
+        Gdx.input.setInputProcessor(stage);
 
-        Table wrapperTable = new Table(); // Table para envolver los campos
-        wrapperTable.setSize(500, 600); // Establece el tamaño deseado para la tabla
-        wrapperTable.setPosition((Gdx.graphics.getWidth() - wrapperTable.getWidth()) / 2, (Gdx.graphics.getHeight() - wrapperTable.getHeight()) / 2); // Centra la tabla en la pantalla
+        Table wrapperTable = new Table();
+        wrapperTable.setSize(500, 600);
+        wrapperTable.setPosition((Gdx.graphics.getWidth() - wrapperTable.getWidth()) / 2, (Gdx.graphics.getHeight() - wrapperTable.getHeight()) / 2);
 
         Texture backgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
         wrapperTable.setBackground(backgroundDrawable);
 
-        Table contentTable = new Table(); // Table para los campos de entrada y botones
-        contentTable.pad(20); // Agrega un relleno de 20 píxeles alrededor del contenido
+        Table contentTable = new Table();
+        contentTable.pad(20);
 
         toggleMusicButton = new TextButton("Toggle Music", AssetManager.lava_skin);
         volumeSlider = new Slider(0, 1, 0.01f, false, AssetManager.lava_skin);
         backButton = new TextButton("Back", AssetManager.lava_skin);
         musicCheckBox = new CheckBox("Music On/Off", AssetManager.lava_skin);
 
-        // Agrega los actores al contentTable
         contentTable.add(toggleMusicButton).pad(10);
         contentTable.row();
         contentTable.add(volumeSlider).pad(10);
@@ -102,10 +106,10 @@ public class OptionsScreen implements Screen {
         contentTable.row();
         contentTable.add(backButton).pad(10);
 
+        wrapperTable.add(contentTable).center();
 
-        wrapperTable.add(contentTable).center(); // Agrega el Table de contenido dentro del Table de envoltura
+        stage.addActor(wrapperTable);
 
-        stage.addActor(wrapperTable); // Agrega el Table de envoltura al Stage
         toggleMusicButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -116,7 +120,6 @@ public class OptionsScreen implements Screen {
         volumeSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                // Implementación de la lógica de control de volumen
                 audioManager.setVolume(volumeSlider.getValue());
             }
         });
@@ -124,12 +127,10 @@ public class OptionsScreen implements Screen {
         musicCheckBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                // Implementación de la lógica de activar/desactivar música
                 boolean isChecked = musicCheckBox.isChecked();
                 audioManager.setMusicEnabled(isChecked);
             }
         });
-
 
         backButton.addListener(new ClickListener() {
             @Override
@@ -137,6 +138,9 @@ public class OptionsScreen implements Screen {
                 game.setScreen(new GameModeScreen(game));
             }
         });
+
+        Music music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/safaera.mp3"));
+        audioManager.setMusic(music);
     }
 
     @Override
@@ -155,26 +159,22 @@ public class OptionsScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
-
     }
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
     }
 
     @Override
     public void dispose() {
-
     }
 }
+
