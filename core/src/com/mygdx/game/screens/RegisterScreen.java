@@ -47,7 +47,7 @@ public class RegisterScreen implements Screen {
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera;
     private ApiService apiService;
-    private static final String URL = "http://localhost:3327/";
+    private static final String URL = "http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/";
     public RegisterScreen(Projecte3 game) {
         this.game = game;
         camera = new OrthographicCamera();

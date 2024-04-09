@@ -42,6 +42,7 @@ public class SalasScreen implements Screen {
     private TextButton startButton;
     private String[] jugadorsSala;
     private String creador = "";
+    private int[] skinsSala;
 
     public SalasScreen(Projecte3 game) {
         this.game = game;
@@ -90,7 +91,6 @@ public class SalasScreen implements Screen {
             }
         });
 
-        stage.addActor(startButton);
 
         textSala = new Label("Sala id:"+ game.SalaActual , AssetManager.lava_skin);
         textSalaCreador = new Label("Creador:" + game.nomUsuari , AssetManager.lava_skin);
@@ -110,10 +110,13 @@ public class SalasScreen implements Screen {
                                 creador = salaInfo.getString("creador");
                                 JSONArray jugadores = salaInfo.getJSONArray("jugadores");
                                 jugadorsSala = new String[jugadores.length()];
+                                skinsSala = new int[jugadores.length()];
                                 for (int i = 0; i < jugadores.length(); i++) {
                                     JSONObject jugador = jugadores.getJSONObject(i);
                                     String nomJugador = jugador.getString("nom");
+                                    int skin = jugador.getInt("skin");
                                     jugadorsSala[i] = nomJugador;
+                                    skinsSala[i] = skin;
                                 }
 
                                 textSala.setText("Sala id: " + idSala);
@@ -146,7 +149,9 @@ public class SalasScreen implements Screen {
         contentTable.row();
         contentTable.add(textSalaCreador).padBottom(20);
         contentTable.row();
-        contentTable.add(textSalaJugadors).padBottom(30);;
+        contentTable.add(textSalaJugadors).padBottom(30);
+        contentTable.row();
+        contentTable.add(startButton);
 
         wrapperTable.add(contentTable); // Agrega el Table de contenido dentro del Table de envoltura
         stage.addActor(wrapperTable); // Agrega el Table de envoltura al Stage
@@ -173,7 +178,7 @@ public class SalasScreen implements Screen {
                     @Override
                     public void run() {
                         System.out.println("GAME_STARTED");
-                        game.setScreen(new MultiplayerGameScreen(game, jugadorsSala, creador));
+                        game.setScreen(new MultiplayerGameScreen(game, jugadorsSala, creador, skinsSala));
                     }
                 });
             }

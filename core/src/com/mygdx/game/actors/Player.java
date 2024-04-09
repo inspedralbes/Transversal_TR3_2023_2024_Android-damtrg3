@@ -15,10 +15,10 @@ import com.mygdx.game.utils.Settings;
 import io.socket.client.Socket;
 
 public class Player extends Actor {
-    private Vector2 position;
-    private int width, height;
+    protected Vector2 position;
+    protected int width, height;
     private Vector2 direction;
-    private float stateTime;
+    protected float stateTime;
     private boolean jumping;
     private float jumpHeight;
     private float velocity;
@@ -130,6 +130,10 @@ public class Player extends Actor {
         shapeRenderer.end();
         batch.begin();
 
+        loadSkin(batch);
+    }
+
+    public void loadSkin(Batch batch){
         TextureRegion texture;
         if (direction.x > 0) {
             texture = (direction.x == 0 && direction.y == 0) ? AssetManager.cat_idle_right : AssetManager.cat_walk_right_animation.getKeyFrame(stateTime, true);

@@ -70,8 +70,9 @@ public class MultiplayerGameScreen implements Screen {
     private String creadorSala;
     private ArrayList<PlayerStats> player_stats;
     private int position;
+    private int[] skins;
 
-    public MultiplayerGameScreen(Projecte3 game, String[] jugadors, String creador) {
+    public MultiplayerGameScreen(Projecte3 game, String[] jugadors, String creador, int[] skins) {
         creadorSala = creador;
         jugadorsIn = jugadors;
         stage = new Stage();
@@ -81,6 +82,7 @@ public class MultiplayerGameScreen implements Screen {
         shapeRenderer = new ShapeRenderer();
         player_stats = new ArrayList<>();
         position = jugadors.length;
+        this.skins = skins;
 
         this.game = game;
 
@@ -106,7 +108,7 @@ public class MultiplayerGameScreen implements Screen {
 
         players = new MultiPlayerPlayer[jugadors.length];
         for (int i = 0; i < jugadors.length; i++) {
-            players[i] = new MultiPlayerPlayer(jugadors[i]);
+            players[i] = new MultiPlayerPlayer(jugadors[i], skins[i]);
             stage.addActor(players[i]);
 
             float randomX = MathUtils.random(spawnRectangle.x, spawnRectangle.x + spawnRectangle.width);
@@ -447,7 +449,7 @@ public class MultiplayerGameScreen implements Screen {
                     public void run() {
                         dispose();
 
-                        game.setScreen(new MultiplayerGameScreen(game, jugadorsIn, creadorSala));
+                        game.setScreen(new MultiplayerGameScreen(game, jugadorsIn, creadorSala, skins));
                     }
                 });
             }
