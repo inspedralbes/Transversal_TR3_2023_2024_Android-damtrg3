@@ -53,7 +53,7 @@ public class GameScreen implements Screen {
     private TiledMapTileLayer plataformaLayer;
 
     private Label forceLabel;
-    private Label scoreLabel;
+    //private Label scoreLabel;
 
     public GameScreen(Projecte3 game) {
         shapeRenderer = new ShapeRenderer();
@@ -77,9 +77,9 @@ public class GameScreen implements Screen {
         forceLabel.setPosition(10, Gdx.graphics.getHeight() - 10);
         stage.addActor(forceLabel);
 
-        scoreLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        /*scoreLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         scoreLabel.setPosition(10, Gdx.graphics.getHeight() - 30);
-        stage.addActor(scoreLabel);
+        stage.addActor(scoreLabel);*/
 
         //Carregar el jugador
         player = new Player();
@@ -116,7 +116,7 @@ public class GameScreen implements Screen {
         float currentForce = player.getPushForce(); // La fuerza actual es igual a pushForce
         forceLabel.setText("Fuerza: " + currentForce); // Muestra la fuerza directamente
 
-        scoreLabel.setText("Puntuación: " + player.getScore());
+        //scoreLabel.setText("Puntuación: " + player.getScore());
 
         stage.act(delta);
         stage.draw();
@@ -160,7 +160,7 @@ public class GameScreen implements Screen {
                 player.remove();
                 // Cuando el jugador "muere", detén el cronómetro y guarda el tiempo transcurrido
                 isPlayerAlive = false;
-                sendScore(player.getScore());
+                //sendScore(player.getScore());
                 // Guardar el tiempo transcurrido cuando el jugador muere
                 elapsedTimeWhenPlayerDied = TimeUtils.timeSinceMillis(startTime);
                 // Enviar el tiempo transcurrido al servidor solo si aún no se ha enviado
@@ -254,7 +254,7 @@ public class GameScreen implements Screen {
         shapeRenderer.end();
     }
 
-    public void sendScore(float score){
+    /*public void sendScore(float score){
         final String URL = "http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/score";
         Net.HttpRequest request = new Net.HttpRequest(Net.HttpMethods.POST);
         request.setUrl(URL);
@@ -277,5 +277,5 @@ public class GameScreen implements Screen {
                 Gdx.app.error("SCORE", "Request cancelled");
             }
         });
-    }
+    }*/
 }
