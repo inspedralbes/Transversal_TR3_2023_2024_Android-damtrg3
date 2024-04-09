@@ -163,6 +163,7 @@ public class GameScreen implements Screen {
                 //sendScore(player.getScore());
                 // Guardar el tiempo transcurrido cuando el jugador muere
                 elapsedTimeWhenPlayerDied = TimeUtils.timeSinceMillis(startTime);
+                game.setScreen(new soloGameEndedScreen(game, elapsedTimeWhenPlayerDied));
                 // Enviar el tiempo transcurrido al servidor solo si aún no se ha enviado
                 if (!isElapsedTimeSent) {
                     sendElapsedTimeToServer(elapsedTimeWhenPlayerDied);
