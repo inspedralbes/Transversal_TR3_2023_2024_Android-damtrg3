@@ -26,6 +26,7 @@ public class Projecte3 extends Game {
 
 	@Override
 	public void create () {
+		Skin = 1;
 		cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite2.png"));
 		AssetManager.load();
 		setScreen(new LoginScreen(this));
