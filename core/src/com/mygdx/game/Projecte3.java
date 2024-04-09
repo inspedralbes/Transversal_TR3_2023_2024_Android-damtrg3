@@ -12,6 +12,9 @@ import com.mygdx.game.screens.LoginScreen;
 import com.mygdx.game.screens.MultiplayerGameScreen;
 import com.mygdx.game.utils.Broadcast;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Projecte3 extends Game {
 
 	public static String nomUsuari;
@@ -21,6 +24,7 @@ public class Projecte3 extends Game {
 	private Broadcast broadcast;
 	private SpriteBatch batch;
 
+	public static Map<String, Integer> skinsPorUsuario = new HashMap<>();
 	public static Texture cat_spritesheet;
 
 
@@ -45,5 +49,17 @@ public class Projecte3 extends Game {
 		super.dispose();
 		AssetManager.dispose();
 		batch.dispose();
+	}
+
+	public void setSkinParaUsuario(String nomUsuari, int skin) {
+		skinsPorUsuario.put(nomUsuari, skin);
+	}
+
+	public int getSkinParaUsuario(String nomUsuari) {
+		Integer skin = skinsPorUsuario.get(nomUsuari);
+		if (skin == null) {
+			skin = 1;  // Usa 1 como valor predeterminado
+		}
+		return skin;
 	}
 }

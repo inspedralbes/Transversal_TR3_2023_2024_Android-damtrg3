@@ -212,7 +212,8 @@ public class PerfilScreen implements Screen {
     }
 
     private void cargarTexturasPersonaje() {
-        switch (game.Skin) {
+        int skin = game.getSkinParaUsuario(game.nomUsuari);
+        switch (skin) {
             case 1:
                 game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite2.png"));
                 break;
@@ -232,7 +233,7 @@ public class PerfilScreen implements Screen {
                 game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite6.png"));
                 break;
             default:
-                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite2.png"));
+                game.cat_spritesheet = new Texture(Gdx.files.internal("/Sprite2.png"));
                 break;
         }
 
