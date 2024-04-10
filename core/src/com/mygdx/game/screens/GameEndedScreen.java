@@ -114,22 +114,22 @@ public class GameEndedScreen implements Screen {
         contentTable.center();
 
 
-        Label nameLabel = new Label("Player", AssetManager.lava_skin);
-        Label winsLabel = new Label("Wins", AssetManager.lava_skin);
+        Label nameLabel = new Label("Jugadors", AssetManager.lava_skin);
+        Label winsLabel = new Label("Victories", AssetManager.lava_skin);
 
-        contentTable.add(nameLabel);
+        contentTable.add(nameLabel).padRight(50);
         contentTable.add(winsLabel);
         contentTable.row();
 
         for (Map.Entry<String, Integer> player : sortedPlayers) {
             Label playerNameLabel = new Label(player.getKey(), AssetManager.lava_skin);
             Label playerWinsLabel = new Label(String.valueOf(player.getValue()), AssetManager.lava_skin);
-            rankingsTable.add(playerNameLabel);
-            rankingsTable.add(playerWinsLabel);
-            rankingsTable.row();
+            contentTable.add(playerNameLabel);
+            contentTable.add(playerWinsLabel);
+            contentTable.row();
         }
 
-        TextButton returnButton = new TextButton("Return", AssetManager.neon_skin);
+        TextButton returnButton = new TextButton("Menu principal", AssetManager.lava_skin);
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
