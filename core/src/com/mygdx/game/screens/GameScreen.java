@@ -52,9 +52,11 @@ public class GameScreen implements Screen {
     //private Label scoreLabel;
     private Projecte3.AudioManager audioManager;
     private Music music;
+    private boolean debeReproducirSonidoDeLava;
+    private Sound lavaSound;
     public GameScreen(Projecte3 game, Projecte3.AudioManager audioManager) {
         this.audioManager = audioManager;
-
+        lavaSound = Gdx.audio.newSound(Gdx.files.internal("GameMode/acid.mp3"));
         // Crear la música aquí en lugar de en show()
         this.music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/lean.mp3"));
         audioManager.setMusic(music);
@@ -102,6 +104,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+        // Inicializar el sonido de la lava
         Gdx.input.setInputProcessor(new GameInputHandler(player));
         Preferences prefs = Gdx.app.getPreferences("MyPreferences");
         float volume = prefs.getFloat("volume", 1.0f); // 1.0f es el valor predeterminado
@@ -117,6 +120,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
+
         checkCollisions();
         checkInPlatform();
 
@@ -142,7 +146,7 @@ public class GameScreen implements Screen {
             long minutes = TimeUnit.MILLISECONDS.toMinutes(timeElapsedMillis) % 60;
             long seconds = TimeUnit.MILLISECONDS.toSeconds(timeElapsedMillis) % 60;
             long milliseconds = timeElapsedMillis % 1000;
-
+            lavaSound.play();
             // Actualizar la etiqueta del cronómetro
             timerLabel.setText(String.format("Tiempo: %02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds));
         }
@@ -173,6 +177,7 @@ public class GameScreen implements Screen {
                 player.remove();
                 // Cuando el jugador "muere", detén el cronómetro y guarda el tiempo transcurrido
                 isPlayerAlive = false;
+                // Reproducir el sonido de la lava
                 //sendScore(player.getScore());
                 // Guardar el tiempo transcurrido cuando el jugador muere
                 elapsedTimeWhenPlayerDied = TimeUtils.timeSinceMillis(startTime);
