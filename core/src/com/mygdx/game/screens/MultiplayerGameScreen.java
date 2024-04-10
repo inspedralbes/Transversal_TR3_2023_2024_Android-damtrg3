@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -71,8 +72,9 @@ public class MultiplayerGameScreen implements Screen {
     private ArrayList<PlayerStats> player_stats;
     private int position;
     private int[] skins;
+    private OptionsScreen.AudioManager audioManager;
 
-    public MultiplayerGameScreen(Projecte3 game, String[] jugadors, String creador, int[] skins) {
+    public MultiplayerGameScreen(Projecte3 game, String[] jugadors, String creador, int[] skins,  OptionsScreen.AudioManager audioManager) {
         creadorSala = creador;
         jugadorsIn = jugadors;
         stage = new Stage();
@@ -85,7 +87,7 @@ public class MultiplayerGameScreen implements Screen {
         this.skins = skins;
 
         this.game = game;
-
+        this.audioManager = audioManager;
         camera = new OrthographicCamera(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
         camera.setToOrtho(false);
         StretchViewport viewport = new StretchViewport(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT, camera);
@@ -212,6 +214,9 @@ public class MultiplayerGameScreen implements Screen {
 
     @Override
     public void show() {
+        Music music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/lean.mp3"));
+        audioManager.setMusic(music);
+        audioManager.setMusicEnabled(true);
         MenuSalasScreen.socket.on("key_down", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
@@ -448,8 +453,8 @@ public class MultiplayerGameScreen implements Screen {
                     @Override
                     public void run() {
                         dispose();
-
-                        game.setScreen(new MultiplayerGameScreen(game, jugadorsIn, creadorSala, skins));
+                        OptionsScreen.AudioManager audioManager = new OptionsScreen.AudioManager();
+                        game.setScreen(new MultiplayerGameScreen(game, jugadorsIn, creadorSala, skins, audioManager));
                     }
                 });
             }
@@ -668,7 +673,7 @@ public class MultiplayerGameScreen implements Screen {
 
     @Override
     public void hide() {
-
+        audioManager.setMusicEnabled(false);
     }
 
     @Override
