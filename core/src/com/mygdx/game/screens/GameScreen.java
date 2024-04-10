@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.actors.Player;
@@ -51,7 +52,6 @@ public class GameScreen implements Screen {
     //private Label scoreLabel;
     private Projecte3.AudioManager audioManager;
     private Music music;
-
     public GameScreen(Projecte3 game, Projecte3.AudioManager audioManager) {
         this.audioManager = audioManager;
 
@@ -59,7 +59,6 @@ public class GameScreen implements Screen {
         this.music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/lean.mp3"));
         audioManager.setMusic(music);
 
-        sound = Gdx.audio.newSound(Gdx.files.internal("GameMode/acid.mp3"));
         shapeRenderer = new ShapeRenderer();
 
         this.game = game;
@@ -107,7 +106,6 @@ public class GameScreen implements Screen {
         Preferences prefs = Gdx.app.getPreferences("MyPreferences");
         float volume = prefs.getFloat("volume", 1.0f); // 1.0f es el valor predeterminado
         boolean musicEnabled = prefs.getBoolean("musicEnabled", true); // true es el valor predeterminado
-
         // Aplicar las preferencias
         Projecte3.audioManager.setVolume(volume);
         Projecte3.audioManager.setMusicEnabled(musicEnabled);
@@ -178,8 +176,6 @@ public class GameScreen implements Screen {
                 //sendScore(player.getScore());
                 // Guardar el tiempo transcurrido cuando el jugador muere
                 elapsedTimeWhenPlayerDied = TimeUtils.timeSinceMillis(startTime);
-                sound.play(1.0f);
-
                 // Enviar el tiempo transcurrido al servidor solo si aún no se ha enviado
                 if (!isElapsedTimeSent) {
                     sendElapsedTimeToServer(elapsedTimeWhenPlayerDied);
