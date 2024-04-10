@@ -16,9 +16,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.Settings;
@@ -30,21 +32,23 @@ public class soloGameEndedScreen implements Screen {
     private Batch batch;
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera;
-    public soloGameEndedScreen(Projecte3 game, long elapsedTimeWhenPlayerDied) {
 
+    private long elapsedTimeWhenPlayerDied;
+    public soloGameEndedScreen(Projecte3 game, long elapsedTimeWhenPlayerDied) {
         this.game = game;
         camera = new OrthographicCamera();
-        mapRenderer = new OrthogonalTiledMapRenderer(AssetManager.tiledMap);
         camera.setToOrtho(false, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
 
-        mapRenderer.setView(camera);
-        mapRenderer.render();
+        stage = new Stage(new StretchViewport(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT, camera));
+        batch = stage.getBatch();
+
+        mapRenderer = new OrthogonalTiledMapRenderer(AssetManager.tiledMap);
+
+        this.elapsedTimeWhenPlayerDied = elapsedTimeWhenPlayerDied;
     }
 
     @Override
     public void show() {
-
-        stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
         batch = stage.getBatch();
@@ -95,18 +99,11 @@ public class soloGameEndedScreen implements Screen {
         TextButton SoloButton = new TextButton("Torna a Jugar", skin);
         TextButton MultiButton = new TextButton("Torna al Menu", skin);
 
-        SoloButton.addListener(new ClickListener() {
+
+        SoloButton.addListener(new ChangeListener() {
             @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Limpia los recursos de la pantalla actual
-                        game.getScreen().dispose();
-                        // Crea una nueva instancia de GameScreen y establece como la pantalla actual
-                        game.setScreen(new GameScreen(game));
-                    }
-                });
+            public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                game.setScreen(new GameScreen(game));
             }
         });
 
@@ -234,12 +231,16 @@ public class soloGameEndedScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        camera.update();
+        mapRenderer.setView(camera);
+        mapRenderer.render();
+
         batch.begin();
         batch.draw(AssetManager.menu_bg2, 0, 0, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
         batch.end();
 
-        stage.draw();
         stage.act(delta);
+        stage.draw();
     }
 
     @Override
@@ -264,6 +265,8 @@ public class soloGameEndedScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        stage.dispose();
+        batch.dispose();
+        mapRenderer.dispose();
     }
 }
