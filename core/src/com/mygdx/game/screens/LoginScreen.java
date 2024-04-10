@@ -133,8 +133,7 @@ public class LoginScreen implements Screen {
                                     Gdx.app.postRunnable(new Runnable() {
                                         @Override
                                         public void run() {
-                                            OptionsScreen.AudioManager audioManager = new OptionsScreen.AudioManager();
-                                            game.setScreen(new GameModeScreen(game, audioManager));
+                                            game.setScreen(new GameModeScreen(game));
                                         }
                                     });
                                 } else {

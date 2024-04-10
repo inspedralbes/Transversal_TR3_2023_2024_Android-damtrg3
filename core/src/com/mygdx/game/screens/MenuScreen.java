@@ -40,8 +40,7 @@ public class MenuScreen implements Screen {
         unJugadorButton.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                OptionsScreen.AudioManager audioManager = new OptionsScreen.AudioManager();
-                game.setScreen(new GameScreen(game, audioManager));
+                game.setScreen(new GameScreen(game, Projecte3.audioManager));
             }
         });
 

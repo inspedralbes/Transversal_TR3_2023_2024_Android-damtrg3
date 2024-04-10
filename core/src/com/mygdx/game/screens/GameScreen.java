@@ -2,8 +2,10 @@ package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -43,17 +45,24 @@ public class GameScreen implements Screen {
     private Stage stage = new Stage();
     private Player player;
     private ShapeRenderer shapeRenderer;
-    private OptionsScreen.AudioManager audioManager;
     private TiledMapTileLayer plataformaLayer;
-
+    private Sound sound;
     private Label forceLabel;
     //private Label scoreLabel;
+    private Projecte3.AudioManager audioManager;
+    private Music music;
 
-    public GameScreen(Projecte3 game, OptionsScreen.AudioManager audioManager) {
+    public GameScreen(Projecte3 game, Projecte3.AudioManager audioManager) {
+        this.audioManager = audioManager;
+
+        // Crear la música aquí en lugar de en show()
+        this.music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/lean.mp3"));
+        audioManager.setMusic(music);
+
+        sound = Gdx.audio.newSound(Gdx.files.internal("GameMode/acid.mp3"));
         shapeRenderer = new ShapeRenderer();
 
         this.game = game;
-        this.audioManager = audioManager;
 
         camera = new OrthographicCamera(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
         camera.setToOrtho(false);
@@ -95,9 +104,17 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(new GameInputHandler(player));
-        Music music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/lean.mp3"));
-        audioManager.setMusic(music);
-        audioManager.setMusicEnabled(true);
+        Preferences prefs = Gdx.app.getPreferences("MyPreferences");
+        float volume = prefs.getFloat("volume", 1.0f); // 1.0f es el valor predeterminado
+        boolean musicEnabled = prefs.getBoolean("musicEnabled", true); // true es el valor predeterminado
+
+        // Aplicar las preferencias
+        Projecte3.audioManager.setVolume(volume);
+        Projecte3.audioManager.setMusicEnabled(musicEnabled);
+        // Aquí solo debes iniciar la música si está habilitada
+        if (audioManager.isMusicEnabled()) {
+            audioManager.getMusic().play();
+        }
     }
 
     @Override
@@ -161,6 +178,8 @@ public class GameScreen implements Screen {
                 //sendScore(player.getScore());
                 // Guardar el tiempo transcurrido cuando el jugador muere
                 elapsedTimeWhenPlayerDied = TimeUtils.timeSinceMillis(startTime);
+                sound.play(1.0f);
+
                 // Enviar el tiempo transcurrido al servidor solo si aún no se ha enviado
                 if (!isElapsedTimeSent) {
                     sendElapsedTimeToServer(elapsedTimeWhenPlayerDied);
@@ -227,7 +246,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
-        audioManager.setMusicEnabled(false);
+        Projecte3.audioManager.setMusicEnabled(false);
     }
 
     @Override

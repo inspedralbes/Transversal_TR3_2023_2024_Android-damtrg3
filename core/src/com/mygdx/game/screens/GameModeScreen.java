@@ -25,15 +25,13 @@ import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.Settings;
 
 public class GameModeScreen implements Screen {
-    private OptionsScreen.AudioManager audioManager;
     private Projecte3 game;
     private Stage stage;
     private Batch batch;
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera;
-    public GameModeScreen(Projecte3 game, OptionsScreen.AudioManager audioManager) {
+    public GameModeScreen(Projecte3 game) {
         this.game = game;
-        this.audioManager = audioManager;
         camera = new OrthographicCamera();
         mapRenderer = new OrthogonalTiledMapRenderer(AssetManager.tiledMap);
         camera.setToOrtho(false, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
@@ -97,8 +95,7 @@ public class GameModeScreen implements Screen {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        OptionsScreen.AudioManager audioManager = new OptionsScreen.AudioManager();
-                        game.setScreen(new GameScreen(game, audioManager));
+                        game.setScreen(new GameScreen(game, Projecte3.audioManager));
                     }
                 });
             }
@@ -301,7 +298,7 @@ public class GameModeScreen implements Screen {
 
     @Override
     public void hide() {
-        audioManager.setMusicEnabled(false);
+        Projecte3.audioManager.setMusicEnabled(false);
     }
 
     @Override

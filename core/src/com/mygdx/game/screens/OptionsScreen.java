@@ -1,6 +1,7 @@
 package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
@@ -30,52 +31,6 @@ public class OptionsScreen implements Screen {
     private TextButton backButton;
     private CheckBox musicCheckBox;
     private Batch batch;
-
-    public static class AudioManager {
-        public boolean isMusicEnabled() {
-            return isMusicEnabled;
-        }
-
-        public Music getMusic() {
-            return music;
-        }
-        private Music music;
-        private boolean isMusicEnabled = true;
-
-        public void toggleMusic() {
-            if (music != null) {
-                if (isMusicEnabled) {
-                    music.pause();
-                } else {
-                    music.play();
-                }
-                isMusicEnabled = !isMusicEnabled;
-            }
-        }
-
-        public void setVolume(float volume) {
-            if (music != null) {
-                music.setVolume(volume);
-            }
-        }
-
-        public void setMusicEnabled(boolean isEnabled) {
-            isMusicEnabled = isEnabled;
-            if (music != null) {
-                if (isMusicEnabled) {
-                    music.play();
-                } else {
-                    music.pause();
-                }
-            }
-        }
-
-        public void setMusic(Music music) {
-            this.music = music;
-        }
-    }
-
-    private AudioManager audioManager = new AudioManager();
 
     public OptionsScreen(Projecte3 game) {
         this.game = game;
@@ -119,37 +74,44 @@ public class OptionsScreen implements Screen {
         toggleMusicButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                audioManager.toggleMusic();
+                Projecte3.audioManager.toggleMusic();
             }
         });
 
         volumeSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                audioManager.setVolume(volumeSlider.getValue());
+                Projecte3.audioManager.setVolume(volumeSlider.getValue());
+
+                // Guardar el volumen en las preferencias
+                Preferences prefs = Gdx.app.getPreferences("MyPreferences");
+                prefs.putFloat("volume", volumeSlider.getValue());
+                prefs.flush();
             }
         });
 
         musicCheckBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if (game.getScreen() instanceof GameScreen) {
-                    boolean isChecked = musicCheckBox.isChecked();
-                    audioManager.setMusicEnabled(isChecked);
-                }
+                boolean isChecked = musicCheckBox.isChecked();
+                Projecte3.audioManager.setMusicEnabled(isChecked);
+
+                // Guardar el estado de la música en las preferencias
+                Preferences prefs = Gdx.app.getPreferences("MyPreferences");
+                prefs.putBoolean("musicEnabled", isChecked);
+                prefs.flush();
             }
         });
 
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                OptionsScreen.AudioManager audioManager = new OptionsScreen.AudioManager();
-                game.setScreen(new GameModeScreen(game, audioManager));
+                game.setScreen(new GameModeScreen(game));
             }
         });
 
         Music music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/lean.mp3"));
-        audioManager.setMusic(music);
+        Projecte3.audioManager.setMusic(music);
     }
 
     @Override
@@ -180,7 +142,7 @@ public class OptionsScreen implements Screen {
 
     @Override
     public void hide() {
-        audioManager.setMusicEnabled(false);
+        Projecte3.audioManager.setMusicEnabled(false);
     }
 
     @Override

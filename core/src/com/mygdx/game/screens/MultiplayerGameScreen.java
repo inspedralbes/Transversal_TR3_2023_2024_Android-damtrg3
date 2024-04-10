@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Net;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
@@ -72,9 +73,17 @@ public class MultiplayerGameScreen implements Screen {
     private ArrayList<PlayerStats> player_stats;
     private int position;
     private int[] skins;
-    private OptionsScreen.AudioManager audioManager;
 
-    public MultiplayerGameScreen(Projecte3 game, String[] jugadors, String creador, int[] skins,  OptionsScreen.AudioManager audioManager) {
+    private Projecte3.AudioManager audioManager;
+    private Music music;
+
+    public MultiplayerGameScreen(Projecte3 game, String[] jugadors, String creador, int[] skins, Projecte3.AudioManager audioManager) {
+        this.audioManager = audioManager;
+
+        // Crear la música aquí en lugar de en show()
+        this.music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/lean.mp3"));
+        audioManager.setMusic(music);
+
         creadorSala = creador;
         jugadorsIn = jugadors;
         stage = new Stage();
@@ -87,7 +96,6 @@ public class MultiplayerGameScreen implements Screen {
         this.skins = skins;
 
         this.game = game;
-        this.audioManager = audioManager;
         camera = new OrthographicCamera(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
         camera.setToOrtho(false);
         StretchViewport viewport = new StretchViewport(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT, camera);
@@ -214,9 +222,17 @@ public class MultiplayerGameScreen implements Screen {
 
     @Override
     public void show() {
-        Music music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/lean.mp3"));
-        audioManager.setMusic(music);
-        audioManager.setMusicEnabled(true);
+        Preferences prefs = Gdx.app.getPreferences("MyPreferences");
+        float volume = prefs.getFloat("volume", 1.0f); // 1.0f es el valor predeterminado
+        boolean musicEnabled = prefs.getBoolean("musicEnabled", true); // true es el valor predeterminado
+
+        // Aplicar las preferencias
+        Projecte3.audioManager.setVolume(volume);
+        Projecte3.audioManager.setMusicEnabled(musicEnabled);
+        // Aquí solo debes iniciar la música si está habilitada
+        if (audioManager.isMusicEnabled()) {
+            audioManager.getMusic().play();
+        }
         MenuSalasScreen.socket.on("key_down", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
@@ -453,8 +469,7 @@ public class MultiplayerGameScreen implements Screen {
                     @Override
                     public void run() {
                         dispose();
-                        OptionsScreen.AudioManager audioManager = new OptionsScreen.AudioManager();
-                        game.setScreen(new MultiplayerGameScreen(game, jugadorsIn, creadorSala, skins, audioManager));
+                        game.setScreen(new MultiplayerGameScreen(game, jugadorsIn, creadorSala, skins, Projecte3.audioManager));
                     }
                 });
             }
@@ -673,7 +688,7 @@ public class MultiplayerGameScreen implements Screen {
 
     @Override
     public void hide() {
-        audioManager.setMusicEnabled(false);
+        Projecte3.audioManager.setMusicEnabled(false);
     }
 
     @Override

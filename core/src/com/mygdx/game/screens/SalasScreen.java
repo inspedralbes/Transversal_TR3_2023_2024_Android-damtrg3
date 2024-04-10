@@ -178,8 +178,7 @@ public class SalasScreen implements Screen {
                     @Override
                     public void run() {
                         System.out.println("GAME_STARTED");
-                        OptionsScreen.AudioManager audioManager = new OptionsScreen.AudioManager();
-                        game.setScreen(new MultiplayerGameScreen(game, jugadorsSala, creador, skinsSala, audioManager));
+                        game.setScreen(new MultiplayerGameScreen(game, jugadorsSala, creador, skinsSala, Projecte3.audioManager));
                     }
                 });
             }

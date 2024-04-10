@@ -121,8 +121,7 @@ public class GameEndedScreen implements Screen {
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                OptionsScreen.AudioManager audioManager = new OptionsScreen.AudioManager();
-                game.setScreen(new GameModeScreen(game, audioManager));
+                game.setScreen(new GameModeScreen(game));
             }
         });
 
