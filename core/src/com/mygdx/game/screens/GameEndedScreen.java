@@ -102,9 +102,9 @@ public class GameEndedScreen implements Screen {
         stage.getBatch().draw(AssetManager.menu_bg, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage.getBatch().end();
 
-        Table rankingsTable = new Table();
-        rankingsTable.setFillParent(true);
-        rankingsTable.setPosition((Gdx.graphics.getWidth() - rankingsTable.getWidth()) / 2, (Gdx.graphics.getHeight() - rankingsTable.getHeight()) / 2); // Centra la tabla en la pantalla
+        Table rankingsTable = new Table(); // Table para envolver los campos
+        rankingsTable.setSize(700, 820); // Establece el tamaño deseado para la tabla
+        rankingsTable.setPosition((Gdx.graphics.getWidth() - rankingsTable.getWidth()) / 2, (Gdx.graphics.getHeight() - rankingsTable.getHeight()) / 2); // Centra la tabla en l
 
         Texture backgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
