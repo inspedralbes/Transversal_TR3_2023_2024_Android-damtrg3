@@ -87,7 +87,6 @@ public class GameModeScreen implements Screen {
         // Crear un TextButton con texto
         TextButton SoloButton = new TextButton("Inidividual", skin);
         TextButton MultiButton = new TextButton("Multijugador", skin);
-        TextButton Ranking = new TextButton("Ranking", skin);
 
         SoloButton.addListener(new ClickListener() {
             @Override
@@ -114,19 +113,6 @@ public class GameModeScreen implements Screen {
                 });
             }
         });
-        Ranking.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                // Aquí va el código que se ejecutará cuando se haga clic en el TextButton
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        game.setScreen(new RankingSreen(game));
-                    }
-                });
-            }
-        });
-
 
         // Añadir la imagen (dentro del contenedor) como actor al botón
         SoloButton.add(imageContainer);
@@ -170,6 +156,43 @@ public class GameModeScreen implements Screen {
         imageButtonContainer.height(43);
 
 
+        //----------------------------- Button Ranking --------------------------------
+
+        // Cargar las imágenes para los estados normal y presionado del ImageButton
+        Texture myButtonRankingTexture = new Texture(Gdx.files.internal("GameMode/ranking1.png"));
+        Drawable myButtonRankingTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myButtonRankingTexture));
+        Texture myButtonRankingPressedTexture = new Texture(Gdx.files.internal("GameMode/ranking2.png"));
+        Drawable myButtonRankingPressedTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myButtonRankingPressedTexture));
+
+        // Crear un ButtonStyle y establecer los Drawable para los estados normal y presionado
+        ImageButton.ImageButtonStyle buttonRankingStyle = new ImageButton.ImageButtonStyle();
+        buttonRankingStyle.imageUp = myButtonRankingTexRegionDrawable;
+        buttonRankingStyle.imageDown = myButtonRankingPressedTexRegionDrawable;
+
+        // Crear un ImageButton con el ButtonStyle
+        ImageButton myImageButtonRanking = new ImageButton(buttonRankingStyle);
+
+        //ClickListener
+        myImageButtonRanking.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // Aquí va el código que se ejecutará cuando se haga clic en el ImageButton
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        game.setScreen(new RankingSreen(game));
+                    }
+                });
+            }
+        });
+
+        // Crear un contenedor para el ImageButton
+        Container<ImageButton> imageButtonRankingContainer = new Container<ImageButton>(myImageButtonRanking);
+        imageButtonRankingContainer.padBottom(300).padLeft(460);
+        imageButtonRankingContainer.width(40);
+        imageButtonRankingContainer.height(40);
+
+
         //----------------------------- Button Perfil --------------------------------
 
 
@@ -202,7 +225,7 @@ public class GameModeScreen implements Screen {
 
         // Crear un contenedor para el ImageButton
         Container<ImageButton> imageButtonPerfilContainer = new Container<ImageButton>(myImageButtonPerfil);
-        imageButtonPerfilContainer.padBottom(300).padLeft(460);
+        imageButtonPerfilContainer.padBottom(300).padRight(130);
         imageButtonPerfilContainer.width(40);
         imageButtonPerfilContainer.height(40);
 
@@ -253,11 +276,11 @@ public class GameModeScreen implements Screen {
         contentTable.addActor(imageButtonTiendaContainer);
         contentTable.addActor(imageButtonPerfilContainer);
         contentTable.addActor(imageButtonContainer);
+        contentTable.addActor(imageButtonRankingContainer);
         contentTable.add(SoloButton).left().padBottom(10);
         contentTable.row();
         contentTable.add(MultiButton).left().padBottom(10);
         contentTable.row();
-        contentTable.add(Ranking).left().padBottom(10);
 
 
 

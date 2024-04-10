@@ -117,16 +117,17 @@ public class GameEndedScreen implements Screen {
         Label nameLabel = new Label("Jugadors", AssetManager.lava_skin);
         Label winsLabel = new Label("Victories", AssetManager.lava_skin);
 
-        contentTable.add(nameLabel).padRight(50);
-        contentTable.add(winsLabel);
+        contentTable.add(nameLabel).padRight(20);
+        contentTable.add(winsLabel).padLeft(20);
         contentTable.row();
 
         for (Map.Entry<String, Integer> player : sortedPlayers) {
             Label playerNameLabel = new Label(player.getKey(), AssetManager.lava_skin);
             Label playerWinsLabel = new Label(String.valueOf(player.getValue()), AssetManager.lava_skin);
-            contentTable.add(playerNameLabel);
-            contentTable.add(playerWinsLabel);
+            contentTable.add(playerNameLabel).padRight(20);
+            contentTable.add(playerWinsLabel).padLeft(20);
             contentTable.row();
+
         }
 
         TextButton returnButton = new TextButton("Menu principal", AssetManager.lava_skin);
@@ -137,7 +138,7 @@ public class GameEndedScreen implements Screen {
             }
         });
 
-        contentTable.add(returnButton).colspan(2).padTop(10);
+        contentTable.add(returnButton).colspan(2).padTop(40);
 
         // Add the table to the stage
         rankingsTable.add(contentTable);

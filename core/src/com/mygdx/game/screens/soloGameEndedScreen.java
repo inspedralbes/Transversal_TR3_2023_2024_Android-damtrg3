@@ -169,9 +169,9 @@ public class soloGameEndedScreen implements Screen {
         //----------------------------- Button Ranking --------------------------------
 
         // Cargar las imágenes para los estados normal y presionado del ImageButton
-        Texture myButtonTiendaTexture = new Texture(Gdx.files.internal("GameMode/tienda3.png")); // Cambia "tienda.png" a la imagen que quieras usar
+        Texture myButtonTiendaTexture = new Texture(Gdx.files.internal("GameMode/ranking1.png")); // Cambia "tienda.png" a la imagen que quieras usar
         Drawable myButtonTiendaTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myButtonTiendaTexture));
-        Texture myButtonTiendaPressedTexture = new Texture(Gdx.files.internal("GameMode/tienda3Nou.png")); // Cambia "tienda2.png" a la imagen que quieras usar cuando se presione el botón
+        Texture myButtonTiendaPressedTexture = new Texture(Gdx.files.internal("GameMode/ranking2.png")); // Cambia "tienda2.png" a la imagen que quieras usar cuando se presione el botón
         Drawable myButtonTiendaPressedTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myButtonTiendaPressedTexture));
 
         // Crear un ButtonStyle y establecer los Drawable para los estados normal y presionado
