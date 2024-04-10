@@ -3,6 +3,7 @@ package com.mygdx.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -48,7 +49,7 @@ public class GameScreen implements Screen {
     private Label forceLabel;
     //private Label scoreLabel;
 
-    public GameScreen(Projecte3 game) {
+    public GameScreen(Projecte3 game, OptionsScreen.AudioManager audioManager) {
         shapeRenderer = new ShapeRenderer();
 
         this.game = game;
@@ -94,9 +95,9 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(new GameInputHandler(player));
-        if (audioManager.isMusicEnabled()) {
-            audioManager.getMusic().play();
-        }
+        Music music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/lean.mp3"));
+        audioManager.setMusic(music);
+        audioManager.setMusicEnabled(true);
     }
 
     @Override
@@ -226,7 +227,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
-
+        audioManager.setMusicEnabled(false);
     }
 
     @Override

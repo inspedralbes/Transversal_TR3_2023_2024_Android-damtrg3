@@ -31,7 +31,7 @@ public class OptionsScreen implements Screen {
     private CheckBox musicCheckBox;
     private Batch batch;
 
-    public class AudioManager {
+    public static class AudioManager {
         public boolean isMusicEnabled() {
             return isMusicEnabled;
         }
@@ -43,24 +43,30 @@ public class OptionsScreen implements Screen {
         private boolean isMusicEnabled = true;
 
         public void toggleMusic() {
-            if (isMusicEnabled) {
-                music.pause();
-            } else {
-                music.play();
+            if (music != null) {
+                if (isMusicEnabled) {
+                    music.pause();
+                } else {
+                    music.play();
+                }
+                isMusicEnabled = !isMusicEnabled;
             }
-            isMusicEnabled = !isMusicEnabled;
         }
 
         public void setVolume(float volume) {
-            music.setVolume(volume);
+            if (music != null) {
+                music.setVolume(volume);
+            }
         }
 
         public void setMusicEnabled(boolean isEnabled) {
             isMusicEnabled = isEnabled;
-            if (isMusicEnabled) {
-                music.play();
-            } else {
-                music.pause();
+            if (music != null) {
+                if (isMusicEnabled) {
+                    music.play();
+                } else {
+                    music.pause();
+                }
             }
         }
 
@@ -127,19 +133,22 @@ public class OptionsScreen implements Screen {
         musicCheckBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                boolean isChecked = musicCheckBox.isChecked();
-                audioManager.setMusicEnabled(isChecked);
+                if (game.getScreen() instanceof GameScreen) {
+                    boolean isChecked = musicCheckBox.isChecked();
+                    audioManager.setMusicEnabled(isChecked);
+                }
             }
         });
 
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new GameModeScreen(game));
+                OptionsScreen.AudioManager audioManager = new OptionsScreen.AudioManager();
+                game.setScreen(new GameModeScreen(game, audioManager));
             }
         });
 
-        Music music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/safaera.mp3"));
+        Music music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/lean.mp3"));
         audioManager.setMusic(music);
     }
 
@@ -171,6 +180,7 @@ public class OptionsScreen implements Screen {
 
     @Override
     public void hide() {
+        audioManager.setMusicEnabled(false);
     }
 
     @Override
