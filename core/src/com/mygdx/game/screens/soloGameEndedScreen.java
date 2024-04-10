@@ -65,19 +65,26 @@ public class soloGameEndedScreen implements Screen {
         //----------------------------- Button Solo i Multi --------------------------------
 
 
-        Texture myTextureSolo = new Texture(Gdx.files.internal("GameMode/soloLogo6.png"));
+        Texture myTextureSolo = new Texture(Gdx.files.internal("GameMode/rePlay.png"));
         Drawable myTexRegionDrawable1 = new TextureRegionDrawable(new TextureRegion(myTextureSolo));
 
-        Texture myTextureMulti = new Texture(Gdx.files.internal("GameMode/multiLogo4.png"));
+        Texture myTextureMulti = new Texture(Gdx.files.internal("GameMode/menu.png"));
         Drawable myTexRegionDrawable2 = new TextureRegionDrawable(new TextureRegion(myTextureMulti));
 
         // Crear un Image con la imagen
         Image myImageSolo = new Image(myTexRegionDrawable1);
         Image myImageMulti = new Image(myTexRegionDrawable2);
 
+        myTexRegionDrawable1.setMinHeight(30);
+        myTexRegionDrawable1.setMinWidth(30);
+
+        myTexRegionDrawable2.setMinHeight(30);
+        myTexRegionDrawable2.setMinWidth(30);
+
+
         // Crear un contenedor para la imagen y añadir relleno
         Container<Image> imageContainer = new Container<Image>(myImageSolo);
-        imageContainer.padLeft(35);
+        imageContainer.padLeft(16);
 
         Container<Image> imageContainer2 = new Container<Image>(myImageMulti);
         imageContainer2.padLeft(10);
@@ -85,22 +92,25 @@ public class soloGameEndedScreen implements Screen {
         Skin skin = AssetManager.lava_skin;
 
         // Crear un TextButton con texto
-        TextButton SoloButton = new TextButton("Inidividual", skin);
-        TextButton MultiButton = new TextButton("Multijugador", skin);
-        TextButton Ranking = new TextButton("Ranking", skin);
+        TextButton SoloButton = new TextButton("Torna a Jugar", skin);
+        TextButton MultiButton = new TextButton("Torna al Menu", skin);
 
         SoloButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // Aquí va el código que se ejecutará cuando se haga clic en el TextButton
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
+                        // Limpia los recursos de la pantalla actual
+                        game.getScreen().dispose();
+                        // Crea una nueva instancia de GameScreen y establece como la pantalla actual
                         game.setScreen(new GameScreen(game));
                     }
                 });
             }
         });
+
+
 
         MultiButton.addListener(new ClickListener() {
             @Override
@@ -109,19 +119,7 @@ public class soloGameEndedScreen implements Screen {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        game.setScreen(new MenuSalasScreen(game));
-                    }
-                });
-            }
-        });
-        Ranking.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                // Aquí va el código que se ejecutará cuando se haga clic en el TextButton
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        game.setScreen(new RankingSreen(game));
+                        game.setScreen(new GameModeScreen(game));
                     }
                 });
             }
@@ -165,49 +163,13 @@ public class soloGameEndedScreen implements Screen {
 
         // Crear un contenedor para el ImageButton
         Container<ImageButton> imageButtonContainer = new Container<ImageButton>(myImageButton);
-        imageButtonContainer.padBottom(300).padRight(230);
+        imageButtonContainer.padBottom(300).padRight(205);
         imageButtonContainer.width(43);
         imageButtonContainer.height(43);
 
 
-        //----------------------------- Button Perfil --------------------------------
 
-
-        // Cargar las imágenes para los estados normal y presionado del ImageButton
-        Texture myButtonPerfilTexture = new Texture(Gdx.files.internal("GameMode/perfilNou2.png")); // Cambia "perfil.png" a la imagen que quieras usar
-        Drawable myButtonPerfilTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myButtonPerfilTexture));
-        Texture myButtonPerfilPressedTexture = new Texture(Gdx.files.internal("GameMode/perfil4Nou.png")); // Cambia "perfil2.png" a la imagen que quieras usar cuando se presione el botón
-        Drawable myButtonPerfilPressedTexRegionDrawable = new TextureRegionDrawable(new TextureRegion(myButtonPerfilPressedTexture));
-
-        // Crear un ButtonStyle y establecer los Drawable para los estados normal y presionado
-        ImageButton.ImageButtonStyle buttonPerfilStyle = new ImageButton.ImageButtonStyle();
-        buttonPerfilStyle.imageUp = myButtonPerfilTexRegionDrawable;
-        buttonPerfilStyle.imageDown = myButtonPerfilPressedTexRegionDrawable;
-
-        // Crear un ImageButton con el ButtonStyle
-        ImageButton myImageButtonPerfil = new ImageButton(buttonPerfilStyle);
-
-        //ClickListener
-        myImageButtonPerfil.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        game.setScreen(new PerfilScreen(game));
-                    }
-                });
-            }
-        });
-
-        // Crear un contenedor para el ImageButton
-        Container<ImageButton> imageButtonPerfilContainer = new Container<ImageButton>(myImageButtonPerfil);
-        imageButtonPerfilContainer.padBottom(300).padLeft(460);
-        imageButtonPerfilContainer.width(40);
-        imageButtonPerfilContainer.height(40);
-
-
-        //----------------------------- Button Tienda --------------------------------
+        //----------------------------- Button Ranking --------------------------------
 
         // Cargar las imágenes para los estados normal y presionado del ImageButton
         Texture myButtonTiendaTexture = new Texture(Gdx.files.internal("GameMode/tienda3.png")); // Cambia "tienda.png" a la imagen que quieras usar
@@ -230,7 +192,7 @@ public class soloGameEndedScreen implements Screen {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        game.setScreen(new TiendaScreen(game));
+                        game.setScreen(new RankingSreen(game));
                     }
                 });
             }
@@ -238,7 +200,7 @@ public class soloGameEndedScreen implements Screen {
 
         // Crear un contenedor para el ImageButton
         Container<ImageButton> imageButtonTiendaContainer = new Container<ImageButton>(myImageButtonTienda);
-        imageButtonTiendaContainer.padBottom(300).padLeft(550);
+        imageButtonTiendaContainer.padBottom(300).padLeft(565);
         imageButtonTiendaContainer.width(40);
         imageButtonTiendaContainer.height(40);
 
@@ -251,13 +213,11 @@ public class soloGameEndedScreen implements Screen {
 
         //-------------------------------------Botons al Table-------------------------------------
         contentTable.addActor(imageButtonTiendaContainer);
-        contentTable.addActor(imageButtonPerfilContainer);
         contentTable.addActor(imageButtonContainer);
         contentTable.add(SoloButton).left().padBottom(10);
         contentTable.row();
         contentTable.add(MultiButton).left().padBottom(10);
         contentTable.row();
-        contentTable.add(Ranking).left().padBottom(10);
 
 
 
