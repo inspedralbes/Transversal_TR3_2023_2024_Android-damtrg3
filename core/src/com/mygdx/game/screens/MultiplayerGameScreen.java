@@ -21,7 +21,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
@@ -71,6 +74,7 @@ public class MultiplayerGameScreen implements Screen {
     private ArrayList<PlayerStats> player_stats;
     private int position;
     private int[] skins;
+    private Touchpad touchpad;
 
     public MultiplayerGameScreen(Projecte3 game, String[] jugadors, String creador, int[] skins) {
         creadorSala = creador;
@@ -208,6 +212,104 @@ public class MultiplayerGameScreen implements Screen {
                 }
             }
         });
+
+        Touchpad.TouchpadStyle touchpadStyle = new Touchpad.TouchpadStyle();
+
+        Drawable touchBackground = AssetManager.clean_skin.getDrawable("touchpad");
+        Drawable touchKnob = AssetManager.clean_skin.getDrawable("touchpad-knob");
+
+        touchpadStyle.background = touchBackground;
+        touchpadStyle.knob = touchKnob;
+
+        touchpad = new Touchpad(10, touchpadStyle);
+        touchpad.setBounds(50, 50, 150, 150);
+
+        touchpad.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                float knobPercentX = touchpad.getKnobPercentX();
+                float knobPercentY = touchpad.getKnobPercentY();
+
+                // Find the current user's player and update its direction
+                for (MultiPlayerPlayer currentPlayer : players) {
+                    if (currentPlayer.isCurrentUser() && currentPlayer.isAlive()) {
+                        currentPlayer.getDirection().x = knobPercentX;
+                        currentPlayer.getDirection().y = knobPercentY;
+
+
+                        JSONObject data = new JSONObject();
+                        try {
+                            data.put("salaId", game.SalaActual);
+                            data.put("user", currentPlayer.getUser());
+                            data.put("knobPercentX", knobPercentX);
+                            data.put("knobPercentY", knobPercentY);
+
+                            MenuSalasScreen.socket.emit("touchpad_movement", data);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+
+        stage.addActor(touchpad);
+
+        TextButton jumpButton = new TextButton("Jump", AssetManager.clean_skin);
+        jumpButton.setPosition(Gdx.graphics.getWidth() - 200, 50);
+        jumpButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                // Find the current user's player and make it jump
+                for (MultiPlayerPlayer currentPlayer : players) {
+                    if (currentPlayer.isCurrentUser()) {
+                        currentPlayer.jump();
+
+                        JSONObject data = new JSONObject();
+                        try {
+                            if(player.isAlive()){
+                                data.put("player", currentPlayer.getUser());
+                                data.put("salaId", game.SalaActual);
+                                data.put("keycode", Input.Keys.UP);
+                                MenuSalasScreen.socket.emit("keyDown", data.toString());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+
+        stage.addActor(jumpButton);
+
+        TextButton slashButton = new TextButton("Slash", AssetManager.clean_skin);
+        slashButton.setPosition(Gdx.graphics.getWidth() - 200, 100);
+        slashButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                // Find the current user's player and make it slash
+                for (MultiPlayerPlayer currentPlayer : players) {
+                    if (currentPlayer.isCurrentUser()) {
+                        currentPlayer.slash();
+
+                        JSONObject data = new JSONObject();
+                        try {
+                            if(player.isAlive()){
+                                data.put("player", currentPlayer.getUser());
+                                data.put("salaId", game.SalaActual);
+                                data.put("keycode", Input.Keys.C);
+                                MenuSalasScreen.socket.emit("keyDown", data.toString());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+
+        stage.addActor(slashButton);
     }
 
     @Override
@@ -463,6 +565,32 @@ public class MultiplayerGameScreen implements Screen {
                     public void run() {
                         dispose();
                         game.setScreen(new GameEndedScreen(game));
+                    }
+                });
+            }
+        });
+
+        MenuSalasScreen.socket.on("update_touchpad_movement", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        JSONObject data = (JSONObject) args[0];
+                        try {
+                            String user = data.getString("user");
+                            float knobPercentX = (float) data.getDouble("knobPercentX");
+                            float knobPercentY = (float) data.getDouble("knobPercentY");
+
+                            for (MultiPlayerPlayer player : players) {
+                                if (player.getUser().equals(user)) {
+                                    player.getDirection().x = knobPercentX;
+                                    player.getDirection().y = knobPercentY;
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             }
