@@ -104,6 +104,9 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+        if(isPlayerAlive){
+            lavaSound.play();
+        }
         // Inicializar el sonido de la lava
         Gdx.input.setInputProcessor(new GameInputHandler(player));
         Preferences prefs = Gdx.app.getPreferences("MyPreferences");

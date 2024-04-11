@@ -7,6 +7,7 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -76,10 +77,10 @@ public class MultiplayerGameScreen implements Screen {
 
     private Projecte3.AudioManager audioManager;
     private Music music;
-
+    private Sound lavaSound;
     public MultiplayerGameScreen(Projecte3 game, String[] jugadors, String creador, int[] skins, Projecte3.AudioManager audioManager) {
         this.audioManager = audioManager;
-
+        lavaSound = Gdx.audio.newSound(Gdx.files.internal("GameMode/acid.mp3"));
         // Crear la música aquí en lugar de en show()
         this.music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/lean.mp3"));
         audioManager.setMusic(music);
@@ -222,6 +223,9 @@ public class MultiplayerGameScreen implements Screen {
 
     @Override
     public void show() {
+        if(player.isAlive()){
+            lavaSound.play();
+        }
         Preferences prefs = Gdx.app.getPreferences("MyPreferences");
         float volume = prefs.getFloat("volume", 1.0f); // 1.0f es el valor predeterminado
         boolean musicEnabled = prefs.getBoolean("musicEnabled", true); // true es el valor predeterminado
