@@ -658,7 +658,7 @@ public class MultiplayerGameScreen implements Screen {
                 if(!currentPlayer.isJumping()){
                     if(currentPlayer.isCurrentUser() && currentPlayer.isAlive()){
                         JSONObject data = new JSONObject();
-                        lavaSound.play();
+                        //lavaSound.play();
                         try {
                             data.put("salaId", game.SalaActual);
                             data.put("user", currentPlayer.getUser());
