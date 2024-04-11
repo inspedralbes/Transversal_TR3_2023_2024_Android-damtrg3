@@ -2,6 +2,7 @@ package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Screen;
@@ -225,27 +226,45 @@ public class MultiplayerGameScreen implements Screen {
         touchpad.setBounds(50, 50, 150, 150);
 
         touchpad.addListener(new ChangeListener() {
+            private int lastDirection = -1;
+
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 float knobPercentX = touchpad.getKnobPercentX();
                 float knobPercentY = touchpad.getKnobPercentY();
 
-                // Find the current user's player and update its direction
+                // Find the current user's player
                 for (MultiPlayerPlayer currentPlayer : players) {
-                    if (currentPlayer.isCurrentUser() && currentPlayer.isAlive()) {
-                        currentPlayer.getDirection().x = knobPercentX;
-                        currentPlayer.getDirection().y = knobPercentY;
-
-
+                    if (currentPlayer.isCurrentUser()) {
                         JSONObject data = new JSONObject();
                         try {
-                            data.put("salaId", game.SalaActual);
-                            data.put("user", currentPlayer.getUser());
-                            data.put("knobPercentX", knobPercentX);
-                            data.put("knobPercentY", knobPercentY);
+                            if(currentPlayer.isAlive()){
+                                currentPlayer.getDirection().x = knobPercentX;
+                                currentPlayer.getDirection().y = knobPercentY;
+                                data.put("player", currentPlayer.getUser());
+                                data.put("salaId", game.SalaActual);
+                                int currentDirection = -1;
+                                if(knobPercentX > 0.5) {
+                                    currentDirection = Input.Keys.RIGHT;
+                                } else if(knobPercentX < -0.5) {
+                                    currentDirection = Input.Keys.LEFT;
+                                } else if(knobPercentY > 0.5) {
+                                    currentDirection = Input.Keys.UP;
+                                } else if(knobPercentY < -0.5) {
+                                    currentDirection = Input.Keys.DOWN;
+                                }
 
-                            MenuSalasScreen.socket.emit("touchpad_movement", data);
-                        } catch (JSONException e) {
+                                if (currentDirection != lastDirection) {
+                                    data.put("keycode", currentDirection);
+                                    MenuSalasScreen.socket.emit("keyDown", data.toString());
+                                    if (lastDirection != -1) {
+                                        data.put("keycode", lastDirection);
+                                        MenuSalasScreen.socket.emit("keyUp", data.toString());
+                                    }
+                                    lastDirection = currentDirection;
+                                }
+                            }
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
@@ -256,7 +275,8 @@ public class MultiplayerGameScreen implements Screen {
         stage.addActor(touchpad);
 
         TextButton jumpButton = new TextButton("Jump", AssetManager.clean_skin);
-        jumpButton.setPosition(Gdx.graphics.getWidth() - 200, 50);
+        jumpButton.setSize(200, 100);
+        jumpButton.setPosition(Gdx.graphics.getWidth() - 300, 50);
         jumpButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -267,10 +287,10 @@ public class MultiplayerGameScreen implements Screen {
 
                         JSONObject data = new JSONObject();
                         try {
-                            if(player.isAlive()){
+                            if(currentPlayer.isAlive()){
                                 data.put("player", currentPlayer.getUser());
                                 data.put("salaId", game.SalaActual);
-                                data.put("keycode", Input.Keys.UP);
+                                data.put("keycode", Input.Keys.SPACE);
                                 MenuSalasScreen.socket.emit("keyDown", data.toString());
                             }
                         } catch (Exception e) {
@@ -284,7 +304,8 @@ public class MultiplayerGameScreen implements Screen {
         stage.addActor(jumpButton);
 
         TextButton slashButton = new TextButton("Slash", AssetManager.clean_skin);
-        slashButton.setPosition(Gdx.graphics.getWidth() - 200, 100);
+        slashButton.setSize(200, 100);
+        slashButton.setPosition(Gdx.graphics.getWidth() - 300, 200);
         slashButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -295,7 +316,7 @@ public class MultiplayerGameScreen implements Screen {
 
                         JSONObject data = new JSONObject();
                         try {
-                            if(player.isAlive()){
+                            if(currentPlayer.isAlive()){
                                 data.put("player", currentPlayer.getUser());
                                 data.put("salaId", game.SalaActual);
                                 data.put("keycode", Input.Keys.C);
@@ -565,32 +586,6 @@ public class MultiplayerGameScreen implements Screen {
                     public void run() {
                         dispose();
                         game.setScreen(new GameEndedScreen(game));
-                    }
-                });
-            }
-        });
-
-        MenuSalasScreen.socket.on("update_touchpad_movement", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        JSONObject data = (JSONObject) args[0];
-                        try {
-                            String user = data.getString("user");
-                            float knobPercentX = (float) data.getDouble("knobPercentX");
-                            float knobPercentY = (float) data.getDouble("knobPercentY");
-
-                            for (MultiPlayerPlayer player : players) {
-                                if (player.getUser().equals(user)) {
-                                    player.getDirection().x = knobPercentX;
-                                    player.getDirection().y = knobPercentY;
-                                }
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
                     }
                 });
             }

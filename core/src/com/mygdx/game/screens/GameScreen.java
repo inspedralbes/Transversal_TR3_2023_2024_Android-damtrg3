@@ -145,7 +145,8 @@ public class GameScreen implements Screen {
         stage.addActor(touchpad);
 
         TextButton jumpButton = new TextButton("Jump", AssetManager.clean_skin);
-        jumpButton.setPosition(Gdx.graphics.getWidth() - 200, 50);
+        jumpButton.setSize(200, 100);
+        jumpButton.setPosition(Gdx.graphics.getWidth() - 300, 50);
         jumpButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -155,7 +156,8 @@ public class GameScreen implements Screen {
         stage.addActor(jumpButton);
 
         TextButton slashButton = new TextButton("Slash", AssetManager.clean_skin);
-        slashButton.setPosition(Gdx.graphics.getWidth() - 200, 100);
+        slashButton.setSize(200, 100);
+        slashButton.setPosition(Gdx.graphics.getWidth() - 300, 200);
         slashButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
