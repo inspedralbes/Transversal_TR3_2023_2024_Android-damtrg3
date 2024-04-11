@@ -55,8 +55,8 @@ public class soloGameEndedScreen implements Screen {
 
         Table wrapperTable = new Table(); // Table para envolver los campos
         wrapperTable.setSize(700, 820); // Establece el tamaño deseado para la tabla
-        wrapperTable.setPosition((Gdx.graphics.getWidth() - wrapperTable.getWidth()) / 2, (Gdx.graphics.getHeight() - wrapperTable.getHeight()) / 2); // Centra la tabla en la pantalla
-
+        wrapperTable.setPosition((stage.getWidth() - wrapperTable.getWidth()) / 2,
+                (stage.getHeight() - wrapperTable.getHeight()) / 2);
         Texture backgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
         wrapperTable.setBackground(backgroundDrawable);
