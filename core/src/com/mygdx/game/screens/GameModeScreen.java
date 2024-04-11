@@ -49,8 +49,6 @@ public class GameModeScreen implements Screen {
     @Override
     public void show() {
 
-
-
         Gdx.input.setInputProcessor(stage);
 
         batch = stage.getBatch();
