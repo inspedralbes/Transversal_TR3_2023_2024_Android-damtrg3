@@ -14,11 +14,13 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
@@ -93,6 +95,36 @@ public class MenuSalasScreen implements Screen {
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
         wrapperTable.setBackground(backgroundDrawable);
 
+
+        // Load the image for the button
+        Texture myButtonTexture = new Texture(Gdx.files.internal("GameMode/torna.png"));
+
+// Create a Drawable from the Texture
+        Drawable myButtonDrawable = new TextureRegionDrawable(new TextureRegion(myButtonTexture));
+
+// Create the ImageButton
+        ImageButton myButton = new ImageButton(myButtonDrawable);
+
+        myButton.getStyle().imageUp.setMinWidth(30);
+        myButton.getStyle().imageUp.setMinHeight(30);
+
+// Add a ClickListener to the ImageButton
+
+        myButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        game.setScreen(new GameModeScreen(game));
+                    }
+                });
+            }
+        });
+
+// Add the ImageButton to the contentTable
+
+
         //Crear table que tindra el contingut
         Table contentTable = new Table();
         contentTable.center();
@@ -107,7 +139,8 @@ public class MenuSalasScreen implements Screen {
         //TextField
 
         //Afegir contingut a la table
-        contentTable.add(crearSalaLabel).padBottom(10).padLeft(100);
+        contentTable.add(myButton).padBottom(20);
+        contentTable.add(crearSalaLabel).padBottom(10).padLeft(70);
         contentTable.row();
         contentTable.add(crearSalaBtn).padBottom(100).colspan(2);
         contentTable.add(unirSalaBtn).padBottom(100).padRight(40).colspan(2);
@@ -138,8 +171,8 @@ public class MenuSalasScreen implements Screen {
         popupTable.add(accedirButton).colspan(2); // Añade el botón a la nueva fila
 
         // Establecer la posición del pop-up en el centro de la pantalla
-        popupTable.setPosition((Gdx.graphics.getWidth() - popupTable.getWidth()) / 2, (float) ((Gdx.graphics.getHeight() - popupTable.getHeight()) / 2.5));
-
+        popupTable.setPosition((stage.getWidth() - popupTable.getWidth()) / 2,
+                (stage.getHeight() - popupTable.getHeight()) / 2.5f);
         Texture popupBackgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
         TextureRegionDrawable popupBackgroundDrawable = new TextureRegionDrawable(new TextureRegion(popupBackgroundTexture));
         popupTable.setBackground(popupBackgroundDrawable);
