@@ -24,14 +24,9 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.Settings;
-
-import org.json.JSONObject;
-
 import java.io.IOException;
 
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
+
 
 public class GameModeScreen implements Screen {
     private Projecte3 game;
