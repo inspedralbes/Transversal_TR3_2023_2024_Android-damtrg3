@@ -3,8 +3,8 @@ package com.mygdx.game.utils;
 import com.badlogic.gdx.math.Vector2;
 
 public class Settings {
-    public final static int SCREEN_WIDTH = 1280;
-    public final static int SCREEN_HEIGHT = 720;
+    public static int SCREEN_WIDTH = 1280;
+    public static int SCREEN_HEIGHT = 720;
 
     //Player Settings
     public final static int PLAYER_WIDTH = 64;
@@ -21,4 +21,12 @@ public class Settings {
     public static final String IP_SERVER = "localhost";
 
     public static final String PUERTO_PETICIONES = "3327";
+
+    public static void setWidth(int width){
+        SCREEN_WIDTH = width;
+    }
+
+    public static void setHeight(int height){
+        SCREEN_HEIGHT = height;
+    }
 }

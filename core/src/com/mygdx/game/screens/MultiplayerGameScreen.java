@@ -2,6 +2,7 @@ package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Preferences;
@@ -24,7 +25,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
@@ -74,6 +78,7 @@ public class MultiplayerGameScreen implements Screen {
     private ArrayList<PlayerStats> player_stats;
     private int position;
     private int[] skins;
+    private Touchpad touchpad;
 
     private Projecte3.AudioManager audioManager;
     private Music music;
@@ -219,6 +224,124 @@ public class MultiplayerGameScreen implements Screen {
                 }
             }
         });
+
+        Touchpad.TouchpadStyle touchpadStyle = new Touchpad.TouchpadStyle();
+
+        Drawable touchBackground = AssetManager.clean_skin.getDrawable("touchpad");
+        Drawable touchKnob = AssetManager.clean_skin.getDrawable("touchpad-knob");
+
+        touchpadStyle.background = touchBackground;
+        touchpadStyle.knob = touchKnob;
+
+        touchpad = new Touchpad(10, touchpadStyle);
+        touchpad.setBounds(50, 50, 150, 150);
+
+        touchpad.addListener(new ChangeListener() {
+            private int lastDirection = -1;
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                float knobPercentX = touchpad.getKnobPercentX();
+                float knobPercentY = touchpad.getKnobPercentY();
+
+                // Find the current user's player
+                for (MultiPlayerPlayer currentPlayer : players) {
+                    if (currentPlayer.isCurrentUser()) {
+                        JSONObject data = new JSONObject();
+                        try {
+                            if(currentPlayer.isAlive()){
+                                currentPlayer.getDirection().x = knobPercentX;
+                                currentPlayer.getDirection().y = knobPercentY;
+                                data.put("player", currentPlayer.getUser());
+                                data.put("salaId", game.SalaActual);
+                                int currentDirection = -1;
+                                if(knobPercentX > 0.5) {
+                                    currentDirection = Input.Keys.RIGHT;
+                                } else if(knobPercentX < -0.5) {
+                                    currentDirection = Input.Keys.LEFT;
+                                } else if(knobPercentY > 0.5) {
+                                    currentDirection = Input.Keys.UP;
+                                } else if(knobPercentY < -0.5) {
+                                    currentDirection = Input.Keys.DOWN;
+                                }
+
+                                if (currentDirection != lastDirection) {
+                                    data.put("keycode", currentDirection);
+                                    MenuSalasScreen.socket.emit("keyDown", data.toString());
+                                    if (lastDirection != -1) {
+                                        data.put("keycode", lastDirection);
+                                        MenuSalasScreen.socket.emit("keyUp", data.toString());
+                                    }
+                                    lastDirection = currentDirection;
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+
+        stage.addActor(touchpad);
+
+        TextButton jumpButton = new TextButton("Jump", AssetManager.clean_skin);
+        jumpButton.setSize(200, 100);
+        jumpButton.setPosition(Gdx.graphics.getWidth() - 300, 50);
+        jumpButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                // Find the current user's player and make it jump
+                for (MultiPlayerPlayer currentPlayer : players) {
+                    if (currentPlayer.isCurrentUser()) {
+                        currentPlayer.jump();
+
+                        JSONObject data = new JSONObject();
+                        try {
+                            if(currentPlayer.isAlive()){
+                                data.put("player", currentPlayer.getUser());
+                                data.put("salaId", game.SalaActual);
+                                data.put("keycode", Input.Keys.SPACE);
+                                MenuSalasScreen.socket.emit("keyDown", data.toString());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+
+        stage.addActor(jumpButton);
+
+        TextButton slashButton = new TextButton("Slash", AssetManager.clean_skin);
+        slashButton.setSize(200, 100);
+        slashButton.setPosition(Gdx.graphics.getWidth() - 300, 200);
+        slashButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                // Find the current user's player and make it slash
+                for (MultiPlayerPlayer currentPlayer : players) {
+                    if (currentPlayer.isCurrentUser()) {
+                        currentPlayer.slash();
+
+                        JSONObject data = new JSONObject();
+                        try {
+                            if(currentPlayer.isAlive()){
+                                data.put("player", currentPlayer.getUser());
+                                data.put("salaId", game.SalaActual);
+                                data.put("keycode", Input.Keys.C);
+                                MenuSalasScreen.socket.emit("keyDown", data.toString());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+
+        stage.addActor(slashButton);
     }
 
     @Override

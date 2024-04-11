@@ -16,8 +16,5 @@ public class AndroidLauncher extends AndroidApplication {
 		config.useCompass = false;
 		config.useImmersiveMode = true;
 		initialize(new Projecte3(), config);
-
-		getWindow().getAttributes().width = Settings.SCREEN_WIDTH;
-		getWindow().getAttributes().height = Settings.SCREEN_HEIGHT;
 	}
 }

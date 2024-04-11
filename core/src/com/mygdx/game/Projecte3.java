@@ -12,6 +12,7 @@ import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.LoginScreen;
 import com.mygdx.game.screens.MultiplayerGameScreen;
 import com.mygdx.game.utils.Broadcast;
+import com.mygdx.game.utils.Settings;
 
 public class Projecte3 extends Game {
 
@@ -72,6 +73,8 @@ public class Projecte3 extends Game {
 
 	@Override
 	public void create () {
+		Settings.setHeight(Gdx.graphics.getHeight());
+		Settings.setWidth(Gdx.graphics.getWidth());
 		Skin = 1;
 		cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite2.png"));
 		AssetManager.load();
