@@ -449,6 +449,7 @@ public class MultiplayerGameScreen implements Screen {
                             for (MultiPlayerPlayer player : players) {
                                 if (player.getUser().equals(user) && player.isAlive()) {
                                     player.setAlive(false);
+                                    lavaSound.play();
                                     PlayerStats playerStats = new PlayerStats(player.getUser(), position, player.getDamageTaken());
                                     --position;
                                     player_stats.add(playerStats);
