@@ -41,7 +41,7 @@ public class Player extends Actor {
     protected float logHitCooldown;
 
     public Player() {
-        position = Settings.PLAYER_START;
+        position = new Vector2(Settings.PLAYER_START);
         width = Settings.PLAYER_WIDTH;
         height = Settings.PLAYER_HEIGHT;
         direction = new Vector2(0, 0);
@@ -219,7 +219,7 @@ public class Player extends Actor {
     }
 
     public void setPosition(Vector2 position) {
-        this.position = position;
+        this.position = new Vector2(position);
     }
 
     public float getPushForce() {

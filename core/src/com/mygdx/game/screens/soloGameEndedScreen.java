@@ -103,6 +103,7 @@ public class soloGameEndedScreen implements Screen {
         SoloButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                System.out.println("Torna a jugar");
                 game.setScreen(new GameScreen(game));
             }
         });

@@ -38,15 +38,15 @@ import java.util.concurrent.TimeUnit;
 
 
 public class GameScreen implements Screen {
-    private boolean isElapsedTimeSent = false;
-    private long elapsedTimeWhenPlayerDied = 0;
-    private boolean isPlayerAlive = true;
+    private boolean isElapsedTimeSent;
+    private long elapsedTimeWhenPlayerDied;
+    private boolean isPlayerAlive;
     private Label timerLabel;
     private long startTime;
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera;
     private Projecte3 game;
-    private Stage stage = new Stage();
+    private Stage stage;
     private Player player;
     private ShapeRenderer shapeRenderer;
 
@@ -57,6 +57,9 @@ public class GameScreen implements Screen {
 
     public GameScreen(Projecte3 game) {
         shapeRenderer = new ShapeRenderer();
+        isPlayerAlive = true;
+        elapsedTimeWhenPlayerDied = 0;
+        isElapsedTimeSent = false;
 
         this.game = game;
 
@@ -100,6 +103,7 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(new GameInputHandler(player));
+        isPlayerAlive = true;
     }
 
     @Override
@@ -156,7 +160,7 @@ public class GameScreen implements Screen {
         int playerTileY = (int) (player.getPosition().y / tileSize);
         TiledMapTileLayer.Cell cell = plataformaLayer.getCell(playerTileX, playerTileY);
         if (cell == null) {
-            if(!player.isJumping()){
+            if(!player.isJumping() && isPlayerAlive){
                 player.remove();
                 // Cuando el jugador "muere", detén el cronómetro y guarda el tiempo transcurrido
                 isPlayerAlive = false;
@@ -236,6 +240,7 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         mapRenderer.dispose();
+        stage.dispose();
     }
 
     public void drawHitboxes(){
