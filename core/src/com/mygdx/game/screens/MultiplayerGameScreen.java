@@ -449,7 +449,6 @@ public class MultiplayerGameScreen implements Screen {
                             for (MultiPlayerPlayer player : players) {
                                 if (player.getUser().equals(user) && player.isAlive()) {
                                     player.setAlive(false);
-                                    lavaSound.play();
                                     PlayerStats playerStats = new PlayerStats(player.getUser(), position, player.getDamageTaken());
                                     --position;
                                     player_stats.add(playerStats);
@@ -524,7 +523,6 @@ public class MultiplayerGameScreen implements Screen {
         MultiPlayerPlayer currentUser = null;
         for(MultiPlayerPlayer player : players){
             if(player.isAlive()){
-                lavaSound.play();
                 ++alive;
                 winner = player;
             }
@@ -660,6 +658,7 @@ public class MultiplayerGameScreen implements Screen {
                 if(!currentPlayer.isJumping()){
                     if(currentPlayer.isCurrentUser() && currentPlayer.isAlive()){
                         JSONObject data = new JSONObject();
+                        lavaSound.play();
                         try {
                             data.put("salaId", game.SalaActual);
                             data.put("user", currentPlayer.getUser());
