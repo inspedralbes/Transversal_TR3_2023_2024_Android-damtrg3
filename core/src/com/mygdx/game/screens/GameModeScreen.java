@@ -25,6 +25,14 @@ import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.Settings;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+
 public class GameModeScreen implements Screen {
     private Projecte3 game;
     private Stage stage;
@@ -47,7 +55,36 @@ public class GameModeScreen implements Screen {
 
     @Override
     public void show() {
+        OkHttpClient client = new OkHttpClient();
+        String url = "http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/ruta/datos";
+        Request request = new Request.Builder().url(url).build();
 
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(okhttp3.Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                } else {
+                    // Aquí puedes procesar la respuesta del servidor
+                    String responseData = response.body().string();
+                    try {
+                        JSONObject json = new JSONObject(responseData);
+                        // Extraer los datos del JSON
+                        Settings.PLAYER_SPEED = json.getInt("velocidadPersonaje");
+                        Settings.PLAYER_DAMAGE_RECIEVED = (float)json.getDouble("danoPersonaje");
+                        Settings.SPINLOG_ACCEL = Float.parseFloat(json.getString("aceleracionTronco").replace("f", ""));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
         batch = stage.getBatch();
