@@ -110,7 +110,7 @@ public class OptionsScreen implements Screen {
             }
         });
 
-        Music music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/lean.mp3"));
+        Music music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/musica.mp3"));
         Projecte3.audioManager.setMusic(music);
     }
 

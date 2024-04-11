@@ -58,7 +58,7 @@ public class GameScreen implements Screen {
         this.audioManager = audioManager;
         lavaSound = Gdx.audio.newSound(Gdx.files.internal("GameMode/acid.mp3"));
         // Crear la música aquí en lugar de en show()
-        this.music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/lean.mp3"));
+        this.music = Gdx.audio.newMusic(Gdx.files.internal("GameMode/musica.mp3"));
         audioManager.setMusic(music);
 
         shapeRenderer = new ShapeRenderer();
