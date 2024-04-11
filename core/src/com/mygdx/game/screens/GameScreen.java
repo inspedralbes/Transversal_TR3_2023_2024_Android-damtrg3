@@ -12,9 +12,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -41,22 +44,27 @@ import com.badlogic.gdx.graphics.Texture;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 
 import java.util.concurrent.TimeUnit;
 
 
 public class GameScreen implements Screen {
-    private boolean isElapsedTimeSent = false;
-    private long elapsedTimeWhenPlayerDied = 0;
-    private boolean isPlayerAlive = true;
+    private boolean isElapsedTimeSent;
+    private long elapsedTimeWhenPlayerDied;
+    private boolean isPlayerAlive;
     private Label timerLabel;
     private long startTime;
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera;
     private Projecte3 game;
-    private Stage stage = new Stage();
+    private Stage stage;
     private Player player;
     private ShapeRenderer shapeRenderer;
+
     private TiledMapTileLayer plataformaLayer;
     private Sound sound;
     private Label forceLabel;
@@ -76,6 +84,9 @@ public class GameScreen implements Screen {
         audioManager.setMusic(music);
 
         shapeRenderer = new ShapeRenderer();
+        isPlayerAlive = true;
+        elapsedTimeWhenPlayerDied = 0;
+        isElapsedTimeSent = false;
 
         this.game = game;
 
@@ -179,6 +190,7 @@ public class GameScreen implements Screen {
         }
         // Inicializar el sonido de la lava
         Gdx.input.setInputProcessor(new GameInputHandler(player));
+        isPlayerAlive = true;
         Preferences prefs = Gdx.app.getPreferences("MyPreferences");
         float volume = prefs.getFloat("volume", 1.0f); // 1.0f es el valor predeterminado
         boolean musicEnabled = prefs.getBoolean("musicEnabled", true); // true es el valor predeterminado
@@ -194,14 +206,12 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-
         checkCollisions();
         checkInPlatform();
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        camera.update();
         mapRenderer.setView(camera);
         mapRenderer.render();
 
@@ -248,7 +258,7 @@ public class GameScreen implements Screen {
         int playerTileY = (int) (player.getPosition().y / tileSize);
         TiledMapTileLayer.Cell cell = plataformaLayer.getCell(playerTileX, playerTileY);
         if (cell == null) {
-            if(!player.isJumping()){
+            if(!player.isJumping() && isPlayerAlive){
                 player.remove();
                 // Cuando el jugador "muere", detén el cronómetro y guarda el tiempo transcurrido
                 isPlayerAlive = false;
@@ -256,6 +266,7 @@ public class GameScreen implements Screen {
                 //sendScore(player.getScore());
                 // Guardar el tiempo transcurrido cuando el jugador muere
                 elapsedTimeWhenPlayerDied = TimeUtils.timeSinceMillis(startTime);
+                game.setScreen(new soloGameEndedScreen(game, elapsedTimeWhenPlayerDied));
                 // Enviar el tiempo transcurrido al servidor solo si aún no se ha enviado
                 if (!isElapsedTimeSent) {
                     sendElapsedTimeToServer(elapsedTimeWhenPlayerDied);
@@ -329,6 +340,7 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         mapRenderer.dispose();
+        stage.dispose();
     }
 
     public void drawHitboxes(){

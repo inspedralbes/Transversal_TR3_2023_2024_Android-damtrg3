@@ -5,11 +5,13 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -24,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.Settings;
@@ -38,6 +41,8 @@ import java.util.ArrayList;
 public class PerfilScreen implements Screen {
     private Projecte3 game;
     private Stage stage;
+    private OrthogonalTiledMapRenderer mapRenderer;
+    private OrthographicCamera camera;
     private TextButton backButton;
 
     private TextButton guardarCanvisButton;
@@ -56,12 +61,21 @@ public class PerfilScreen implements Screen {
 
     public PerfilScreen(Projecte3 game) {
         this.game = game;
+        camera = new OrthographicCamera(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
+        camera.setToOrtho(false);
+
+        StretchViewport viewport = new StretchViewport(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT, camera);
+        mapRenderer = new OrthogonalTiledMapRenderer(AssetManager.tiledMap);
+        stage = new Stage(viewport);
+        camera.setToOrtho(false, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
+
+        mapRenderer.setView(camera);
+        mapRenderer.render();
     }
 
     @Override
     public void show() {
         batch = new SpriteBatch();
-        stage = new Stage();
         Gdx.input.setInputProcessor(stage);
         setupButtonStyles();
         getInventari(game.nomUsuari);
@@ -142,7 +156,8 @@ public class PerfilScreen implements Screen {
 
         Table wrapperTable = new Table();
         wrapperTable.setSize(750, 880);
-        wrapperTable.setPosition((Gdx.graphics.getWidth() - wrapperTable.getWidth()) / 2, (Gdx.graphics.getHeight() - wrapperTable.getHeight()) / 2);
+        wrapperTable.setPosition((stage.getWidth() - wrapperTable.getWidth()) / 2,
+                (stage.getHeight() - wrapperTable.getHeight()) / 2);
         Texture backgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
         wrapperTable.setBackground(backgroundDrawable);
@@ -257,6 +272,8 @@ public class PerfilScreen implements Screen {
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
 
+        // Actualizar el tamaño del fondo para que se ajuste al nuevo tamaño de la pantalla
+        batch.setProjectionMatrix(camera.combined);
     }
 
     @Override
