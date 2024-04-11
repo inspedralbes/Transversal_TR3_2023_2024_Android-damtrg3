@@ -18,6 +18,8 @@ public class AssetManager {
 
     public static Skin lava_skin;
 
+    public static Skin clean_skin;
+
     public static Texture menu_bg;
 
     public static Texture menu_bg2;
@@ -53,6 +55,7 @@ public class AssetManager {
 
         neon_skin = new Skin(Gdx.files.internal("skins/neon/neon-ui.json"));
         lava_skin = new Skin(Gdx.files.internal("skins/lava/tracer-ui.json"));
+        clean_skin = new Skin(Gdx.files.internal("skins/clean-crispy/clean-crispy-ui.json"));
         white = neon_skin.getRegion("white");
 
 

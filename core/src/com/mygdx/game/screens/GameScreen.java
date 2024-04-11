@@ -1,6 +1,8 @@
 package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -16,7 +18,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.actors.Player;
@@ -25,7 +32,11 @@ import com.mygdx.game.actors.obstacles.SpinLog;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.helpers.GameInputHandler;
 import com.mygdx.game.utils.Settings;
-
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad.TouchpadStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.graphics.Texture;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,17 +65,28 @@ public class GameScreen implements Screen {
 
     private Label forceLabel;
     //private Label scoreLabel;
+    private FitViewport viewport;
+    private Touchpad touchpad;
+    private InputMultiplexer inputMultiplexer;
 
     public GameScreen(Projecte3 game) {
         shapeRenderer = new ShapeRenderer();
 
         this.game = game;
 
-        camera = new OrthographicCamera(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
+        Settings.setHeight(Gdx.graphics.getHeight());
+        Settings.setWidth(Gdx.graphics.getWidth());
+
+        camera = new OrthographicCamera();
+        viewport = new FitViewport(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT, camera);
         camera.setToOrtho(false);
-        StretchViewport viewport = new StretchViewport(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT, camera);
-        stage = new Stage(viewport);
+        camera.update();
+
         mapRenderer = new OrthogonalTiledMapRenderer(AssetManager.tiledMap);
+        mapRenderer.setView(camera);
+        mapRenderer.render();
+
+        stage = new Stage(viewport);
 
         mapRenderer.setView(camera);
         mapRenderer.render();
@@ -87,7 +109,10 @@ public class GameScreen implements Screen {
 
         plataformaLayer = (TiledMapTileLayer) AssetManager.tiledMap.getLayers().get("plataforma");
 
-        Gdx.input.setInputProcessor(new GameInputHandler(player));
+        inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(stage);
+        inputMultiplexer.addProcessor(new GameInputHandler(player));
+        Gdx.input.setInputProcessor(inputMultiplexer);
 
         startTime = TimeUtils.millis();
 
@@ -95,11 +120,54 @@ public class GameScreen implements Screen {
         timerLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         timerLabel.setPosition(10, Gdx.graphics.getHeight() - 30);
         stage.addActor(timerLabel);
+
+        TouchpadStyle touchpadStyle = new TouchpadStyle();
+
+        Drawable touchBackground = AssetManager.clean_skin.getDrawable("touchpad");
+        Drawable touchKnob = AssetManager.clean_skin.getDrawable("touchpad-knob");
+
+        touchpadStyle.background = touchBackground;
+        touchpadStyle.knob = touchKnob;
+
+        touchpad = new Touchpad(10, touchpadStyle);
+        touchpad.setBounds(50, 50, 150, 150);
+
+        touchpad.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                float knobPercentX = touchpad.getKnobPercentX();
+                float knobPercentY = touchpad.getKnobPercentY();
+                player.getDirection().x = knobPercentX;
+                player.getDirection().y = knobPercentY;
+            }
+        });
+
+        stage.addActor(touchpad);
+
+        TextButton jumpButton = new TextButton("Jump", AssetManager.clean_skin);
+        jumpButton.setPosition(Gdx.graphics.getWidth() - 200, 50);
+        jumpButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                player.jump();
+            }
+        });
+        stage.addActor(jumpButton);
+
+        TextButton slashButton = new TextButton("Slash", AssetManager.clean_skin);
+        slashButton.setPosition(Gdx.graphics.getWidth() - 200, 100);
+        slashButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                player.slash();
+            }
+        });
+        stage.addActor(slashButton);
     }
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(new GameInputHandler(player));
+        Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
     @Override
@@ -110,6 +178,7 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        camera.update();
         mapRenderer.setView(camera);
         mapRenderer.render();
 
@@ -214,7 +283,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        stage.getViewport().update(width, height, true);
+        camera.position.set(Settings.SCREEN_WIDTH / 2f, Settings.SCREEN_HEIGHT / 2f, 0);
     }
 
     @Override
