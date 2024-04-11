@@ -223,9 +223,6 @@ public class MultiplayerGameScreen implements Screen {
 
     @Override
     public void show() {
-        if(player.isAlive()){
-            lavaSound.play();
-        }
         Preferences prefs = Gdx.app.getPreferences("MyPreferences");
         float volume = prefs.getFloat("volume", 1.0f); // 1.0f es el valor predeterminado
         boolean musicEnabled = prefs.getBoolean("musicEnabled", true); // true es el valor predeterminado
@@ -526,6 +523,7 @@ public class MultiplayerGameScreen implements Screen {
         MultiPlayerPlayer currentUser = null;
         for(MultiPlayerPlayer player : players){
             if(player.isAlive()){
+                lavaSound.play();
                 ++alive;
                 winner = player;
             }
