@@ -85,7 +85,6 @@ public class GameModeScreen implements Screen {
                 }
             }
         });
-        stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
         batch = stage.getBatch();
@@ -350,6 +349,9 @@ public class GameModeScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
+
+        // Actualizar el tamaño del fondo para que se ajuste al nuevo tamaño de la pantalla
+        batch.setProjectionMatrix(camera.combined);
     }
 
     @Override

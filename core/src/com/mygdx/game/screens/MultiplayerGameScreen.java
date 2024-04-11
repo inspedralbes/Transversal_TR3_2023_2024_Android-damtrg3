@@ -11,8 +11,10 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -24,11 +26,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
@@ -70,6 +76,8 @@ public class MultiplayerGameScreen implements Screen {
     private BitmapFont font;
     private SpriteBatch batch;
     private TextButton playAgainButton, endGameButton;
+
+    private Table popupTable;
     private boolean scoreSent;
     private boolean leftPressed, rightPressed, upPressed, downPressed;
     private String[] jugadorsIn;
@@ -176,10 +184,28 @@ public class MultiplayerGameScreen implements Screen {
             }
         }
 
-        playAgainButton = new TextButton("Play Again", AssetManager.neon_skin);
-        playAgainButton.setPosition(Settings.SCREEN_WIDTH / 2 - playAgainButton.getWidth() / 2, Settings.SCREEN_HEIGHT / 2 - playAgainButton.getHeight() / 2);
+
+        popupTable = new Table();
+        popupTable.setSize(350, 320);
+        popupTable.setVisible(false); // Inicialmente, hacer que la tabla no sea visible
+
+        // Establecer la posición del pop-up en el centro de la pantalla
+        popupTable.setPosition((stage.getWidth() - popupTable.getWidth()) / 2,
+                (stage.getHeight() - popupTable.getHeight()) / 2);
+
+        popupTable.center();
+
+
+        Texture popupBackgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
+        TextureRegionDrawable popupBackgroundDrawable = new TextureRegionDrawable(new TextureRegion(popupBackgroundTexture));
+        popupTable.setBackground(popupBackgroundDrawable);
+
+
+        playAgainButton = new TextButton("Play Again", AssetManager.lava_skin);
+        playAgainButton.setPosition((stage.getWidth() - playAgainButton.getWidth()) / 2,
+                (stage.getHeight() - playAgainButton.getHeight()) / 2);
+
         playAgainButton.setVisible(false);
-        stage.addActor(playAgainButton);
         playAgainButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -204,8 +230,9 @@ public class MultiplayerGameScreen implements Screen {
             }
         });
 
-        endGameButton = new TextButton("End Game", AssetManager.neon_skin);
-        endGameButton.setPosition(Settings.SCREEN_WIDTH / 2 - endGameButton.getWidth() / 2, Settings.SCREEN_HEIGHT / 2 - endGameButton.getHeight() / 2 - 100);
+        endGameButton = new TextButton("End Game", AssetManager.lava_skin);
+        endGameButton.setPosition((stage.getWidth() - playAgainButton.getWidth()) / 2,
+                (stage.getHeight() - playAgainButton.getHeight()) / 2);
         endGameButton.setVisible(false);
         stage.addActor(endGameButton);
         endGameButton.addListener(new ClickListener() {
@@ -224,6 +251,12 @@ public class MultiplayerGameScreen implements Screen {
                 }
             }
         });
+
+        popupTable.add(playAgainButton).pad(10); // Add some padding around the button
+        popupTable.row(); // Move to the next row
+        popupTable.add(endGameButton).pad(10); // Add some padding around the button
+
+        stage.addActor(popupTable);
 
         Touchpad.TouchpadStyle touchpadStyle = new Touchpad.TouchpadStyle();
 
@@ -287,7 +320,7 @@ public class MultiplayerGameScreen implements Screen {
 
         TextButton jumpButton = new TextButton("Jump", AssetManager.clean_skin);
         jumpButton.setSize(200, 100);
-        jumpButton.setPosition(Gdx.graphics.getWidth() - 300, 50);
+        jumpButton.setPosition(viewport.getWorldWidth() - 300, 180);
         jumpButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -316,7 +349,7 @@ public class MultiplayerGameScreen implements Screen {
 
         TextButton slashButton = new TextButton("Slash", AssetManager.clean_skin);
         slashButton.setSize(200, 100);
-        slashButton.setPosition(Gdx.graphics.getWidth() - 300, 200);
+        slashButton.setPosition(viewport.getWorldWidth() - 300, 50); // Bajar el botón de slas
         slashButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -628,7 +661,7 @@ public class MultiplayerGameScreen implements Screen {
         stage.act(delta);
         stage.draw();
 
-        drawHitboxes();
+        //drawHitboxes();
 
         batch.begin();
         for(MultiPlayerPlayer player : players){
@@ -665,6 +698,7 @@ public class MultiplayerGameScreen implements Screen {
 
             ganadorRonda = winner;
             if(currentUser.getUser().equals(creadorSala)){
+                popupTable.setVisible(true);
                 playAgainButton.setVisible(true);
                 endGameButton.setVisible(true);
             }
@@ -798,7 +832,16 @@ public class MultiplayerGameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        // Update the stage's viewport to the new screen size
+        stage.getViewport().update(width, height, true);
 
+        // Update the size and position of the playAgainButton's hitbox
+        playAgainButton.setSize(playAgainButton.getWidth(), playAgainButton.getHeight());
+        playAgainButton.setPosition(playAgainButton.getX(), playAgainButton.getY());
+
+        // Update the size and position of the endGameButton's hitbox
+        endGameButton.setSize(endGameButton.getWidth(), endGameButton.getHeight());
+        endGameButton.setPosition(endGameButton.getX(), endGameButton.getY());
     }
 
     @Override
@@ -818,10 +861,22 @@ public class MultiplayerGameScreen implements Screen {
 
     @Override
     public void dispose() {
-        mapRenderer.dispose();
-        font.dispose();
-        batch.dispose();
-        stage.dispose();
+        if (mapRenderer != null) {
+            mapRenderer.dispose();
+            mapRenderer = null;
+        }
+        if (font != null) {
+            font.dispose();
+            font = null;
+        }
+        if (batch != null) {
+            batch.dispose();
+            batch = null;
+        }
+        if (stage != null) {
+            stage.dispose();
+            stage = null;
+        }
         MenuSalasScreen.socket.off("key_down");
         MenuSalasScreen.socket.off("key_up");
         MenuSalasScreen.socket.off("update_positions");
@@ -830,7 +885,7 @@ public class MultiplayerGameScreen implements Screen {
         MenuSalasScreen.socket.off("player_dead");
         MenuSalasScreen.socket.off("PLAY_AGAIN");
     }
-    public void drawHitboxes(){
+    /*public void drawHitboxes(){
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         for(Actor actor : stage.getActors()){
             if (actor instanceof Player){
@@ -845,6 +900,6 @@ public class MultiplayerGameScreen implements Screen {
             }
         }
         shapeRenderer.end();
-    }
+    }*/
 
 }

@@ -3,8 +3,10 @@ package com.mygdx.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -12,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.Settings;
@@ -31,10 +34,22 @@ public class GameEndedScreen implements Screen {
 
     private Projecte3 game;
     private Stage stage;
+    private OrthographicCamera camera;
+
+    private OrthogonalTiledMapRenderer mapRenderer;
 
     public GameEndedScreen(Projecte3 game) {
         this.game = game;
-        this.stage = new Stage();
+        camera = new OrthographicCamera(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
+        camera.setToOrtho(false);
+
+        StretchViewport viewport = new StretchViewport(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT, camera);
+        mapRenderer = new OrthogonalTiledMapRenderer(AssetManager.tiledMap);
+        stage = new Stage(viewport);
+        camera.setToOrtho(false, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
+
+        mapRenderer.setView(camera);
+        mapRenderer.render();
 
         fetchAndDisplayLobbyRanking();
     }
@@ -104,7 +119,8 @@ public class GameEndedScreen implements Screen {
 
         Table rankingsTable = new Table(); // Table para envolver los campos
         rankingsTable.setSize(700, 820); // Establece el tamaño deseado para la tabla
-        rankingsTable.setPosition((Gdx.graphics.getWidth() - rankingsTable.getWidth()) / 2, (Gdx.graphics.getHeight() - rankingsTable.getHeight()) / 2); // Centra la tabla en l
+        rankingsTable.setPosition((stage.getWidth() - rankingsTable.getWidth()) / 2,
+                (stage.getHeight() - rankingsTable.getHeight()) / 2);
 
         Texture backgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
@@ -131,6 +147,8 @@ public class GameEndedScreen implements Screen {
         }
 
         TextButton returnButton = new TextButton("Menu principal", AssetManager.lava_skin);
+        returnButton.setPosition((stage.getWidth() - returnButton.getWidth()) / 2,
+                (stage.getHeight() - returnButton.getHeight()) / 2);
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -166,7 +184,7 @@ public class GameEndedScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        stage.getViewport().update(width, height, true);
     }
 
     @Override

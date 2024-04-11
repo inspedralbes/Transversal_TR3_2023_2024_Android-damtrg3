@@ -90,8 +90,8 @@ public class GameScreen implements Screen {
 
         this.game = game;
 
-        Settings.setHeight(Gdx.graphics.getHeight());
-        Settings.setWidth(Gdx.graphics.getWidth());
+        //Settings.setHeight(Gdx.graphics.getHeight());
+        //Settings.setWidth(Gdx.graphics.getWidth());
 
         camera = new OrthographicCamera();
         viewport = new FitViewport(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT, camera);
@@ -106,6 +106,7 @@ public class GameScreen implements Screen {
 
         mapRenderer.setView(camera);
         mapRenderer.render();
+
 
         SpinLog spinLog = new SpinLog();
         stage.addActor(spinLog);
@@ -162,7 +163,7 @@ public class GameScreen implements Screen {
 
         TextButton jumpButton = new TextButton("Jump", AssetManager.clean_skin);
         jumpButton.setSize(200, 100);
-        jumpButton.setPosition(Gdx.graphics.getWidth() - 300, 50);
+        jumpButton.setPosition(viewport.getWorldWidth() - 300, 180); // Bajar el botón de salto Posición relativa al ancho y alto del viewport
         jumpButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -173,7 +174,7 @@ public class GameScreen implements Screen {
 
         TextButton slashButton = new TextButton("Slash", AssetManager.clean_skin);
         slashButton.setSize(200, 100);
-        slashButton.setPosition(Gdx.graphics.getWidth() - 300, 200);
+        slashButton.setPosition(viewport.getWorldWidth() - 300, 50); // Bajar el botón de slash
         slashButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -223,7 +224,7 @@ public class GameScreen implements Screen {
         stage.act(delta);
         stage.draw();
 
-        drawHitboxes();
+        //drawHitboxes();
 
         if (isPlayerAlive) {
             long timeElapsedMillis = TimeUtils.timeSinceMillis(startTime);
@@ -343,7 +344,7 @@ public class GameScreen implements Screen {
         stage.dispose();
     }
 
-    public void drawHitboxes(){
+    /*public void drawHitboxes(){
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         for(Actor actor : stage.getActors()){
             if (actor instanceof Player){
@@ -358,7 +359,7 @@ public class GameScreen implements Screen {
             }
         }
         shapeRenderer.end();
-    }
+    }*/
 
     /*public void sendScore(float score){
         final String URL = "http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/score";
