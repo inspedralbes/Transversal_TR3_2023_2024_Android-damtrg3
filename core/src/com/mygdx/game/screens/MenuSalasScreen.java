@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.Settings;
@@ -60,8 +61,11 @@ public class MenuSalasScreen implements Screen {
 
     public MenuSalasScreen(Projecte3 game) {
         this.game = game;
-        camera = new OrthographicCamera();
-        mapRenderer = new OrthogonalTiledMapRenderer(AssetManager.tiledMap);
+        camera = new OrthographicCamera(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
+        camera.setToOrtho(false);
+
+        StretchViewport viewport = new StretchViewport(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT, camera);
+        stage = new Stage(viewport);
         camera.setToOrtho(false, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
 
         try {
@@ -70,20 +74,20 @@ public class MenuSalasScreen implements Screen {
             throw new RuntimeException(e);
         }
 
-        mapRenderer.setView(camera);
-        mapRenderer.render();
+        //mapRenderer.setView(camera);
+        //mapRenderer.render();
     }
     @Override
     public void show() {
 
-        stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
         batch = stage.getBatch();
 
         Table wrapperTable = new Table(); // Table para envolver los campos
         wrapperTable.setSize(500, 680); // Establece el tamaño deseado para la tabla
-        wrapperTable.setPosition((Gdx.graphics.getWidth() - wrapperTable.getWidth()) / 2, (Gdx.graphics.getHeight() - wrapperTable.getHeight()) / 2); // Centra la tabla en la pantalla
+        wrapperTable.setPosition((stage.getWidth() - wrapperTable.getWidth()) / 2,
+                (stage.getHeight() - wrapperTable.getHeight()) / 2);
 
         Texture backgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
@@ -176,6 +180,9 @@ public class MenuSalasScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
+
+        // Actualizar el tamaño del fondo para que se ajuste al nuevo tamaño de la pantalla
+        batch.setProjectionMatrix(camera.combined);
     }
 
     @Override
