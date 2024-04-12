@@ -112,9 +112,9 @@ public class GameScreen implements Screen {
         stage.addActor(spinLog);
 
         // Crear la etiqueta de fuerza y añadirla al escenario
-        forceLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        forceLabel.setPosition(10, Gdx.graphics.getHeight() - 10);
-        stage.addActor(forceLabel);
+        //forceLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        //forceLabel.setPosition(10, viewport.getWorldHeight() - forceLabel.getHeight() - 10);
+        //stage.addActor(forceLabel);
 
         /*scoreLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         scoreLabel.setPosition(10, Gdx.graphics.getHeight() - 30);
@@ -135,7 +135,7 @@ public class GameScreen implements Screen {
 
         // Crear la etiqueta del cronómetro y añadirla al escenario
         timerLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        timerLabel.setPosition(10, Gdx.graphics.getHeight() - 30);
+        timerLabel.setPosition(10, viewport.getWorldHeight() - timerLabel.getHeight() - 10);
         stage.addActor(timerLabel);
 
         TouchpadStyle touchpadStyle = new TouchpadStyle();
@@ -216,8 +216,8 @@ public class GameScreen implements Screen {
         mapRenderer.setView(camera);
         mapRenderer.render();
 
-        float currentForce = player.getPushForce(); // La fuerza actual es igual a pushForce
-        forceLabel.setText("Fuerza: " + currentForce); // Muestra la fuerza directamente
+        //float currentForce = player.getPushForce(); // La fuerza actual es igual a pushForce
+        //forceLabel.setText("Fuerza: " + currentForce); // Muestra la fuerza directamente
 
         //scoreLabel.setText("Puntuación: " + player.getScore());
 
