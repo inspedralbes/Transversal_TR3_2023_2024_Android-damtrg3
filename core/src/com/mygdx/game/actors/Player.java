@@ -153,7 +153,7 @@ public class Player extends Actor {
     }
 
     public void jump() {
-        if (!jumping && jumpCooldown >= 1) {
+        if (!jumping && jumpCooldown >= 0.1) {
             jumping = true;
             originalY = position.y;
             jumpStartTime = stateTime;
