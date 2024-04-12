@@ -229,10 +229,10 @@ public class PerfilScreen implements Screen {
     private void cargarTexturasPersonaje() {
         switch (game.Skin) {
             case 1:
-                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite2.png"));
+                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite1.png"));
                 break;
             case 2:
-                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite1.png"));
+                game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite2.png"));
                 break;
             case 3:
                 game.cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite3.png"));
