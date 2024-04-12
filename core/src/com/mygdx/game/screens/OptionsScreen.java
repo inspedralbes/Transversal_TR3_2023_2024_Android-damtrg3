@@ -38,6 +38,8 @@ public class OptionsScreen implements Screen {
     private OrthographicCamera camera;
 
     private OrthogonalTiledMapRenderer mapRenderer;
+
+
     public class AudioManager {
         private Music music;
         private boolean isMusicEnabled = true;
@@ -74,6 +76,22 @@ public class OptionsScreen implements Screen {
     private AudioManager audioManager = new AudioManager();
     public OptionsScreen(Projecte3 game) {
         this.game = game;
+        volumeSlider = new Slider(0, 1, 0.01f, false, AssetManager.lava_skin);
+        musicCheckBox = new CheckBox("Music On/Off", AssetManager.lava_skin);
+
+        // Cargar las preferencias
+        Preferences prefs = Gdx.app.getPreferences("MyPreferences");
+
+        // Comprobar si las preferencias contienen los valores que necesitamos
+        if (prefs.contains("volume")) {
+            float volume = prefs.getFloat("volume");
+            volumeSlider.setValue(volume); // Establecer el valor del slider
+        }
+
+        if (prefs.contains("musicEnabled")) {
+            boolean isMusicEnabled = prefs.getBoolean("musicEnabled");
+            musicCheckBox.setChecked(isMusicEnabled); // Establecer el estado del checkbox
+        }
         camera = new OrthographicCamera(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
         camera.setToOrtho(false);
 
@@ -105,17 +123,14 @@ public class OptionsScreen implements Screen {
         Table contentTable = new Table(); // Table para los campos de entrada y botones
         contentTable.center();
 
-        toggleMusicButton = new TextButton("Toggle Music", AssetManager.lava_skin);
-        volumeSlider = new Slider(0, 1, 0.01f, false, AssetManager.lava_skin);
         backButton = new TextButton("Back", AssetManager.lava_skin);
-        musicCheckBox = new CheckBox("Music On/Off", AssetManager.lava_skin);
 
         // Agrega los actores al contentTable
         contentTable.add(toggleMusicButton).pad(10);
         contentTable.row();
-        contentTable.add(volumeSlider).pad(10);
-        contentTable.row();
         contentTable.add(musicCheckBox).pad(10);
+        contentTable.row();
+        contentTable.add(volumeSlider).pad(10);
         contentTable.row();
         contentTable.add(backButton).pad(10);
 
@@ -123,12 +138,6 @@ public class OptionsScreen implements Screen {
         wrapperTable.add(contentTable).center(); // Agrega el Table de contenido dentro del Table de envoltura
 
         stage.addActor(wrapperTable); // Agrega el Table de envoltura al Stage
-        toggleMusicButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Projecte3.audioManager.toggleMusic();
-            }
-        });
 
         volumeSlider.addListener(new ChangeListener() {
             @Override
