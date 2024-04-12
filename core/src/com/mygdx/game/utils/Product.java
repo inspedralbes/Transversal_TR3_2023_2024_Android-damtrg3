@@ -48,5 +48,14 @@ public class Product {
     public void setImage_1920(String image_1920) {
         this.image_1920 = image_1920;
     }
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", list_price=" + list_price +
+                ", image_1920='" + image_1920 + '\'' +
+                '}';
+    }
 
 }

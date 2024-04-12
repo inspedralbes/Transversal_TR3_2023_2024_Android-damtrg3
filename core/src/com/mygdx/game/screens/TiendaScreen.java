@@ -4,20 +4,25 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.ApiService;
@@ -51,6 +56,9 @@ public class TiendaScreen implements Screen {
     private ApiService apiService;
     private static final String BASE_URL = "http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/";
     private Table productsTable;;
+
+    private OrthogonalTiledMapRenderer mapRenderer;
+    private OrthographicCamera camera;
     private Batch batch;
     private Label moneyLabel;
     private int playerMoney;
@@ -66,6 +74,18 @@ public class TiendaScreen implements Screen {
                 .build();
         apiService = retrofit.create(ApiService.class);
         productsTable = new Table();
+
+        this.game = game;
+        camera = new OrthographicCamera(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
+        camera.setToOrtho(false);
+
+        StretchViewport viewport = new StretchViewport(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT, camera);
+        mapRenderer = new OrthogonalTiledMapRenderer(AssetManager.tiledMap);
+        stage = new Stage(viewport);
+        camera.setToOrtho(false, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
+
+        mapRenderer.setView(camera);
+        mapRenderer.render();
     }
 
     @Override
@@ -73,29 +93,43 @@ public class TiendaScreen implements Screen {
         // Crear un nuevo SpriteBatch
         batch = new SpriteBatch();
 
-        stage = new Stage(); // Initialize stage first
         Gdx.input.setInputProcessor(stage); // Set InputProcessor after stage initialization
 
         Table wrapperTable = new Table(); // Table para envolver los campos
-        wrapperTable.setSize(750, 880); // Establece el tamaño deseado para la tabla
-        wrapperTable.setPosition((Gdx.graphics.getWidth() - wrapperTable.getWidth()) / 2, (Gdx.graphics.getHeight() - wrapperTable.getHeight()) / 2); // Centra la tabla en la pantalla
-
+        wrapperTable.setSize(750, 900); // Establece el tamaño deseado para la tabla
+        wrapperTable.setPosition((stage.getWidth() - wrapperTable.getWidth()) / 2,
+                (stage.getHeight() - wrapperTable.getHeight()) / 2);
         Texture backgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
         wrapperTable.setBackground(backgroundDrawable);
 
         Table contentTable = new Table(); // Table para los campos de entrada y botones
-        contentTable.pad(20); // Agrega un relleno de 20 píxeles alrededor del contenido
+        contentTable.center();
 
         //----------------------------- Label Dinero --------------------------------
 
-        noMoneyLabel = new Label("No tens prou diners", AssetManager.lava_skin);
-        contentTable.add(noMoneyLabel).align(Align.top).pad(10);
+        noMoneyLabel = new Label("Credit insuficient !!!", AssetManager.lava_skin);
         noMoneyLabel.setVisible(false);
         stage.addActor(noMoneyLabel);
 
-        moneyLabel = new Label("Diners: ", AssetManager.lava_skin);
-        contentTable.add(moneyLabel).align(Align.top).pad(10);
+        // Load the image for the button
+        Texture myButtonTexture = new Texture(Gdx.files.internal("GameMode/torna.png"));
+
+// Create a Drawable from the Texture
+        Drawable myButtonDrawable = new TextureRegionDrawable(new TextureRegion(myButtonTexture));
+
+// Create the ImageButton
+        ImageButton myButton = new ImageButton(myButtonDrawable);
+
+        myButton.getStyle().imageUp.setMinWidth(30);
+        myButton.getStyle().imageUp.setMinHeight(30);
+
+        moneyLabel = new Label("Credit total: ", AssetManager.lava_skin);
+        contentTable.add(myButton).padRight(400);
+        contentTable.row();
+        contentTable.add(moneyLabel);
+        contentTable.row();
+        contentTable.add(noMoneyLabel).padBottom(10);
 
         Call<Double> userMoneyCall = apiService.getUserMoney(game.nomUsuari);
         userMoneyCall.enqueue(new Callback<Double>() {
@@ -107,7 +141,7 @@ public class TiendaScreen implements Screen {
                     Gdx.app.postRunnable(new Runnable() {
                         @Override
                         public void run() {
-                            moneyLabel.setText("Diners: " + money);
+                            moneyLabel.setText("Credit Total: " + money);
                         }
                     });
                 } else {
@@ -123,22 +157,25 @@ public class TiendaScreen implements Screen {
 
         //----------------------------- Button Enrere --------------------------------
 
-        backButton = new TextButton("Enrere", AssetManager.lava_skin);
-
-        backButton.addListener(new ClickListener() {
+        myButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new GameModeScreen(game));
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        game.setScreen(new GameModeScreen(game));
+                    }
+                });
             }
         });
+
 
         //----------------------------- Button Guardar Canvis --------------------------------
 
         //Elements al table
-        contentTable.add(backButton).pad(10);
 
 
-        wrapperTable.add(contentTable).center(); // Agrega el Table de contenido dentro del Table de envoltura
+        wrapperTable.add(contentTable); // Agrega el Table de contenido dentro del Table de envoltura
 
         //Obtenir els productes que té l'usuari
         Call<List<Integer>> userProductsCall = apiService.getUserProducts(game.nomUsuari);
@@ -169,6 +206,9 @@ public class TiendaScreen implements Screen {
             public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
                 if (response.isSuccessful()) {
                     List<Product> products = response.body();
+                    for (Product product : products) {
+                        System.out.println(product);
+                    }
                     Iterator<Product> iterator = products.iterator();
                     while (iterator.hasNext()) {
                         Product product = iterator.next();
@@ -192,19 +232,23 @@ public class TiendaScreen implements Screen {
                                 public void run() {
                                     // Crea una imagen a partir del Pixmap
                                     Texture texture = new Texture(pixmap);
-                                    Image productImage = new Image(texture);
+                                    TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(texture));
+                                    drawable.setMinWidth(100);
+                                    drawable.setMinHeight(100);
+                                    Image productImage = new Image(drawable);
+
 
                                     // Crea una tabla para cada producto
                                     Table productTable = new Table();
-                                    productTable.add(productLabel).padBottom(10); // Agrega el nombre del producto a la tabla del producto
+                                    productTable.add(productLabel).padBottom(5); // Agrega el nombre del producto a la tabla del producto
                                     productTable.row(); // Crea una nueva fila en la tabla del producto
-                                    productTable.add(productImage).padBottom(10); // Agrega la imagen del producto a la tabla del producto
+                                    productTable.add(productImage).padBottom(5); // Agrega la imagen del producto a la tabla del producto
                                     productTable.row(); // Crea una nueva fila en la tabla del producto
                                     productTable.add(productPrice); // Agrega el precio del producto a la tabla del producto
                                     productTable.row(); // Crea una nueva fila en la tabla del producto
                                     productTable.add(productId);
                                     // Agrega la tabla del producto a la tabla de productos
-                                    productsTable.add(productTable).pad(10);
+                                    productsTable.add(productTable).pad(5);
 
                                     // Añade un oyente de clics al producto
                                     productTable.addListener(new ClickListener() {
@@ -222,7 +266,9 @@ public class TiendaScreen implements Screen {
                     }
 
                     // Agrega productsTable a contentTable
+                    contentTable.row();
                     contentTable.add(productsTable);
+
                 } else {
                     Gdx.app.error("ERROR", "No se pudieron obtener los productos");
                 }
@@ -243,14 +289,16 @@ public class TiendaScreen implements Screen {
         batch.draw(AssetManager.menu_bg2, 0, 0, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
         batch.end();
 
-        stage.act(delta);
         stage.draw();
+        stage.act(delta);
     }
 
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
 
+        // Actualizar el tamaño del fondo para que se ajuste al nuevo tamaño de la pantalla
+        batch.setProjectionMatrix(camera.combined);
     }
 
     @Override
