@@ -100,10 +100,10 @@ public class MultiPlayerPlayer extends Player{
         Texture cat_spritesheet;
         switch (this.skin) {
             case 1:
-                cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite2.png"));
+                cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite1.png"));
                 break;
             case 2:
-                cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite1.png"));
+                cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite2.png"));
                 break;
             case 3:
                 cat_spritesheet = new Texture(Gdx.files.internal("characters/Sprite3.png"));
