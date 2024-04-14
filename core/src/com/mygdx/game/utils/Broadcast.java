@@ -101,7 +101,7 @@ public class Broadcast {
             messageTime += deltaTime; // Incrementa el contador de tiempo
 
             // Si el contador es menor o igual a 5 segundos
-            if (messageTime <= 5) {
+            if (messageTime <= 10) {
                 // Dibuja el pop-up
                 popupTable.draw(batch, 1);
             } else {

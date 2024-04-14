@@ -18,7 +18,7 @@ public class Settings {
 
     //INFO IPS
 
-    public static final String IP_SERVER = "localhost";
+    public static final String IP_SERVER = "grup3joc.dam.inspedralbes.cat";
     //public static final String IP_SERVER = "10.0.2.2";
 
     public static final String PUERTO_PETICIONES = "3327";
