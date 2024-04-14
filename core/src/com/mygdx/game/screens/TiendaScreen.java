@@ -245,8 +245,7 @@ public class TiendaScreen implements Screen {
                                     productTable.add(productImage).padBottom(5); // Agrega la imagen del producto a la tabla del producto
                                     productTable.row(); // Crea una nueva fila en la tabla del producto
                                     productTable.add(productPrice); // Agrega el precio del producto a la tabla del producto
-                                    productTable.row(); // Crea una nueva fila en la tabla del producto
-                                    productTable.add(productId);
+
                                     // Agrega la tabla del producto a la tabla de productos
                                     productsTable.add(productTable).pad(5);
 
