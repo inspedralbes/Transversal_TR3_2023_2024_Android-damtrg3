@@ -255,7 +255,7 @@ public class TiendaScreen implements Screen {
                                         @Override
                                         public void clicked(InputEvent event, float x, float y) {
                                             // Cuando se hace clic en el producto, compra el producto
-                                            buyProduct(product.getId(), game.nomUsuari,product.getList_price());
+                                            showConfirmationPopup(product);
                                         }
                                     });
                                 }
@@ -280,6 +280,7 @@ public class TiendaScreen implements Screen {
             }
         });
     }
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -341,6 +342,57 @@ public class TiendaScreen implements Screen {
             return null;
         }
     }
+
+    private void showConfirmationPopup(Product product) {
+        // Crear una tabla para contener los elementos del pop-up
+        Table popupTable = new Table();
+        popupTable.setSize(400, 320);
+
+        // Agregar elementos al pop-up, como mensaje de confirmación y botones
+        Label confirmationLabel = new Label("¿Confirmar la compra de " + product.getName() + "?", AssetManager.lava_skin);
+        TextButton confirmButton = new TextButton("Confirmar", AssetManager.lava_skin);
+        TextButton cancelButton = new TextButton("Cancelar", AssetManager.lava_skin);
+
+        popupTable.setPosition((stage.getWidth() - popupTable.getWidth()) / 2,
+                (stage.getHeight() - popupTable.getHeight()) / 2.5f);
+        Texture popupBackgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
+        TextureRegionDrawable popupBackgroundDrawable = new TextureRegionDrawable(new TextureRegion(popupBackgroundTexture));
+        popupTable.setBackground(popupBackgroundDrawable);
+
+        // Agregar listeners a los botones
+        confirmButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // Ocultar el pop-up al confirmar la compra
+                popupTable.setVisible(false);
+                // Realizar la compra del producto
+                buyProduct(product.getId(), game.nomUsuari, product.getList_price());
+            }
+        });
+
+        cancelButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // Ocultar el pop-up al cancelar la compra
+                popupTable.setVisible(false);
+            }
+        });
+
+        // Agregar elementos al pop-up
+        popupTable.add(confirmationLabel).colspan(2).padBottom(10).row();
+        popupTable.add(confirmButton).padRight(20);
+        popupTable.add(cancelButton);
+
+        // Establecer la posición del pop-up en el centro de la pantalla
+        popupTable.setPosition((stage.getWidth() - popupTable.getWidth()) / 2,
+                (stage.getHeight() - popupTable.getHeight()) / 2);
+
+        // Agregar el pop-up a la etapa
+        stage.addActor(popupTable);
+
+        // Hacer visible el pop-up
+        popupTable.setVisible(true);
+    }
     public void buyProduct(int productId, String username, double listPrice) {
         if(playerMoney < listPrice){
             noMoneyLabel.setVisible(true);
@@ -360,6 +412,12 @@ public class TiendaScreen implements Screen {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     playerMoney -= listPrice;
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            game.setScreen(new TiendaScreen(game));
+                        }
+                    });
                 }
             }
 
