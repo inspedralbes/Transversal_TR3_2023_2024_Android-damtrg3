@@ -277,6 +277,7 @@ public class MenuSalasScreen implements Screen {
                                 @Override
                                 public void run() {
                                     System.out.println("Sala creada!");
+                                    socket.emit("unirSala", salaId);
                                     game.setScreen(new SalasScreen(game));
                                 }
                             });
