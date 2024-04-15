@@ -20,6 +20,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Projecte3;
 import com.mygdx.game.helpers.AssetManager;
 import com.mygdx.game.utils.ApiService;
@@ -47,12 +49,21 @@ public class RegisterScreen implements Screen {
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera;
     private ApiService apiService;
+
+    private FitViewport viewport;
     private static final String URL = "http://" + Settings.IP_SERVER + ":" + Settings.PUERTO_PETICIONES + "/";
     public RegisterScreen(Projecte3 game) {
         this.game = game;
-        camera = new OrthographicCamera();
+
+        camera = new OrthographicCamera(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
+        camera.setToOrtho(false);
+
+        StretchViewport viewport = new StretchViewport(Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT, camera);
         mapRenderer = new OrthogonalTiledMapRenderer(AssetManager.tiledMap);
+        stage = new Stage(viewport);
         camera.setToOrtho(false, Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT);
+
+
 
         mapRenderer.setView(camera);
         mapRenderer.render();
@@ -61,14 +72,14 @@ public class RegisterScreen implements Screen {
 
     @Override
     public void show() {
-        stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
         batch = stage.getBatch();
 
         Table wrapperTable = new Table(); // Table para envolver los campos
         wrapperTable.setSize(550, 750); // Establece el tamaño deseado para la tabla
-        wrapperTable.setPosition((Gdx.graphics.getWidth() - wrapperTable.getWidth()) / 2, (Gdx.graphics.getHeight() - wrapperTable.getHeight()) / 2); // Centra la tabla en la pantalla
+        wrapperTable.setPosition((stage.getWidth() - wrapperTable.getWidth()) / 2,
+                (stage.getHeight() - wrapperTable.getHeight()) / 2);
 
         Texture backgroundTexture = new Texture(Gdx.files.internal("frame6.png"));
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(backgroundTexture));
