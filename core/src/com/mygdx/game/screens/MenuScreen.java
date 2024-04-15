@@ -40,7 +40,7 @@ public class MenuScreen implements Screen {
         unJugadorButton.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new GameScreen(game));
+                game.setScreen(new GameScreen(game, Projecte3.audioManager));
             }
         });
 
@@ -87,6 +87,6 @@ public class MenuScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        stage.dispose();
     }
 }
